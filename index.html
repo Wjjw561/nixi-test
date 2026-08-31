@@ -38,7 +38,7 @@ button{cursor:pointer}
 .mascot-frame{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(145deg,var(--card),var(--soft));border:1px solid var(--line);overflow:hidden}
 .companion-choice .mascot-frame{width:74px;height:74px;margin-bottom:9px}
 .companion-big-avatar{overflow:hidden}.companion-big-avatar .mascot-art{width:76px;height:76px}
-@media(max-width:760px){.hero-layout{grid-template-columns:1fr}.hero-visual{min-height:300px}.hero-dashboard{width:58%}.hero-mascot{width:138px;height:138px}}
+@media(max-width:760px){.score-structure-grid{grid-template-columns:1fr 1fr}.conclusion-grid{grid-template-columns:1fr 1fr}.hero-layout{grid-template-columns:1fr}.hero-visual{min-height:300px}.hero-dashboard{width:58%}.hero-mascot{width:138px;height:138px}}
 .hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--soft);font-size:12px;color:var(--muted)}
 .stepbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
@@ -110,7 +110,7 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .dash-buddy-art .mascot-art{width:66px;height:66px}
 .state-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:10px;color:var(--muted);font-weight:800}
 @media(max-width:760px){.dashboard-strip{grid-template-columns:1fr 1fr}.dashboard-strip .dash-card:first-child{grid-column:1/-1}}
-@media(max-width:430px){.dashboard-strip{grid-template-columns:1fr}.dashboard-strip .dash-card:first-child{grid-column:auto}}
+@media(max-width:430px){.score-structure-grid,.conclusion-grid{grid-template-columns:1fr}.dashboard-strip{grid-template-columns:1fr}.dashboard-strip .dash-card:first-child{grid-column:auto}}
 .eyebrow{font-size:11px;letter-spacing:.12em;font-weight:900;color:var(--muted)}
 .result-title{font-size:38px;line-height:1.1;margin:8px 0 10px;letter-spacing:-1px}
 .result-sub{color:var(--muted);line-height:1.7;max-width:760px}
@@ -1073,6 +1073,69 @@ function loadBuddyMissions(){
   return [false,false,false];
 }
 function saveBuddyMissions(){try{localStorage.setItem(missionStorageKey(),JSON.stringify(buddyMissionDone));}catch(e){}}
+function dominantIssue(ranked){
+  var counts={};
+  ranked.slice(0,Math.min(4,ranked.length)).forEach(function(x){counts[x.issue]=(counts[x.issue]||0)+(x.priority||1);});
+  var best="base",score=-1;
+  Object.keys(counts).forEach(function(k){if(counts[k]>score){score=counts[k];best=k;}});
+  return best;
+}
+function profileName(c,problem,ranked){
+  var level=c.rate<.52?"基础重建":c.rate<.68?"中段提分":c.rate<.82?"冲高进阶":"高分精修";
+  var structure=c.bias>.24?"偏科明显":c.bias>.13?"轻度偏科":"科目均衡";
+  return level+" · "+structure;
+}
+function profileSummary(c,problem,ranked){
+  var top=ranked[0],issue=issueLabel(dominantIssue(ranked));
+  if(c.pressure==="很高"||c.pressure==="较高")return "你的核心矛盾是“目标较紧 + "+top.name+"存在明显提分空间”。先拆阶段目标，比同时追全部分差更稳妥。";
+  if(c.bias>.24)return "你的总分被科目差距拉开。当前优先解决 "+top.name+"，比给所有科目平均加时间更有价值。";
+  if(c.rate>.82)return "你的基础并不弱，真正的损失更可能来自 "+issue+"、速度和稳定性，而不是知识面不够。";
+  return "你已经有可用基础，主要问题是提分资源没有集中到最有回报的位置；优先处理 "+top.name+" 和 "+issue+"。";
+}
+function scoreBand(s){
+  if(s.gap<=0)return "守住即可";
+  if(s.rate<.55)return "先回收基础分";
+  if(s.rate<.75)return "主攻基础+中档";
+  return "精修稳定性";
+}
+function suggestedRange(s){
+  if(s.gap<=0)return [0,0];
+  var low=Math.max(1,Math.round(s.gap*.3));
+  var factor=s.rate<.55?.65:s.rate<.75?.55:.42;
+  if(s.issue==="careless"||s.issue==="unstable")factor=Math.min(.7,factor+.1);
+  var high=Math.max(low,Math.min(s.gap,Math.round(s.gap*factor)));
+  return [low,high];
+}
+function renderScoreStructure(ranked){
+  var box=document.getElementById("scoreStructure");if(!box)return;box.innerHTML="";
+  ranked.slice(0,6).forEach(function(s,i){
+    var rr=suggestedRange(s),range=rr[0]===0?"目标已达":("+"+rr[0]+"～"+rr[1]+" 分");
+    box.innerHTML+='<div class="score-structure-card '+(i===0?'primary':'')+'">'+
+      '<div class="score-structure-top"><h3>'+escapeHtml(s.name)+'</h3><span class="score-band">'+scoreBand(s)+'</span></div>'+
+      '<div class="recover-range">'+range+'</div><div class="recover-label">第一阶段建议争取值 · 不是成绩预测</div>'+
+      '<div class="structure-row">当前 '+s.score+'/'+s.full+'（'+Math.round(s.rate*100)+'%）· 阶段目标 '+s.target+'</div>'+
+      '<div class="structure-row"><b>主要失分：</b>'+issueLabel(s.issue)+'<br><b>优先动作：</b>'+escapeHtml(priorityAction(s,i))+'</div></div>';
+  });
+}
+function finalConclusions(c,ranked,problem){
+  var top=ranked[0],second=ranked[1]||ranked[0],issue=dominantIssue(ranked),avoids=avoidAdvice(problem);
+  var rr=ranked.slice(0,2).map(suggestedRange),low=rr.reduce(function(a,x){return a+x[0]},0),high=rr.reduce(function(a,x){return a+x[1]},0);
+  var pressureText=c.pressure==="很高"?"当前目标组合压力很高，建议拆成两个阶段。":c.pressure==="较高"?"目标压力偏高，必须减少低回报任务。":c.pressure==="适中"?"目标压力适中，关键在于集中投入。":"目标压力相对温和，更重要的是稳定执行。";
+  return [
+    ["优先顺序", "先 "+top.name+"，再 "+second.name, "不要平均补所有科。前两科决定了当前额外学习时间应该怎么分。"],
+    ["第一阶段争取值", low===0&&high===0?"以守分为主":("前两科合计 +"+low+"～"+high+" 分"), "这是规划用的优先争取区间，不是对考试成绩的预测或保证。"],
+    ["最大失分模式", issueLabel(issue), "接下来做题和复盘时，最需要反复检查的就是这一类失分。"],
+    ["目标压力判断", c.pressure, pressureText],
+    ["最该避免", avoids[0].t, avoids[0].a]
+  ];
+}
+function renderFinalConclusion(c,ranked,problem){
+  var box=document.getElementById("finalConclusion");if(!box)return;box.innerHTML="";
+  finalConclusions(c,ranked,problem).forEach(function(x,i){
+    box.innerHTML+='<div class="conclusion-item"><div class="conclusion-no">0'+(i+1)+'</div><b>'+escapeHtml(x[0])+' · '+escapeHtml(x[1])+'</b><p>'+escapeHtml(x[2])+'</p></div>';
+  });
+}
+
 function currentMode(c){
   if(c.days<=14||c.pressure==="很高")return ["冲刺抢分","只保留高回报任务，优先限时训练和错题回炉。"];
   if(c.execution<50)return ["轻量稳住","先把每日任务压缩到能完成，再逐步增加学习量。"];
@@ -1082,44 +1145,43 @@ function currentMode(c){
 }
 function updateDashboard(c,ranked,problem){
   if(!c||!ranked||!ranked.length)return;
-  var mode=currentMode(c),done=buddyMissionDone.filter(Boolean).length,st=buddyStateInfo(buddyState),top=ranked[0];
-  document.getElementById("dashMode").textContent=mode[0];
-  document.getElementById("dashModeText").textContent=mode[1];
-  document.getElementById("dashProgressBar").style.width=Math.round(done/3*100)+"%";
-  document.getElementById("dashProgressText").textContent="今日搭子任务 "+done+" / 3";
+  var mode=profileName(c,problem,ranked),top=ranked[0];
+  document.getElementById("dashMode").textContent=mode;
+  document.getElementById("dashModeText").textContent=profileSummary(c,problem,ranked);
+  var tags=document.getElementById("dashProfileTags");
+  if(tags)tags.innerHTML='<span>'+c.base+'</span><span>'+c.biasType+'</span><span>目标压力 '+c.pressure+'</span><span>'+issueLabel(dominantIssue(ranked))+'</span>';
   document.getElementById("dashTopSubject").textContent=top.name+" · "+top.score+"→"+top.target;
   document.getElementById("dashTopReason").textContent="距目标 "+top.gap+" 分 · "+issueLabel(top.issue)+" · 当前得分率 "+Math.round(top.rate*100)+"%";
   document.getElementById("dashTopTag").textContent=top.rate<.6?"高回报突破":top.gap<=top.full*.06?"接近目标":"重点补强";
   document.getElementById("dashBuddyArt").innerHTML=mascotStateMarkup(selectedCompanion,buddyState);
   document.getElementById("dashBuddyName").textContent=selectedCompanion.name;
-  document.getElementById("dashBuddyState").textContent=st[0];
-  document.getElementById("dashBuddyText").textContent=st[1];
+  document.getElementById("dashBuddyState").textContent=selectedCompanion.role.replace("搭子","解读");
+  document.getElementById("dashBuddyText").textContent=companionReason(c,problem);
+}
+function companionInterpretation(c,ranked,problem,index){
+  var top=ranked[0],second=ranked[1]||ranked[0],issue=issueLabel(dominantIssue(ranked));
+  var common=[
+    "这份报告最重要的结论不是你“差在哪里”，而是 "+top.name+" 目前最值得先投入；其次是 "+second.name+"。顺序比总学习时长更重要。",
+    "你的主要失分信号集中在“"+issue+"”。以后看到错题时，先判断是不是同一种失分重复出现，再决定是否值得整理。",
+    c.pressure==="很高"||c.pressure==="较高"?"你的目标并不是不能追，但一次追完整个分差会让计划过重。把目标拆阶段，比每天增加更多任务更合理。":"你的目标压力目前并不极端，真正决定结果的是能不能把额外时间持续放在前两项高回报科目上。"
+  ];
+  if(selectedCompanion.tone==="gentle")common=common.map(function(x){return "不用把报告变成压力。"+x;});
+  if(selectedCompanion.tone==="push")common=common.map(function(x){return "直接看结论： "+x;});
+  if(selectedCompanion.tone==="detective")common=common.map(function(x){return "从失分线索看，"+x;});
+  return common[index%common.length];
 }
 function renderBuddy(c,ranked,problem){
-  var st=buddyStateInfo(buddyState);
   document.getElementById("companionAvatar").innerHTML=mascotStateMarkup(selectedCompanion,buddyState);
   document.getElementById("companionName").textContent=selectedCompanion.name;
-  document.getElementById("companionRole").textContent=selectedCompanion.role+" · "+selectedCompanion.goodFor;
-  document.getElementById("companionMeta").innerHTML='<span>'+st[0]+'</span>'+selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
-  document.getElementById("companionWhy").textContent="匹配理由："+companionReason(c,problem);
-  document.getElementById("buddyDialogueTitle").textContent=st[0]+" · "+selectedCompanion.name+" 对你说";
-  document.getElementById("companionLine").textContent=st[1]+" "+selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length];
-  var ms=buddyMissionsFor(c,ranked),box=document.getElementById("buddyMissions");box.innerHTML="";
-  ms.forEach(function(m,i){
-    box.innerHTML+='<div class="buddy-mission '+(buddyMissionDone[i]?"done":"")+'" onclick="toggleBuddyMission('+i+')"><b>0'+(i+1)+' · '+m[0]+'</b>'+escapeHtml(m[1])+'</div>';
-  });
+  document.getElementById("companionRole").textContent=selectedCompanion.role.replace("搭子","报告解读")+" · "+selectedCompanion.goodFor;
+  document.getElementById("companionMeta").innerHTML=selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
+  document.getElementById("companionWhy").textContent="为什么匹配它："+companionReason(c,problem);
+  document.getElementById("buddyDialogueTitle").textContent=selectedCompanion.name+" 的报告解读";
+  document.getElementById("companionLine").textContent=companionInterpretation(c,ranked,problem,buddyLineIndex);
   updateDashboard(c,ranked,problem);
 }
-function toggleBuddyMission(i){
-  if(i<0||i>2)return;
-  buddyMissionDone[i]=!buddyMissionDone[i];
-  if(buddyMissionDone.every(Boolean))buddyState="done";
-  else if(lastReport)buddyState=chooseBuddyState(lastReport.classify,lastReport.problem);
-  saveBuddyMissions();renderHeroMascot();
-  if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
-}
 function nextBuddyLine(){
-  buddyLineIndex=(buddyLineIndex+1)%selectedCompanion.lines.length;
+  buddyLineIndex=(buddyLineIndex+1)%3;
   if(lastReport)renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);
 }
 function switchBuddy(){
@@ -1127,15 +1189,6 @@ function switchBuddy(){
   selectedCompanion=companions[(idx+1)%companions.length];
   companionAuto=false;buddyLineIndex=0;updateAutoMatchUI();renderHeroMascot();
   if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
-}
-function buddyCheckIn(){
-  buddyMissionDone=[true,true,true];
-  buddyState="done";
-  saveBuddyMissions();
-  try{localStorage.setItem("nixi_buddy_check_"+todayKey(),selectedCompanion.name);}catch(e){}
-  renderHeroMascot();
-  if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
-  showToast("今日 3 项搭子任务全部完成");
 }
 
 document.querySelectorAll(".theme-choice").forEach(function(t){
@@ -1625,8 +1678,7 @@ function generateReport(){
   var c=classify(),ranked=rankedSubjects();
   var problem=document.getElementById("problem").value;
   pickCompanion(c,problem,ranked);
-  buddyMissionDone=loadBuddyMissions();
-  buddyState=buddyMissionDone.every(Boolean)?"done":chooseBuddyState(c,problem);
+  buddyState=chooseBuddyState(c,problem);
   renderHeroMascot();
   var nick=document.getElementById("nickname").value.trim();
   var grade=document.getElementById("grade").value;
@@ -1677,6 +1729,7 @@ function generateReport(){
 
   renderRiskRadar(c,ranked);
   renderLeverMap(ranked);
+  renderScoreStructure(ranked);
   var totalMin=Math.round(c.hours*60),mins=allocateMinutes(ranked,totalMin);
   var tb=document.getElementById("timeBox");tb.innerHTML="";
   document.getElementById("timeTotalBadge").textContent=totalMin+" 分钟 / 天";
@@ -1758,6 +1811,7 @@ function generateReport(){
   updateSimulator();
 
   renderBuddy(c,ranked,problem);
+  renderFinalConclusion(c,ranked,problem);
 
   var one="先把 "+ranked[0].name+(ranked[1]?" 和 "+ranked[1].name:"")+" 的高频失分拿回来，再扩展到其他科。你现在真正需要的不是“学更多”，而是让每一天的学习都直接指向可以拿回来的分。";
   document.getElementById("oneLine").textContent=one;
@@ -1769,7 +1823,8 @@ function generateReport(){
 function copySummary(){
   var text=document.getElementById("typeTitle").textContent+"\n"+
     document.getElementById("resultIntro").textContent+"\n"+
-    document.getElementById("diagnosis").textContent+"\n"+
+    document.getElementById("diagnosis").innerText+"\n"+
+    document.getElementById("finalConclusion").innerText+"\n"+
     document.getElementById("oneLine").textContent;
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){showToast("结果摘要已复制")}).catch(function(){showToast("复制失败，请长按复制")});
