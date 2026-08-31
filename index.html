@@ -443,10 +443,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card">
-      <h2>选择你的学习搭子</h2>
-      <div class="desc">每个搭子的性格、提醒方式和擅长场景都不同。默认开启“自动匹配”，系统会根据你的偏科、执行条件和目标压力推荐更适合你的那个。</div>
+      <h2>选择你的报告解读伙伴</h2>
+      <div class="desc">伙伴不会陪你长期打卡，只负责用不同风格解释这份一次性测评报告。默认自动匹配，也可以自己选。</div>
       <div class="auto-match">
-        <div><b>✨ 自动匹配搭子</b><div class="small" id="autoMatchHint">当前开启 · 生成报告时自动选择</div></div>
+        <div><b>✨ 自动匹配解读伙伴</b><div class="small" id="autoMatchHint">当前开启 · 根据测评结果自动选择解读风格</div></div>
         <button class="btn ghost inline no-print" id="autoMatchBtn" onclick="enableAutoCompanion()">已开启</button>
       </div>
       <div class="companion-grid" id="companionGrid"></div>
@@ -497,11 +497,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     <div id="reportOverview" class="section-anchor"></div>
     <div class="dashboard-strip">
       <div class="dash-card">
-        <div class="dash-label">TODAY MODE · 今日模式</div>
-        <div class="dash-big" id="dashMode">稳步推进</div>
-        <div class="dash-sub" id="dashModeText">先完成最高回报任务，再处理其他科目。</div>
-        <div class="dash-progress"><i id="dashProgressBar" style="width:0%"></i></div>
-        <div class="dash-sub" id="dashProgressText" style="margin-top:6px">今日任务 0 / 3</div>
+        <div class="dash-label">STUDY PROFILE · 学习画像</div>
+        <div class="dash-big" id="dashMode">等待分析</div>
+        <div class="dash-sub" id="dashModeText">系统会根据分数结构、偏科程度、目标压力和失分原因生成你的学习画像。</div>
+        <div class="profile-tags" id="dashProfileTags"></div>
       </div>
       <div class="dash-card">
         <div class="dash-label">TOP LEVER · 第一突破</div>
@@ -510,10 +509,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <div class="state-pill" id="dashTopTag" style="margin-top:10px">等待生成</div>
       </div>
       <div class="dash-card">
-        <div class="dash-label">STUDY BUDDY · 搭子状态</div>
+        <div class="dash-label">REPORT GUIDE · 报告解读伙伴</div>
         <div class="dash-buddy">
           <div class="dash-buddy-art" id="dashBuddyArt"></div>
-          <div><div class="dash-big" id="dashBuddyName" style="font-size:19px">-</div><div class="state-pill" id="dashBuddyState">待机中</div></div>
+          <div><div class="dash-big" id="dashBuddyName" style="font-size:19px">-</div><div class="state-pill" id="dashBuddyState">解读风格</div></div>
         </div>
         <div class="dash-sub" id="dashBuddyText" style="margin-top:9px"></div>
       </div>
@@ -581,14 +580,25 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <h2>③ 分数结构拆解</h2>
+          <div class="desc">把各科目标差拆成“先回收、再提升、最后攻坚”，告诉你哪些分更值得先拿。</div>
+        </div>
+        <span class="state-pill">分数不是同样难拿</span>
+      </div>
+      <div id="scoreStructure" class="score-structure-grid"></div>
+    </div>
+
     <div class="card detail-full" id="roadmapSection">
-      <h2 id="roadmapTitle">③ 你的阶段路线</h2>
+      <h2 id="roadmapTitle">④ 你的阶段路线</h2>
       <div class="desc">不是把每天排满，而是让每一阶段只解决一个主要问题。</div>
       <div class="grid4" id="roadmap"></div>
     </div>
 
     <div class="card detail-full" id="subjectStrategySection">
-      <h2>④ 各科怎么补</h2>
+      <h2>⑤ 各科怎么补</h2>
       <div class="grid3" id="subjectStrategies"></div>
     </div>
 
@@ -596,7 +606,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     <div class="card plan-card">
       <div class="section-title">
         <div>
-          <h2>⑤ 14 天执行计划</h2>
+          <h2>⑥ 14 天执行计划</h2>
           <div class="desc">一次只看一周。每天只保留“主攻、补强、复盘”三件事，减少信息压迫感。</div>
         </div>
         <div class="plan-tabs no-print">
@@ -610,7 +620,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     <div class="card avoid-card detail-full">
       <div class="section-title">
         <div>
-          <h2>⑥ 避坑提醒</h2>
+          <h2>⑦ 避坑提醒</h2>
           <div class="desc">不是“不能做”，而是这些行为最容易消耗时间却不转化成分数。</div>
         </div>
         <span class="state-pill">少踩坑 = 多拿分</span>
@@ -619,20 +629,20 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card detail-full">
-      <h2>⑦ 本周量化目标</h2>
-      <div class="desc">把“努力”改成可以打勾的数字目标。</div>
+      <h2>⑧ 阶段执行标准</h2>
+      <div class="desc">把模糊的“努力”换成这份报告建议你在阶段内达到的执行标准。</div>
       <div class="goal-grid" id="weeklyGoals"></div>
     </div>
 
     <div id="reportReview" class="section-anchor"></div>
     <div class="card">
-      <h2>⑧ 错题二刷节奏</h2>
+      <h2>⑨ 错题复习节奏</h2>
       <div class="desc">重要错题不要只看一次。下面给你一个简单复习节奏：当天、次日、第3天、第7天、第14天。</div>
       <div class="review-schedule" id="reviewSchedule"></div>
     </div>
 
     <div class="card no-print detail-full">
-      <h2>⑨ 目标压力模拟器</h2>
+      <h2>⑩ 目标压力模拟器</h2>
       <div class="desc">拖动“每天时间”和“阶段目标”，看看执行压力如何变化。它不是提分预测，只是帮助你把目标调到更可执行。</div>
       <div class="simulator">
         <div>
@@ -652,7 +662,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card paper detail-full">
-      <h2>⑩ 你的“电子学习本”</h2>
+      <h2>⑪ 报告附带执行模板</h2>
       <div class="desc">可以直接截图或保存 PDF，当作接下来一周的执行页。</div>
       <div id="notebook"></div>
     </div>
@@ -669,6 +679,17 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <button class="btn ghost" onclick="downloadPoster()">下载这张海报</button>
     </div>
 
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <h2>最终结论</h2>
+          <div class="desc">如果你不想记住整份报告，只记住下面这几件事就够了。</div>
+        </div>
+        <span class="state-pill">你的测评结论</span>
+      </div>
+      <div id="finalConclusion" class="conclusion-grid"></div>
+    </div>
+
     <div id="reportBuddy" class="section-anchor"></div>
     <div class="card">
       <div class="companion-result">
@@ -682,12 +703,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
             <div class="small" id="companionWhy"></div>
           </div>
         </div>
-        <div class="buddy-missions" id="buddyMissions"></div>
-        <div class="buddy-dialogue"><b id="buddyDialogueTitle">搭子对你说</b><div id="companionLine" class="small" style="margin-top:5px"></div></div>
+        <div class="buddy-dialogue"><b id="buddyDialogueTitle">伙伴解读</b><div id="companionLine" class="small" style="margin-top:5px"></div></div>
         <div class="buddy-tools no-print">
-          <button onclick="nextBuddyLine()">换一句搭子话</button>
-          <button onclick="switchBuddy()">换一个搭子</button>
-          <button onclick="buddyCheckIn()">完成今日打卡</button>
+          <button onclick="nextBuddyLine()">换一种解读</button>
+          <button onclick="switchBuddy()">换个解读伙伴</button>
         </div>
       </div>
       <div class="quote" id="oneLine" style="margin-top:14px"></div>
@@ -697,7 +716,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         
         <button class="btn" onclick="restart()">重新测试</button>
       </div>
-      <div class="notice">建议完成 7–14 天后用最新成绩重新测一次，观察主攻科、成绩趋势和执行条件是否发生变化。</div>
+      <div class="notice">这是一份一次性学习测评报告。建议保存结果后直接按优先级和 14 天计划执行；如果之后成绩结构明显变化，再重新测试即可。</div>
     </div>
   </section>
 </div>
@@ -1666,7 +1685,7 @@ function generateReport(){
     tb.innerHTML+='<div class="time-row"><div class="time-row-top"><span>'+escapeHtml(s.name)+'</span><span>'+mins[i]+' 分钟 · '+share+'%</span></div><div class="time-mini-bar"><i style="width:'+share+'%"></i></div></div>';
   });
 
-  document.getElementById("roadmapTitle").textContent="③ 你的 "+c.days+" 天阶段路线";
+  document.getElementById("roadmapTitle").textContent="④ 你的 "+c.days+" 天阶段路线";
   var roadmap=document.getElementById("roadmap");roadmap.innerHTML="";
   var phases;
   if(c.days<=14)phases=[
