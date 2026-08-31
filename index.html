@@ -37,6 +37,10 @@ button{cursor:pointer}
 .hero-brand-panel b{display:block;font-size:12px;margin-bottom:3px}.hero-brand-panel .tiny{font-size:10px;color:#73809a}
 .hero-brand-mark{position:absolute;right:12px;top:10px;width:30px;height:30px;border-radius:10px;background:#1e2a47;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900}
 .report-preview-card{overflow:hidden}
+.final-step-card{border-color:var(--accent2);background:linear-gradient(145deg,var(--card),var(--soft))}
+.final-visual-preview-inner{margin:14px 0}
+.final-step-card .form-status{margin:14px 0 0;background:var(--card)}
+.final-generate-btn{margin-top:14px;font-size:15px;padding:14px 18px}
 .report-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .report-preview-item{padding:15px;border-radius:16px;background:var(--soft);border:1px solid var(--line)}
 .report-preview-item b{display:block;font-size:13px;margin-bottom:5px}
@@ -441,25 +445,25 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="form-status no-print">
-      <div class="form-status-main">
-        <div>
-          <div class="eyebrow">YOUR INPUT · 当前填写</div>
-          <b id="formProgressText">正在准备你的测评</b>
-          <div class="small" id="draftStatus">填写内容会自动保存在本机</div>
-        </div>
-        <button class="mini-link" onclick="clearDraft()">清空重填</button>
+    <div class="card">
+      <h2>选择你的报告解读伙伴</h2>
+      <div class="desc">伙伴不会陪你长期打卡，只负责用不同风格解释这份一次性测评报告。默认自动匹配，也可以自己选。</div>
+      <div class="auto-match">
+        <div><b>✨ 自动匹配解读伙伴</b><div class="small" id="autoMatchHint">当前开启 · 根据测评结果自动选择解读风格</div></div>
+        <button class="btn ghost inline no-print" id="autoMatchBtn" onclick="enableAutoCompanion()">已开启</button>
       </div>
-      <div class="form-progress"><i id="formProgressBar" style="width:0%"></i></div>
-      <div class="input-snapshot" id="inputSnapshot">
-        <span>当前总分 <b id="liveCurrent">-</b></span>
-        <span>各科目标 <b id="liveTarget">-</b></span>
-        <span>计划提升 <b id="liveGain">-</b></span>
-        <span id="goalConsistency">等待成绩数据</span>
-      </div>
+      <div class="companion-grid" id="companionGrid"></div>
     </div>
-
-    <div class="card final-visual-preview">
+    <div class="card final-step-card">
+      <div class="section-title">
+        <div>
+          <div class="eyebrow">FINAL CHECK · 最后一步</div>
+          <h2 style="margin:4px 0 0">确认数据，然后生成学习档案</h2>
+          <div class="desc">到这里才显示数据完整度和报告视觉预览。确认无误后再生成正式结果。</div>
+        </div>
+        <span class="state-pill">准备生成</span>
+      </div>
+      <div class="final-visual-preview-inner">
       <div class="section-title">
         <div>
           <h2>报告视觉预览</h2>
@@ -476,19 +480,28 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
           <div class="tiny">成绩结构 / 提分优先级 / 14 天路线 / 报告解读</div>
         </div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>选择你的报告解读伙伴</h2>
-      <div class="desc">伙伴不会陪你长期打卡，只负责用不同风格解释这份一次性测评报告。默认自动匹配，也可以自己选。</div>
-      <div class="auto-match">
-        <div><b>✨ 自动匹配解读伙伴</b><div class="small" id="autoMatchHint">当前开启 · 根据测评结果自动选择解读风格</div></div>
-        <button class="btn ghost inline no-print" id="autoMatchBtn" onclick="enableAutoCompanion()">已开启</button>
       </div>
-      <div class="companion-grid" id="companionGrid"></div>
-      <button class="btn no-print" onclick="generateReport()">生成我的逆袭档案</button>
+      <div class="form-status no-print">
+        <div class="form-status-main">
+          <div>
+            <div class="eyebrow">YOUR INPUT · 当前填写</div>
+            <b id="formProgressText">正在准备你的测评</b>
+            <div class="small" id="draftStatus">填写内容会自动保存在本机</div>
+          </div>
+          <button class="mini-link" onclick="clearDraft()">清空重填</button>
+        </div>
+        <div class="form-progress"><i id="formProgressBar" style="width:0%"></i></div>
+        <div class="input-snapshot" id="inputSnapshot">
+          <span>当前总分 <b id="liveCurrent">-</b></span>
+          <span>各科目标 <b id="liveTarget">-</b></span>
+          <span>计划提升 <b id="liveGain">-</b></span>
+          <span id="goalConsistency">等待成绩数据</span>
+        </div>
+      </div>
+      <button class="btn no-print final-generate-btn" onclick="generateReport()">生成我的逆袭档案</button>
       <div class="notice">本测试提供学习规划参考，不承诺固定提分结果。成绩变化还受课程难度、学习基础、执行质量等因素影响。</div>
     </div>
+
     <div class="mobile-generate no-print">
       <div><b>逆袭档案</b><span id="mobileReadyText">填写完成后生成报告</span></div>
       <button onclick="generateReport()">生成报告</button>
