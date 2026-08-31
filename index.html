@@ -302,6 +302,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
   .wrap{max-width:none;padding:0}.card,.result-cover{box-shadow:none;break-inside:avoid}
+  #resultArea.focus-mode .detail-full{display:block!important}
 }
 </style>
 </head>
@@ -484,9 +485,12 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <a href="#reportReview">复盘</a>
         <a href="#reportBuddy">搭子</a>
       </div>
-      <div class="view-switch">
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+        <button class="mini-link" onclick="restart()">修改数据</button>
+        <div class="view-switch">
         <button class="view-btn active" data-view="focus" onclick="setReportView('focus',this)">重点版</button>
         <button class="view-btn" data-view="full" onclick="setReportView('full',this)">完整版</button>
+        </div>
       </div>
     </div>
 
@@ -806,6 +810,8 @@ function gradeSubjects(grade){
 function loadGradePreset(){
   subjects=gradeSubjects(document.getElementById("grade").value);
   renderSubjects();
+  if(typeof updateFormStatus==="function")updateFormStatus();
+  if(typeof scheduleDraftSave==="function")scheduleDraftSave();
 }
 
 function issueOptions(current){
@@ -847,10 +853,14 @@ function renderSubjects(){
 function addSubject(){
   subjects.push({name:"新科目",score:60,full:100,target:75,issue:"base"});
   renderSubjects();
+  if(typeof updateFormStatus==="function")updateFormStatus();
+  if(typeof scheduleDraftSave==="function")scheduleDraftSave();
 }
 function removeSubject(i){
   if(subjects.length<=2){showToast("至少保留两科");return;}
   subjects.splice(i,1);renderSubjects();
+  if(typeof updateFormStatus==="function")updateFormStatus();
+  if(typeof scheduleDraftSave==="function")scheduleDraftSave();
 }
 function escapeHtml(s){
   return String(s||"").replace(/[&<>"']/g,function(m){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[m]});
@@ -963,6 +973,7 @@ function renderCompanions(){
       document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
       d.classList.add("active");
       updateAutoMatchUI();renderHeroMascot();
+      if(typeof scheduleDraftSave==="function")scheduleDraftSave();
       if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
     };
     box.appendChild(d);
@@ -978,6 +989,7 @@ function enableAutoCompanion(){
   companionAuto=true;
   document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
   updateAutoMatchUI();
+  if(typeof scheduleDraftSave==="function")scheduleDraftSave();
   showToast("已开启自动匹配");
 }
 function pickCompanion(c,problem,ranked){
@@ -1112,6 +1124,7 @@ document.querySelectorAll(".theme-choice").forEach(function(t){
     document.querySelectorAll(".theme-choice").forEach(function(x){x.classList.remove("active")});
     t.classList.add("active");
     document.body.className="theme-"+t.dataset.theme;
+    if(typeof scheduleDraftSave==="function")scheduleDraftSave();
     if(lastReport)renderPoster();
   };
 });
