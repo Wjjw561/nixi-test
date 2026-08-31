@@ -184,6 +184,9 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .input-snapshot span{padding:5px 8px;border-radius:999px;background:var(--soft);font-size:10px;color:var(--muted)}
 .input-snapshot b{display:inline;font-size:10px;color:var(--text)}
 .inline-note{margin-top:10px;padding:10px 12px;border-radius:13px;background:var(--soft);font-size:11px;color:var(--muted);line-height:1.55}
+.method-note{margin-top:13px;border-top:1px dashed var(--line);padding-top:10px;color:var(--muted);font-size:10px;line-height:1.65}
+.method-note summary{cursor:pointer;font-weight:850;color:var(--muted);width:max-content}
+.method-note div{padding-top:7px;max-width:780px}
 .result-toolbar{position:sticky;top:8px;z-index:7;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 10px;margin:0 0 14px;border-radius:18px;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(16px);border:1px solid var(--line);box-shadow:0 9px 24px rgba(36,38,32,.06)}
 .result-nav{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 .result-nav::-webkit-scrollbar{display:none}
@@ -467,6 +470,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <div class="kpi"><span>剩余时间</span><b id="leftDays">-</b><em id="timeWindow">-</em></div>
         <div class="kpi"><span>每日投入</span><b id="dailyHours">-</b><em>建议额外学习</em></div>
       </div>
+      <details class="method-note">
+        <summary>这份报告是怎么判断的？</summary>
+        <div>分型综合使用当前总得分率、科目差距、各科目标差、主要失分原因、剩余天数和执行条件。它用于决定“先做什么”，不是成绩预测，也不承诺固定提分。</div>
+      </details>
     </div>
 
     <div class="result-toolbar no-print">
@@ -1488,6 +1495,99 @@ function avoidAdvice(problem){
   return base.slice(0,6);
 }
 
+var DRAFT_KEY="nixi_report_draft_v6";
+var draftTimer=null;
+
+function setReportView(mode,btn){
+  var area=document.getElementById("resultArea");
+  if(!area)return;
+  area.classList.toggle("focus-mode",mode==="focus");
+  document.querySelectorAll(".view-btn").forEach(function(x){x.classList.toggle("active",x.dataset.view===mode)});
+  if(btn)btn.classList.add("active");
+  try{localStorage.setItem("nixi_report_view",mode);}catch(e){}
+}
+function formFieldIds(){
+  return ["nickname","grade","exam","targetSchool","days","hours","goalGain","problem","rank","prev2","prev1","completion","reviewHabit","fixedTime","focus"];
+}
+function getSelectedTheme(){
+  var x=document.querySelector(".theme-choice.active");
+  return x?x.dataset.theme:"scholar";
+}
+function saveDraft(){
+  var data={fields:{},subjects:subjects,theme:getSelectedTheme(),companionAuto:companionAuto,companionTone:selectedCompanion?selectedCompanion.tone:"focus"};
+  formFieldIds().forEach(function(id){var el=document.getElementById(id);if(el)data.fields[id]=el.value;});
+  try{
+    localStorage.setItem(DRAFT_KEY,JSON.stringify(data));
+    var ds=document.getElementById("draftStatus");if(ds)ds.textContent="已自动保存到本机";
+  }catch(e){}
+}
+function scheduleDraftSave(){
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(saveDraft,250);
+}
+function restoreDraft(){
+  var raw=null;
+  try{raw=localStorage.getItem(DRAFT_KEY);}catch(e){}
+  if(!raw){updateFormStatus();return;}
+  try{
+    var data=JSON.parse(raw);
+    if(data.fields)Object.keys(data.fields).forEach(function(id){var el=document.getElementById(id);if(el)el.value=data.fields[id];});
+    if(Array.isArray(data.subjects)&&data.subjects.length>=2){subjects=data.subjects;renderSubjects();}
+    if(data.theme){
+      document.body.className="theme-"+data.theme;
+      document.querySelectorAll(".theme-choice").forEach(function(x){x.classList.toggle("active",x.dataset.theme===data.theme)});
+    }
+    companionAuto=data.companionAuto!==false;
+    if(data.companionTone){
+      var found=companions.find(function(x){return x.tone===data.companionTone});
+      if(found)selectedCompanion=found;
+    }
+    renderCompanions();updateAutoMatchUI();renderHeroMascot();
+    var ds=document.getElementById("draftStatus");if(ds)ds.textContent="已恢复上次填写内容";
+  }catch(e){}
+  updateFormStatus();
+}
+function clearDraft(){
+  if(!confirm("确定清空当前填写内容并恢复默认示例吗？"))return;
+  try{localStorage.removeItem(DRAFT_KEY);}catch(e){}
+  location.reload();
+}
+function liveSubjectTotals(){
+  var current=0,target=0,full=0,valid=true;
+  subjects.forEach(function(x){
+    var sc=+x.score||0,ta=+x.target||0,fu=+x.full||0;
+    current+=sc;target+=ta;full+=fu;
+    if(!x.name||fu<=0||sc<0||sc>fu||ta<0||ta>fu)valid=false;
+  });
+  return {current:current,target:target,full:full,gain:target-current,valid:valid};
+}
+function updateFormStatus(){
+  var t=liveSubjectTotals(),wanted=Math.max(0,+((document.getElementById("goalGain")||{}).value||0));
+  var basic=["grade","exam","days","hours","goalGain","problem"].every(function(id){var e=document.getElementById(id);return e&&String(e.value).trim()!==""});
+  var execution=["completion","reviewHabit","fixedTime","focus"].every(function(id){var e=document.getElementById(id);return e&&e.value});
+  var trend=((document.getElementById("prev1")||{}).value||"")!==""||((document.getElementById("prev2")||{}).value||"")!=="";
+  var progress=(basic?35:15)+(t.valid&&subjects.length>=2?45:15)+(execution?15:5)+(trend?5:0);
+  progress=Math.min(100,progress);
+  var bar=document.getElementById("formProgressBar");if(bar)bar.style.width=progress+"%";
+  var txt=document.getElementById("formProgressText");if(txt)txt.textContent=progress>=95?"数据已比较完整，可以生成报告":progress>=80?"核心数据已齐，可以继续补充细节":"继续填写，报告会更准确";
+  var ready=document.getElementById("mobileReadyText");if(ready)ready.textContent=progress>=80?"核心数据已齐 · 可生成":"继续填写核心信息";
+  var c=document.getElementById("liveCurrent"),tg=document.getElementById("liveTarget"),g=document.getElementById("liveGain");
+  if(c)c.textContent=t.current;if(tg)tg.textContent=t.target;if(g)g.textContent=(t.gain>=0?"+":"")+t.gain;
+  var diff=Math.abs(t.gain-wanted),cons=document.getElementById("goalConsistency"),note=document.getElementById("subjectGoalNote");
+  var msg="";
+  if(!t.valid)msg="有科目数据需要检查";
+  else if(diff<=10)msg="各科目标与总目标基本一致";
+  else msg="各科目标合计 "+(t.gain>=0?"+":"")+t.gain+"，与总目标 +"+wanted+" 相差 "+diff+" 分";
+  if(cons)cons.textContent=msg;
+  if(note)note.textContent=msg+(diff>10?"。建议统一后再生成，结果会更自然。":"。当前目标结构可以直接用于测评。");
+}
+function setupFormPersistence(){
+  var area=document.getElementById("formArea");if(!area)return;
+  ["input","change"].forEach(function(evt){
+    area.addEventListener(evt,function(){updateFormStatus();scheduleDraftSave();});
+  });
+}
+
 function generateReport(){
   if(!validate())return;
   var c=classify(),ranked=rankedSubjects();
@@ -1502,6 +1602,7 @@ function generateReport(){
 
   document.getElementById("formArea").classList.add("hidden");
   document.getElementById("resultArea").classList.remove("hidden");
+  setReportView("focus");
   document.getElementById("s1").classList.remove("on");
   document.getElementById("s2").classList.add("on");
   document.getElementById("s3").classList.add("on");
@@ -1649,6 +1750,7 @@ function restart(){
   document.getElementById("s2").classList.remove("on");
   document.getElementById("s3").classList.remove("on");
   document.getElementById("s1").classList.add("on");
+  updateFormStatus();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -1662,6 +1764,9 @@ renderSubjects();
 renderCompanions();
 updateAutoMatchUI();
 renderHeroMascot();
+restoreDraft();
+setupFormPersistence();
+updateFormStatus();
 </script>
 </body>
 </html>
