@@ -1703,9 +1703,76 @@ function renderSubjectStrategies(ranked){
   });
 }
 
-function taskFor(name,index){
-  var list=subjectTaskBank[name]||["基础知识复习20分钟","专项练习一组","错题二刷","限时训练20分钟"];
-  return list[index%list.length];
+function subjectDailyTasks(s){
+  var family=subjectFamily(s.name),stage=subjectStage(s.rate);
+  var bank={
+    math:{
+      foundation:["公式/定义闭卷回忆 15 分钟","典型例题 2 道 + 基础题 6 道","基础错题二刷 4 道","基础题小测 15–20 分钟"],
+      growth:["高频题型专项 4–6 道","同类题连续训练 1 组","错题二刷并写题型识别信号","限时中档题组 20–25 分钟"],
+      refine:["限时混合题组 1 组","复盘低级失分与超时题","重做本周最卡的 3 道题","小套卷训练时间分配"]
+    },
+    english:{
+      foundation:["高频词/短语主动回忆 20 分钟","基础语法小练习 + 订正","短阅读 1 篇，逐句确认理解","旧词复现 + 句子中再认"],
+      growth:["阅读或完形专项 1 篇","整理一组阅读错因","高频词复习 + 写作表达 5 句","限时阅读组 20–25 分钟"],
+      refine:["限时阅读组 1 组","长难句拆解 5 句","作文短段落限时输出","整卷易错点复盘"]
+    },
+    chinese:{
+      foundation:["古诗文/基础知识 20 分钟","文言或基础阅读 1 组","阅读常见题型专项 1 组","本周高频错点回看"],
+      growth:["现代文阅读专项 1 篇","文言文限时小组题","作文审题 + 提纲 1 次","阅读错题按题型归类"],
+      refine:["限时阅读组 1 组","作文审题 + 结构限时训练","答案漏点与表达精修","综合语文小套练习"]
+    },
+    physics:{
+      foundation:["公式含义 + 典型情境回忆","基础题 8–10 道","受力/过程/单位专项检查","基础错题二刷 4 道"],
+      growth:["力学/电学等专题题组","同模型题连续训练","错题写清模型识别信号","限时中档题组"],
+      refine:["综合题拆过程 2–3 道","限时计算训练","步骤分与卡顿点复盘","小套卷稳定性训练"]
+    },
+    chemistry:{
+      foundation:["概念/方程式闭卷回忆","基础题 8–10 道","实验现象/操作专项","基础计算模板练习"],
+      growth:["实验或反应原理专项","计算/推断题组 1 组","错题回填对应概念","限时中档题训练"],
+      refine:["综合实验题 1–2 组","推断题信息提取训练","规范表达与方程式条件复盘","限时综合小套题"]
+    },
+    biology:{
+      foundation:["核心概念主动回忆","教材图表/过程复盘","基础选择题 12–15 道","概念混淆错题二刷"],
+      growth:["图表题专项 1 组","实验题变量/对照训练","材料题回扣教材概念","错题知识点回填"],
+      refine:["综合材料题 1 组","实验设计题专项","术语表达精修","限时选择 + 主观题小套"]
+    },
+    history:{
+      foundation:["时间线/事件框架回忆","基础选择题 10–15 道","原因/影响知识块整理","章节错题回看"],
+      growth:["材料题 1 组","设问类型专项训练","材料信息挂回教材框架","错题知识点归位"],
+      refine:["限时材料题 1 组","比较/评价题专项","分点表达精修","小套题时间控制"]
+    },
+    geography:{
+      foundation:["地图定位与区域基础 20 分钟","基础规律/过程回忆","基础选择题 10–15 道","错题回到地图或规律"],
+      growth:["图表材料题 1 组","自然/人文专题专项","读图顺序训练","错题记录漏看信息"],
+      refine:["限时综合题 1 组","区域差异比较训练","术语与因果链精修","小套题时间控制"]
+    },
+    politics:{
+      foundation:["核心概念/关键词回忆","基础选择题 10–15 道","章节框架复盘","概念混淆错题二刷"],
+      growth:["材料题 1 组","设问类型 + 知识模块匹配","观点 + 材料对应训练","错题回填知识点"],
+      refine:["限时主观题 1 组","材料结合与分点表达","重复/漏点复盘","小套题时间控制"]
+    },
+    general:{
+      foundation:["基础知识复习 20 分钟","基础题一组","错题二刷","基础小测"],
+      growth:["高频模块专项一组","同类题连续训练","错题二刷","限时训练 20 分钟"],
+      refine:["限时混合题组","低级失分复盘","超时题重做","小套题稳定性训练"]
+    }
+  };
+  return (bank[family]||bank.general)[stage];
+}
+function issueTaskTail(issue){
+  var map={
+    base:"，结束前标出 1 个仍不稳的知识点",
+    method:"，每题写下 1 个“看到什么就想到什么方法”的信号",
+    careless:"，最后专查审题、步骤、计算/书写中的具体失分",
+    speed:"，全程计时并记录最慢的环节",
+    memory:"，结束后合上资料主动回忆一次",
+    unstable:"，记录正确率、卡顿点和状态波动位置"
+  };
+  return map[issue]||"";
+}
+function taskForSubject(s,index){
+  var list=subjectDailyTasks(s);
+  return list[index%list.length]+issueTaskTail(s.issue);
 }
 
 function renderTrend(current){
@@ -2172,8 +2239,8 @@ function generateReport(){
       inside+='<div class="plan-day">'+
         '<div class="plan-date"><b>D'+d+'</b><span>'+dateText+'</span></div>'+
         '<div class="plan-main"><div class="plan-day-head"><b>'+phase+'</b><span class="plan-phase">'+escapeHtml(a.name)+' 优先</span></div>'+
-        '<div class="plan-task"><strong>主攻</strong><span>'+escapeHtml(a.name)+' · '+escapeHtml(taskFor(a.name,d-1))+'</span></div>'+
-        '<div class="plan-task"><strong>补强</strong><span>'+escapeHtml(b.name)+' · '+escapeHtml(taskFor(b.name,d))+'</span></div>'+
+        '<div class="plan-task"><strong>主攻</strong><span>'+escapeHtml(a.name)+' · '+escapeHtml(taskForSubject(a,d-1))+'</span></div>'+
+        '<div class="plan-task"><strong>补强</strong><span>'+escapeHtml(b.name)+' · '+escapeHtml(taskForSubject(b,d))+'</span></div>'+
         '<div class="plan-review">复盘 10 分钟：只记今天最有价值的 1 个错误，不要求把所有错题都整理完。</div></div></div>';
     }
     week.innerHTML+='<div class="plan-week '+(w===0?'active':'')+'">'+
