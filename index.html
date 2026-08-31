@@ -428,6 +428,27 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 .subject-issue-chip{display:inline-flex;margin-top:8px;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:9px;color:var(--muted);font-weight:850}
 @media(max-width:760px){.subject-strategy-grid{grid-template-columns:1fr}}
 @media(max-width:430px){.subject-plan-card{padding:14px}.subject-plan-row{grid-template-columns:64px 1fr}}
+
+/* explainable assessment */
+.explain-details{margin-top:11px;border-top:1px dashed var(--line);padding-top:9px}
+.explain-details summary,.report-evidence summary{cursor:pointer;list-style:none;font-size:10px;font-weight:900;color:var(--muted);width:max-content}
+.explain-details summary::-webkit-details-marker,.report-evidence summary::-webkit-details-marker{display:none}
+.explain-details summary:before,.report-evidence summary:before{content:"＋";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:var(--soft);margin-right:6px;font-size:11px;color:var(--text)}
+.explain-details[open] summary:before,.report-evidence[open] summary:before{content:"－"}
+.evidence-body{padding-top:10px;display:grid;gap:7px}
+.evidence-row{display:grid;grid-template-columns:82px 1fr;gap:8px;align-items:start;font-size:10px;line-height:1.55}
+.evidence-row b{color:var(--muted);font-size:9px;padding-top:1px}
+.evidence-value{color:var(--text)}
+.evidence-meter{height:6px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:5px}
+.evidence-meter i{display:block;height:100%;border-radius:99px;background:var(--accent2)}
+.evidence-note{padding:9px 10px;border-radius:12px;background:var(--soft);font-size:9px;color:var(--muted);line-height:1.6}
+.report-evidence{margin-top:13px;padding-top:12px;border-top:1px dashed var(--line)}
+.report-evidence-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.report-evidence-card{padding:12px;border-radius:14px;background:var(--soft);border:1px solid var(--line)}
+.report-evidence-card b{display:block;font-size:10px;margin-bottom:4px}
+.report-evidence-card span{display:block;font-size:9px;color:var(--muted);line-height:1.55}
+@media(max-width:760px){.report-evidence-body{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.report-evidence-body{grid-template-columns:1fr}.evidence-row{grid-template-columns:72px 1fr}}
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
   .wrap{max-width:none;padding:0}.card,.result-cover{box-shadow:none;break-inside:avoid}
@@ -881,6 +902,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <span class="state-pill">你的测评结论</span>
       </div>
       <div id="finalConclusion" class="conclusion-grid"></div>
+      <details class="report-evidence">
+        <summary>查看这份报告的判断依据</summary>
+        <div id="reportEvidenceBody"></div>
+      </details>
     </div>
 
     <div id="reportBuddy" class="section-anchor"></div>
