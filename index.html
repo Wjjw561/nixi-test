@@ -424,6 +424,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 var subjects=[];
 var selectedCompanion={emoji:"📘",name:"学霸猫",tone:"focus"};
 var lastReport=null;
+var posterStyle="brief";
 var companions=[
   {emoji:"📘",name:"学霸猫",tone:"focus",text:"先完成最重要的一项，再处理下一项。今天不求学很多，只求真正拿回一点分。"},
   {emoji:"☁️",name:"云朵同桌",tone:"gentle",text:"不用一下子变得特别厉害，能把今天该做的做完，就是很实在的进步。"},
@@ -771,6 +772,56 @@ function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight){
   }
   if(line)ctx.fillText(line,x,y);
 }
+
+
+function renderRiskRadar(c,ranked){
+  var vals=[
+    {n:"基础风险",v:Math.max(5,Math.min(95,Math.round((1-c.rate)*105))),t:"基础分流失"},
+    {n:"偏科风险",v:Math.max(5,Math.min(95,Math.round(c.bias*260))),t:"科目差距"},
+    {n:"执行风险",v:Math.max(5,Math.min(95,100-c.execution)),t:"计划落地"},
+    {n:"目标压力",v:c.pressure==="很高"?92:c.pressure==="较高"?72:c.pressure==="适中"?45:25,t:"目标与时间"}
+  ];
+  var cx=150,cy=150,r=105,points=[];
+  for(var i=0;i<4;i++){var a=-Math.PI/2+i*Math.PI/2,rr=r*vals[i].v/100;points.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr])}
+  var rings="";
+  [0.25,0.5,0.75,1].forEach(function(k){var ps=[];for(var i=0;i<4;i++){var a=-Math.PI/2+i*Math.PI/2;ps.push([cx+Math.cos(a)*r*k,cy+Math.sin(a)*r*k].join(","))}rings+='<polygon points="'+ps.join(" ")+'" fill="none" stroke="var(--line)" stroke-width="1"/>'});
+  document.getElementById("riskRadar").innerHTML='<svg viewBox="0 0 300 300">'+rings+'<polygon points="'+points.map(function(p){return p.join(",")}).join(" ")+'" fill="var(--accent2)" fill-opacity=".22" stroke="var(--accent2)" stroke-width="3"/><text x="150" y="20" text-anchor="middle" fill="var(--text)" font-size="12">基础</text><text x="288" y="154" text-anchor="end" fill="var(--text)" font-size="12">偏科</text><text x="150" y="294" text-anchor="middle" fill="var(--text)" font-size="12">执行</text><text x="12" y="154" fill="var(--text)" font-size="12">压力</text></svg>';
+  var box=document.getElementById("riskList");box.innerHTML="";
+  vals.forEach(function(x){var tip=x.v>70?"优先处理":x.v>45?"需要关注":"当前较稳";box.innerHTML+='<div class="risk-item"><b><span>'+x.n+'</span><span>'+x.v+'</span></b><div class="small">'+x.t+' · '+tip+'</div></div>'});
+}
+function renderWeeklyGoals(c,ranked){
+  var sessions=c.hours>=3?5:c.hours>=2?4:3, reviews=c.execution<55?3:5, comp=c.execution<55?70:c.execution<75?80:90;
+  var gs=[
+    [sessions+"次",ranked[0].name+"主攻训练","每次只处理一个高频模块"],
+    [reviews+"次","高价值错题二刷","优先重复错和方法不会的题"],
+    [comp+"%","计划完成率","宁可少排一点，也要真正完成"]
+  ],box=document.getElementById("weeklyGoals");box.innerHTML="";
+  gs.forEach(function(g){box.innerHTML+='<div class="goal-card"><div class="small">'+g[1]+'</div><div class="num">'+g[0]+'</div><div class="small">'+g[2]+'</div></div>'});
+}
+function setPosterStyle(style,btn){
+  posterStyle=style;document.querySelectorAll(".poster-btn").forEach(function(x){x.classList.remove("active")});if(btn)btn.classList.add("active");renderPoster();
+}
+function posterPalette(){
+  if(document.body.classList.contains("theme-dark"))return ["#15171c","#202329","#f5f6f8","#aeb3bd","#8d9cff"];
+  if(document.body.classList.contains("theme-cute"))return ["#fff7f8","#ffffff","#422f37","#8d7480","#cf7190"];
+  if(document.body.classList.contains("theme-campus"))return ["#eef7ff","#ffffff","#19364f","#74899d","#356fa8"];
+  return ["#f5f3ee","#fffdf9","#1b1c19","#777a72","#6f765e"];
+}
+function renderPoster(){
+  if(!lastReport)return;var cv=document.getElementById("shareCanvas");if(!cv)return;var x=cv.getContext("2d"),p=posterPalette(),r=lastReport;
+  x.fillStyle=p[0];x.fillRect(0,0,1080,1350);x.fillStyle=p[1];x.fillRect(65,65,950,1220);
+  x.fillStyle=p[2];x.font="800 42px sans-serif";x.fillText("逆袭档案",120,145);x.fillStyle=p[3];x.font="26px sans-serif";x.fillText("PERSONAL STUDY REPORT",120,190);
+  if(posterStyle==="goal"){
+    x.fillStyle=p[4];x.font="900 110px sans-serif";x.fillText("+"+r.gain,120,360);x.fillStyle=p[2];x.font="800 42px sans-serif";x.fillText("阶段目标提升",120,425);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("剩余 "+r.days+" 天 · 每天约 "+r.hours+" 小时",120,520);
+  }else if(posterStyle==="companion"){
+    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);x.font="100px serif";x.fillText(selectedCompanion.emoji,120,520);x.font="800 38px sans-serif";x.fillText(selectedCompanion.name,260,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.text,260,535,650,44);
+  }else{
+    x.fillStyle=p[2];x.font="900 66px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,80);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("当前 "+r.current+" · 目标 +"+r.gain+" · "+r.days+" 天",120,510);
+  }
+  x.fillStyle=p[2];x.font="800 36px sans-serif";x.fillText("优先突破",120,690);x.font="52px sans-serif";x.fillText(r.ranked.slice(0,3).map(function(q){return q.name}).join(" · "),120,770);
+  x.fillStyle=p[3];x.font="29px sans-serif";wrapCanvas(x,r.oneLine||"",120,885,820,45);x.fillText("Study Rise Report · 静态测评",120,1215);
+}
+function downloadPoster(){renderPoster();var a=document.createElement("a");a.href=document.getElementById("shareCanvas").toDataURL("image/png");a.download="逆袭档案-结果海报.png";a.click();}
 
 function generateReport(){
   if(!validate())return;
