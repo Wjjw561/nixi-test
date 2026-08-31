@@ -1308,6 +1308,25 @@ function renderPoster(){
 }
 function downloadPoster(){renderPoster();var a=document.createElement("a");a.href=document.getElementById("shareCanvas").toDataURL("image/png");a.download="逆袭档案-结果海报.png";a.click();}
 
+function switchPlanWeek(index,btn){
+  document.querySelectorAll(".plan-week").forEach(function(x,i){x.classList.toggle("active",i===index)});
+  document.querySelectorAll(".plan-tab").forEach(function(x,i){x.classList.toggle("active",i===index)});
+  if(btn)btn.classList.add("active");
+}
+function avoidAdvice(problem){
+  var base=[
+    {t:"别平均分配时间",d:"弱科和目标差最大的科目更值得优先投入。",a:"先做第一突破科，再做保持科。"},
+    {t:"别只抄错题答案",d:"抄完答案不等于下次会做，最关键的是找到错因。",a:"至少写清：为什么错、下次怎么识别。"},
+    {t:"别用难题证明努力",d:"基础和中档分没稳住时，难题投入回报通常很低。",a:"先把能稳定拿到的分锁住。"},
+    {t:"别把计划排满",d:"没有缓冲的计划一旦被打断，很容易整天崩掉。",a:"每天预留 10%–20% 空白时间。"},
+    {t:"别连续一周不复盘",d:"只做不看结果，会让同一种低效方法重复出现。",a:"每 7 天看一次正确率和完成率。"}
+  ];
+  if(problem==="plan")base.unshift({t:"别继续增加计划数量",d:"你的主要问题不是缺计划，而是计划没有落地。",a:"每天只留 2–3 个关键任务。"});
+  if(problem==="careless")base.unshift({t:"别把“粗心”当结论",d:"粗心只是表面现象，真正原因可能是审题、步骤、计算或检查。",a:"每次错题定位到具体环节。"});
+  if(problem==="slow")base.unshift({t:"别无限延长单题时间",d:"卡题太久会挤掉整套卷子的可得分时间。",a:"给高频题型设置明确限时。"});
+  return base.slice(0,6);
+}
+
 function generateReport(){
   if(!validate())return;
   var c=classify(),ranked=rankedSubjects();
@@ -1406,25 +1425,26 @@ function generateReport(){
       var d=w*7+dd;
       var a=ranked[(d-1)%Math.min(3,ranked.length)],b=ranked[d%Math.min(3,ranked.length)];
       var phase=d<=3?"查漏洞":d<=7?"集中补强":d<=11?"专项提速":"二刷稳定";
-      inside+='<div class="day"><div class="dayhead"><span>Day '+d+'</span><span class="tag">'+phase+'</span></div>'+
-        '<div class="task">• '+escapeHtml(a.name)+'：'+escapeHtml(taskFor(a.name,d-1))+'</div>'+
-        '<div class="task">• '+escapeHtml(b.name)+'：'+escapeHtml(taskFor(b.name,d))+'</div>'+
-        '<div class="task">• 10 分钟：回看今天最有价值的一个错误</div></div>';
+      var date=new Date();date.setDate(date.getDate()+d-1);
+      var dateText=(date.getMonth()+1)+"/"+date.getDate();
+      inside+='<div class="plan-day">'+
+        '<div class="plan-date"><b>D'+d+'</b><span>'+dateText+'</span></div>'+
+        '<div class="plan-main"><div class="plan-day-head"><b>'+phase+'</b><span class="plan-phase">'+escapeHtml(a.name)+' 优先</span></div>'+
+        '<div class="plan-task"><strong>主攻</strong><span>'+escapeHtml(a.name)+' · '+escapeHtml(taskFor(a.name,d-1))+'</span></div>'+
+        '<div class="plan-task"><strong>补强</strong><span>'+escapeHtml(b.name)+' · '+escapeHtml(taskFor(b.name,d))+'</span></div>'+
+        '<div class="plan-review">复盘 10 分钟：只记今天最有价值的 1 个错误，不要求把所有错题都整理完。</div></div></div>';
     }
-    week.innerHTML+='<details class="week" '+(w===0?'open':'')+'><summary>第 '+(w+1)+' 周 · '+(w===0?'定位与补强':'专项与稳定')+'</summary><div class="inside">'+inside+'</div></details>';
+    week.innerHTML+='<div class="plan-week '+(w===0?'active':'')+'">'+
+      '<div class="plan-summary"><div><b>'+(w===0?'第 1 周 · 定位与补强':'第 2 周 · 专项与稳定')+'</b><div class="small">'+(w===0?'先找出真正拖分的地方，再集中补。':'减少新内容，开始提高速度和稳定性。')+'</div></div><span>'+(w===0?'Day 1–7':'Day 8–14')+'</span></div>'+
+      '<div class="plan-list">'+inside+'</div></div>';
   }
+  document.querySelectorAll(".plan-tab").forEach(function(x,i){x.classList.toggle("active",i===0)});
 
-  var avoids=[
-    "不要每天给所有科目平均分时间。",
-    "不要只抄错题答案，不写“为什么错”。",
-    "不要一开始就用大量难题证明自己很努力。",
-    "不要把每天计划排到没有任何缓冲。",
-    "不要连续一周不看正确率和成绩变化就机械照旧。"
-  ];
-  if(problem==="plan")avoids.unshift("尤其不要继续增加计划数量，先把每天完成率做上去。");
-  if(problem==="careless")avoids.unshift("尤其不要把“粗心”当成原因结束复盘，要追到具体是哪一步出错。");
+  var avoids=avoidAdvice(problem);
   var ab=document.getElementById("avoidBox");ab.innerHTML="";
-  avoids.slice(0,6).forEach(function(x){ab.innerHTML+='<div class="priority">'+x+'</div>'});
+  avoids.forEach(function(x,i){
+    ab.innerHTML+='<div class="avoid-item '+(i===0?'primary':'')+'"><div class="avoid-num">0'+(i+1)+'</div><b>'+escapeHtml(x.t)+'</b><p>'+escapeHtml(x.d)+'<br><strong>更好的做法：</strong>'+escapeHtml(x.a)+'</p></div>';
+  });
 
   renderWeeklyGoals(c,ranked);
   renderReviewSchedule();
