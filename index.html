@@ -406,6 +406,28 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
   .score-structure-grid,.loss-grid,.scenario-summary,.scenario-metrics,.scenario-subjects,.conclusion-grid{grid-template-columns:1fr}
   .scenario-hero{grid-template-columns:1fr}.scenario-pressure{width:max-content}
 }
+
+/* subject-specific strategy library */
+.subject-strategy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.subject-plan-card{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:17px;min-width:0}
+.subject-plan-card:first-child{background:linear-gradient(145deg,var(--soft),var(--card));border-color:var(--accent2)}
+.subject-plan-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:11px}
+.subject-plan-head h3{margin:0;font-size:19px}
+.subject-stage{font-size:9px;padding:5px 8px;border-radius:999px;background:var(--soft);color:var(--muted);white-space:nowrap;font-weight:850}
+.subject-scoreline{font-size:10px;color:var(--muted);margin-top:3px}
+.subject-core{padding:11px 12px;border-radius:14px;background:var(--soft);margin-bottom:10px}
+.subject-core span{display:block;font-size:9px;color:var(--muted);margin-bottom:3px}
+.subject-core b{display:block;font-size:12px;line-height:1.55}
+.subject-plan-row{display:grid;grid-template-columns:72px 1fr;gap:9px;padding:9px 0;border-top:1px dashed var(--line)}
+.subject-plan-row>span{font-size:9px;color:var(--muted);font-weight:900;padding-top:2px}
+.subject-plan-row>div{font-size:10px;line-height:1.65}
+.subject-plan-row.action>div{font-weight:800;color:var(--text)}
+.subject-plan-row.avoid>div{color:var(--muted)}
+.subject-check{margin-top:10px;padding:10px 11px;border-radius:13px;border:1px solid var(--line);font-size:10px;line-height:1.6}
+.subject-check b{display:block;font-size:9px;color:var(--muted);margin-bottom:3px}
+.subject-issue-chip{display:inline-flex;margin-top:8px;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:9px;color:var(--muted);font-weight:850}
+@media(max-width:760px){.subject-strategy-grid{grid-template-columns:1fr}}
+@media(max-width:430px){.subject-plan-card{padding:14px}.subject-plan-row{grid-template-columns:64px 1fr}}
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
   .wrap{max-width:none;padding:0}.card,.result-cover{box-shadow:none;break-inside:avoid}
@@ -770,7 +792,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 
     <div class="card detail-full" id="subjectStrategySection">
       <h2>⑦ 各科怎么补</h2>
-      <div class="grid3" id="subjectStrategies"></div>
+      <div class="subject-strategy-grid" id="subjectStrategies"></div>
     </div>
 
     <div id="reportPlan" class="section-anchor"></div>
