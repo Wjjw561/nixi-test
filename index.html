@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>逆袭档案 · 学习逆袭类型测试</title>
+<style>
+:root{
+  --bg:#f4f5f7;--card:#fff;--text:#17191d;--muted:#7a7f89;--line:#e7e9ee;
+  --accent:#16181c;--soft:#eef0f4;--accent2:#6f7cff;--shadow:0 14px 42px rgba(20,24,32,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:980px;margin:auto;padding:20px}
+.hero,.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:26px}
+.hero{padding:34px;margin-bottom:18px;background:linear-gradient(135deg,var(--card),var(--soft))}
+.hero h1{font-size:42px;line-height:1.05;margin:0 0 12px}.hero p{color:var(--muted);line-height:1.8;margin:0}
+.stepbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.step{padding:11px;border-radius:14px;background:var(--soft);font-size:13px;color:var(--muted);text-align:center;font-weight:700}
+.step.on{background:var(--accent);color:#fff}
+.card{padding:22px;margin-bottom:18px}
+.card h2{margin:0 0 14px;font-size:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
+.subject{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr;gap:8px}
+.btn{width:100%;padding:14px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-weight:800;font-size:16px;margin-top:14px}
+.btn.ghost{background:var(--soft);color:var(--text)}
+.hidden{display:none}
+.result-cover{padding:30px;border-radius:28px;background:linear-gradient(135deg,var(--soft),var(--card));border:1px solid var(--line);margin-bottom:18px}
+.eyebrow{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.08em}
+.result-cover h1{font-size:40px;margin:8px 0 8px}
+.tag{display:inline-block;padding:6px 9px;border-radius:999px;background:var(--soft);font-size:12px;margin:3px 4px 3px 0;color:var(--muted)}
+.kpi{background:var(--soft);border-radius:16px;padding:15px}.kpi span{display:block;font-size:11px;color:var(--muted)}.kpi b{display:block;font-size:26px;margin-top:5px}
+.priority{padding:13px 0;border-bottom:1px solid var(--line)}.priority:last-child{border:0}
+.phead{display:flex;justify-content:space-between;font-weight:800}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin:7px 0}.bar i{display:block;height:100%;background:var(--accent2)}
+.phase{padding:15px;background:var(--soft);border-radius:16px}
+.phase b{display:block;margin-bottom:6px}
+.quote{padding:17px;background:var(--soft);border-left:4px solid var(--accent2);border-radius:14px;line-height:1.75}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.theme{padding:14px;border:1px solid var(--line);border-radius:16px;cursor:pointer;background:var(--card)}
+.theme.active{outline:3px solid var(--accent2)}
+.theme-cute{--bg:#fff6f8;--card:#fff;--text:#3e2f35;--muted:#907985;--line:#f0dce4;--accent:#d66f92;--soft:#fde7ef;--accent2:#ec91af}
+.theme-dark{--bg:#15171c;--card:#202329;--text:#f6f7fa;--muted:#aeb3bd;--line:#353a44;--accent:#f4f5f7;--soft:#2b2f37;--accent2:#8d9cff}
+.theme-campus{--bg:#edf7ff;--card:#fff;--text:#18344d;--muted:#74899d;--line:#d8e7f2;--accent:#356fa8;--soft:#dfedf8;--accent2:#5f97cb}
+.theme-scholar{--bg:#f4f4ef;--card:#fff;--text:#191a18;--muted:#72756f;--line:#e4e5df;--accent:#191a18;--soft:#e9eae3;--accent2:#6d735f}
+.printline{text-align:center;color:var(--muted);font-size:12px;margin-top:14px}
+@media(max-width:720px){.grid2,.grid3,.grid4,.theme-grid{grid-template-columns:1fr 1fr}.subject{grid-template-columns:1fr 1fr}.hero h1,.result-cover h1{font-size:32px}.wrap{padding:12px}}
+@media print{.no-print,.hero,.stepbar{display:none!important}.wrap{max-width:none;padding:0}.card,.result-cover{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body class="theme-scholar">
+<div class="wrap">
+  <section class="hero">
+    <h1>你的学习逆袭类型是什么？</h1>
+    <p>用 2 分钟输入成绩、目标和剩余时间，生成一份专属“逆袭档案”：你现在属于哪一类、最该救哪几科、每天怎么分配时间，以及接下来 30/60/90 天该怎么走。</p>
+  </section>
+
+  <div class="stepbar no-print">
+    <div class="step on" id="s1">1. 填写数据</div>
+    <div class="step" id="s2">2. 自动分型</div>
+    <div class="step" id="s3">3. 生成报告</div>
+  </div>
+
+  <section id="formArea">
+    <div class="card">
+      <h2>基础信息</h2>
+      <div class="grid2">
+        <div><label>年级</label><select id="grade"><option>初一</option><option>初二</option><option>初三</option><option>高一</option><option selected>高二</option><option>高三</option></select></div>
+        <div><label>目标考试</label><input id="exam" value="期末考试" placeholder="如：中考、期末、高考"></div>
+        <div><label>距离考试还有多少天</label><input id="days" type="number" value="60" min="7"></div>
+        <div><label>每天能额外学习多久（小时）</label><input id="hours" type="number" step=".5" value="3" min=".5"></div>
+        <div><label>当前总排名（可选）</label><input id="rank" placeholder="例如：年级 320 / 900"></div>
+        <div><label>目标提升多少总分</label><input id="goalGain" type="number" value="50" min="1"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>各科成绩</h2>
+      <div id="subjectBox"></div>
+      <button class="btn ghost no-print" onclick="addSubject()">+ 添加科目</button>
+    </div>
+
+    <div class="card">
+      <h2>选择结果页风格</h2>
+      <div class="theme-grid">
+        <div class="theme active" data-theme="scholar"><b>极简学霸</b><div class="printline">干净、克制、目标感</div></div>
+        <div class="theme" data-theme="cute"><b>奶油治愈</b><div class="printline">柔和、轻松、陪伴感</div></div>
+        <div class="theme" data-theme="campus"><b>校园清新</b><div class="printline">学生感、明亮、清爽</div></div>
+        <div class="theme" data-theme="dark"><b>暗黑自律</b><div class="printline">冷静、强目标、冲刺感</div></div>
+      </div>
+      <button class="btn no-print" onclick="generateReport()">生成我的逆袭档案</button>
+    </div>
+  </section>
+
+  <section id="resultArea" class="hidden">
+    <div class="result-cover">
+      <div class="eyebrow">PERSONAL STUDY REPORT</div>
+      <h1 id="typeTitle">中等提升 · 明显偏科型</h1>
+      <div id="typeTags"></div>
+      <div class="grid4" style="margin-top:20px">
+        <div class="kpi"><span>当前总分</span><b id="curTotal">-</b></div>
+        <div class="kpi"><span>目标提升</span><b id="gainTarget">-</b></div>
+        <div class="kpi"><span>剩余时间</span><b id="leftDays">-</b></div>
+        <div class="kpi"><span>每日时间</span><b id="dailyHours">-</b></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>你最应该先救哪几科</h2>
+        <div id="priorityBox"></div>
+      </div>
+      <div class="card">
+        <h2>系统判断</h2>
+        <div class="quote" id="diagnosis"></div>
+        <h2 style="margin-top:20px">每天时间怎么分</h2>
+        <div id="timeBox"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 id="roadmapTitle">你的 60 天逆袭路线</h2>
+      <div class="grid4" id="roadmap"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>第一周最重要的任务</h2>
+        <div id="week1"></div>
+      </div>
+      <div class="card">
+        <h2>你现在最不该做的事</h2>
+        <div id="avoidBox"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>一句话策略</h2>
+      <div class="quote" id="oneLine"></div>
+      <button class="btn ghost no-print" onclick="window.print()">保存 / 打印这份结果</button>
+      <button class="btn no-print" onclick="restart()">重新测试</button>
+    </div>
+  </section>
+</div>
+
+<script>
+let subjects=[
+  {name:"语文",score:88,full:150,target:105},
+  {name:"数学",score:78,full:150,target:110},
+  {name:"英语",score:92,full:150,target:110},
+  {name:"物理",score:61,full:100,target:80},
+  {name:"化学",score:72,full:100,target:85}
+];
+
+function renderSubjects(){
+  const box=document.getElementById("subjectBox"); box.innerHTML="";
+  subjects.forEach((s,i)=>{
+    const d=document.createElement("div"); d.className="subject";
+    d.innerHTML=`
+      <div><label>科目</label><input value="${s.name}" oninput="subjects[${i}].name=this.value"></div>
+      <div><label>当前分</label><input type="number" value="${s.score}" oninput="subjects[${i}].score=+this.value"></div>
+      <div><label>满分</label><input type="number" value="${s.full}" oninput="subjects[${i}].full=+this.value"></div>
+      <div><label>目标分</label><input type="number" value="${s.target}" oninput="subjects[${i}].target=+this.value"></div>`;
+    box.appendChild(d);
+  })
+}
+function addSubject(){subjects.push({name:"新科目",score:60,full:100,target:75});renderSubjects()}
+
+document.querySelectorAll(".theme").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".theme").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.body.className="theme-"+t.dataset.theme;
+});
+
+function classify(){
+  const current=subjects.reduce((a,s)=>a+(+s.score||0),0);
+  const full=subjects.reduce((a,s)=>a+(+s.full||0),0);
+  const rate=current/Math.max(1,full);
+  const gaps=subjects.map(s=>Math.max(0,(+s.target||0)-(+s.score||0)));
+  const scores=subjects.map(s=>(+s.score||0)/Math.max(1,(+s.full||100)));
+  const maxRate=Math.max(...scores), minRate=Math.min(...scores);
+  const bias=maxRate-minRate;
+  const gain=+document.getElementById("goalGain").value||30;
+  const days=+document.getElementById("days").value||30;
+  let base = rate<.55?"基础薄弱型":rate<.7?"中等提升型":rate<.82?"稳步冲高型":"高分冲刺型";
+  let biasType = bias>.25?"明显偏科":bias>.14?"轻度偏科":"相对均衡";
+  let goalType = gain<=20?"小幅提分":gain<=50?"中等提分":"大幅提分";
+  let timeType = days<=14?"短期冲刺":days<=30?"30天提升":days<=60?"60天提升":"长期稳升";
+  return {current,full,rate,gaps,scores,bias,base,biasType,goalType,timeType,gain,days};
+}
+
+function generateReport(){
+  const c=classify();
+  const hours=+document.getElementById("hours").value||2;
+  document.getElementById("formArea").classList.add("hidden");
+  document.getElementById("resultArea").classList.remove("hidden");
+  document.getElementById("s1").classList.remove("on");document.getElementById("s2").classList.add("on");document.getElementById("s3").classList.add("on");
+
+  document.getElementById("typeTitle").textContent=`${c.base} · ${c.biasType}`;
+  document.getElementById("typeTags").innerHTML=
+    `<span class="tag">${c.goalType}</span><span class="tag">${c.timeType}</span><span class="tag">${document.getElementById("grade").value}</span><span class="tag">${document.getElementById("exam").value}</span>`;
+  document.getElementById("curTotal").textContent=c.current;
+  document.getElementById("gainTarget").textContent="+"+c.gain;
+  document.getElementById("leftDays").textContent=c.days+"天";
+  document.getElementById("dailyHours").textContent=hours+"h";
+
+  const ranked=subjects.map(s=>{
+    const score=+s.score||0, full=Math.max(1,+s.full||100), target=+s.target||0;
+    const rate=score/full, gap=Math.max(0,target-score);
+    const priority=gap/full*1.6+(1-rate)*.65;
+    return {...s,score,full,target,rate,gap,priority};
+  }).sort((a,b)=>b.priority-a.priority);
+
+  const pb=document.getElementById("priorityBox");pb.innerHTML="";
+  ranked.forEach((s,i)=>{
+    let label=i===0?"第一突破":i===1?"重点补强":i===2?"稳定提升":"保持";
+    let pct=Math.round(s.rate*100);
+    pb.innerHTML+=`<div class="priority"><div class="phead"><span>${i+1}. ${s.name}</span><span>${s.score} → ${s.target}</span></div><div class="bar"><i style="width:${pct}%"></i></div><div class="printline" style="text-align:left">${label} · 当前得分率 ${pct}% · 目标差 ${s.gap} 分</div></div>`;
+  });
+
+  let diag="";
+  if(c.base==="基础薄弱型") diag="你现在最大的问题不是难题不会，而是基础分丢得太多。第一阶段必须先把基础题和高频知识点拿稳，否则刷再多难题也很难形成有效提分。";
+  else if(c.base==="中等提升型") diag="你已经有一定基础，最值得做的是把薄弱科和高频失分点集中处理。这个阶段最怕平均用力，因为平均用力会让每科都学了、但总分涨得不明显。";
+  else if(c.base==="稳步冲高型") diag="你的基础已经不差，主要任务从“会不会”转向“稳不稳、快不快”。减少低级错误、提高熟练度和综合题稳定性，会比重新大面积补基础更有效。";
+  else diag="你现在属于高分段，继续提升的关键是稳定性、考试节奏和中高难题。不要再用低效的大量重复刷题消耗时间。";
+  if(c.biasType==="明显偏科") diag+=" 另外，你的偏科非常明显，优先救最弱的 1–2 科，比给所有科目平均加时更划算。";
+  document.getElementById("diagnosis").textContent=diag;
+
+  const weights=ranked.map((s,i)=>Math.max(.08,s.priority)*(i<2?1.25:1));
+  const sum=weights.reduce((a,b)=>a+b,0), totalMin=Math.round(hours*60);
+  const tb=document.getElementById("timeBox");tb.innerHTML="";
+  ranked.forEach((s,i)=>{
+    const mins=Math.max(10,Math.round(totalMin*weights[i]/sum));
+    tb.innerHTML+=`<div class="priority"><div class="phead"><span>${s.name}</span><span>${mins} 分钟</span></div></div>`;
+  });
+
+  document.getElementById("roadmapTitle").textContent=`你的 ${c.days} 天逆袭路线`;
+  const roadmap=document.getElementById("roadmap"); roadmap.innerHTML="";
+  let phases;
+  if(c.days<=14) phases=[
+    ["阶段1","查漏洞","Day 1–3","只找高频失分点"],
+    ["阶段2","补核心","Day 4–7","薄弱科集中突破"],
+    ["阶段3","限时练","Day 8–11","提高做题速度"],
+    ["阶段4","冲刺","Day 12–14","错题与高频点回看"]
+  ];
+  else if(c.days<=30) phases=[
+    ["阶段1","找漏洞","Day 1–7","基础题+错因归类"],
+    ["阶段2","补薄弱","Day 8–14","主攻最弱两科"],
+    ["阶段3","提速度","Day 15–21","限时专项+二刷"],
+    ["阶段4","稳分","Day 22–30","模拟+查漏补缺"]
+  ];
+  else if(c.days<=60) phases=[
+    ["阶段1","补基础","第1–2周","基础分先拿稳"],
+    ["阶段2","攻薄弱","第3–4周","两科集中突破"],
+    ["阶段3","提熟练","第5–6周","专项+限时训练"],
+    ["阶段4","稳分冲刺","第7–8周","模拟与错题回炉"]
+  ];
+  else phases=[
+    ["阶段1","重建基础","前25%时间","知识点补齐"],
+    ["阶段2","专项突破","25%–50%","薄弱科提分"],
+    ["阶段3","综合训练","50%–75%","做题速度与稳定"],
+    ["阶段4","冲刺稳定","最后25%","模拟+错题回炉"]
+  ];
+  phases.forEach(x=>roadmap.innerHTML+=`<div class="phase"><b>${x[0]} · ${x[1]}</b><div class="printline" style="text-align:left">${x[2]}<br>${x[3]}</div></div>`);
+
+  const wk=document.getElementById("week1");wk.innerHTML="";
+  const top1=ranked[0], top2=ranked[1]||ranked[0];
+  const weekItems=[
+    `${top1.name}：把最近错题按“不会 / 粗心 / 时间不够”重新分类。`,
+    `${top1.name}：连续 3 天做基础与中档题，先看正确率是否稳定。`,
+    `${top2.name}：每天至少安排一次专项练习，不和其他科平均分时间。`,
+    `每天结束用 10 分钟记录“今天最值得二刷的 1 个错误”。`,
+    `第 7 天重新看一次各科正确率，再决定下一周是否换主攻科目。`
+  ];
+  weekItems.forEach((x,i)=>wk.innerHTML+=`<div class="priority"><b>${i+1}. </b>${x}</div>`);
+
+  const avoid=document.getElementById("avoidBox");avoid.innerHTML="";
+  const avoids=[
+    "不要每天给所有科目平均分时间。",
+    "不要只抄错题答案，不写为什么错。",
+    "不要一上来就大量刷难题。",
+    "不要把计划写得很满，最后一天都执行不完。",
+    "不要连续一周不看成绩变化就机械照旧。"
+  ];
+  avoids.forEach(x=>avoid.innerHTML+=`<div class="priority">${x}</div>`);
+
+  let one=`先集中把 ${ranked[0].name}`;
+  if(ranked[1]) one+=` 和 ${ranked[1].name}`;
+  one+=` 的高频失分拿回来，再扩展到其他科；你现在最需要的不是“学更多”，而是让每一天的学习都直接指向可以拿回来的分。`;
+  document.getElementById("oneLine").textContent=one;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function restart(){
+  document.getElementById("resultArea").classList.add("hidden");
+  document.getElementById("formArea").classList.remove("hidden");
+  document.getElementById("s2").classList.remove("on");document.getElementById("s3").classList.remove("on");document.getElementById("s1").classList.add("on");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+renderSubjects();
+</script>
+</body>
+</html>
