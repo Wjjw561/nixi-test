@@ -1452,6 +1452,7 @@ function renderFinalConclusion(c,ranked,problem){
   finalConclusions(c,ranked,problem).forEach(function(x,i){
     box.innerHTML+='<div class="conclusion-item"><div class="conclusion-no">0'+(i+1)+'</div><b>'+escapeHtml(x[0])+' · '+escapeHtml(x[1])+'</b><p>'+escapeHtml(x[2])+'</p></div>';
   });
+  renderReportEvidence(c,ranked,problem);
 }
 
 function currentMode(c){
@@ -2002,6 +2003,39 @@ function renderPoster(){
 }
 function downloadPoster(){renderPoster();var a=document.createElement("a");a.href=document.getElementById("shareCanvas").toDataURL("image/png");a.download="逆袭档案-结果海报.png";a.click();}
 
+function priorityEvidenceHtml(s,i,ranked){
+  var maxPriority=Math.max.apply(null,ranked.map(function(x){return x.priority}))||1;
+  var scorePct=Math.round(s.rate*100);
+  var gapPct=Math.round((s.gap/Math.max(1,s.full))*100);
+  var relative=Math.round((s.priority/maxPriority)*100);
+  var next=ranked[i+1];
+  var compare=next?
+    (s.priority>next.priority?"它的规则优先指数高于下一科，因此排在前面。":"它与下一科接近，建议结合近期考试感受微调。"):
+    "它仍有需要处理的目标差，但优先级低于前两科。";
+  var loss=issueLabel(s.issue);
+  return '<details class="explain-details"><summary>为什么排在这里？</summary><div class="evidence-body">'+
+    '<div class="evidence-row"><b>当前得分率</b><div><div class="evidence-value">'+scorePct+'%</div><div class="evidence-meter"><i style="width:'+Math.min(100,scorePct)+'%"></i></div></div></div>'+
+    '<div class="evidence-row"><b>目标差占比</b><div><div class="evidence-value">'+s.gap+' 分，占该科满分约 '+gapPct+'%</div><div class="evidence-meter"><i style="width:'+Math.min(100,gapPct*3)+'%"></i></div></div></div>'+
+    '<div class="evidence-row"><b>主要失分</b><div class="evidence-value">'+escapeHtml(loss)+'</div></div>'+
+    '<div class="evidence-row"><b>相对优先度</b><div><div class="evidence-value">'+relative+'/100（仅用于这份报告内部排序）</div><div class="evidence-meter"><i style="width:'+relative+'%"></i></div></div></div>'+
+    '<div class="evidence-note">'+escapeHtml(compare)+' 排序时“目标差”权重高于单纯的低分；失分类型主要用来决定怎么补，不会被当成成绩概率。</div>'+
+  '</div></details>';
+}
+function renderReportEvidence(c,ranked,problem){
+  var box=document.getElementById("reportEvidenceBody");if(!box)return;
+  var top=ranked[0],targetGap=ranked.reduce(function(a,x){return a+x.gap},0);
+  var trendFilled=((document.getElementById("prev1")||{}).value||"")!==""||((document.getElementById("prev2")||{}).value||"")!=="";
+  box.innerHTML='<div class="report-evidence-body">'+
+    '<div class="report-evidence-card"><b>成绩结构</b><span>当前总得分率 '+Math.round(c.rate*100)+'%，科目差距类型为“'+escapeHtml(c.biasType)+'”。</span></div>'+
+    '<div class="report-evidence-card"><b>目标结构</b><span>各科目标差合计约 +'+targetGap+' 分；第一突破科为 '+escapeHtml(top.name)+'。</span></div>'+
+    '<div class="report-evidence-card"><b>失分原因</b><span>使用了你为各科选择的主要失分原因，用于生成学科策略和 14 天任务。</span></div>'+
+    '<div class="report-evidence-card"><b>时间条件</b><span>剩余 '+c.days+' 天、每天约 '+c.hours+' 小时，目标压力判定为“'+escapeHtml(c.pressure)+'”。</span></div>'+
+    '<div class="report-evidence-card"><b>执行条件</b><span>执行条件指数 '+c.execution+'/100，用于决定计划应偏保守、标准还是冲刺。</span></div>'+
+    '<div class="report-evidence-card"><b>成绩趋势</b><span>'+(trendFilled?'使用了你填写的历史总分，只用于调整节奏。':'未填写足够历史成绩，因此没有用趋势做主要判断。')+'</span></div>'+
+    '<div class="report-evidence-card"><b>规则边界</b><span>本报告不读取真实试卷，也不预测考试结果；所有结论都是基于你输入的数据做的规划排序。</span></div>'+
+  '</div>';
+}
+
 function priorityWhy(s,i){
   if(i===0){
     if(s.rate<.55)return "当前得分率偏低、目标差又明显，基础和中档分都有较大回收空间。";
@@ -2199,7 +2233,8 @@ function generateReport(){
       '<div class="priority-gap">+'+s.gap+'<span style="font-size:12px;font-weight:700;color:var(--muted)"> 分目标差</span></div>'+
       '<div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div>'+
       '<div class="priority-why">'+escapeHtml(priorityWhy(s,i))+'</div>'+
-      '<div class="priority-action">'+escapeHtml(priorityAction(s,i))+'</div></div>';
+      '<div class="priority-action">'+escapeHtml(priorityAction(s,i))+'</div>'+
+      priorityEvidenceHtml(s,i,ranked)+'</div>';
   });
   var rest=document.getElementById("priorityRest");rest.innerHTML="";
   ranked.slice(3).forEach(function(s){rest.innerHTML+='<span class="rest-chip">'+escapeHtml(s.name)+' · '+Math.round(s.rate*100)+'% · 维持</span>'});
