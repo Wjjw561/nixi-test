@@ -1353,6 +1353,46 @@ function renderPoster(){
 }
 function downloadPoster(){renderPoster();var a=document.createElement("a");a.href=document.getElementById("shareCanvas").toDataURL("image/png");a.download="逆袭档案-结果海报.png";a.click();}
 
+function priorityWhy(s,i){
+  if(i===0){
+    if(s.rate<.55)return "当前得分率偏低、目标差又明显，基础和中档分都有较大回收空间。";
+    if(s.gap>s.full*.15)return "离目标分差距较大，继续维持现状会明显拖累总目标。";
+    return "综合得分率、目标差和失分原因后，它是当前最值得优先投入的科目。";
+  }
+  if(i===1)return s.gap>s.full*.1?"第二高回报科，适合和第一突破科交替推进。":"需要稳定补强，防止继续拉开差距。";
+  return s.rate<.7?"保持固定训练频率，逐步减少失分。":"不用重压投入，重点守住稳定性。";
+}
+function priorityAction(s,i){
+  if(s.issue==="careless")return "今天：做 1 组专项，并把每个失分定位到具体步骤。";
+  if(s.issue==="speed")return "今天：做 1 组限时训练，记录最耗时的题型。";
+  if(s.issue==="method")return "今天：整理 1 个高频题型的方法，再连续做 3–5 道同类题。";
+  if(s.issue==="memory")return "今天：做一次闭卷回忆 + 当天复习，晚上再快速回看。";
+  if(s.issue==="unstable")return "今天：完成 1 次小型限时训练，固定答题顺序。";
+  return "今天：先补 1 个基础知识块，再用基础题验证是否真正掌握。";
+}
+function diagnosisCards(c,problem,ranked){
+  var mainTitle,mainText;
+  if(c.rate<.52){mainTitle="基础分流失";mainText="当前最值得做的不是追难题，而是先把高频基础和中档分稳定拿回来。";}
+  else if(c.bias>.24){mainTitle="偏科拖总分";mainText="科目之间差距明显。把最弱的 1–2 科拉起来，比所有科平均加量更有效。";}
+  else if(c.rate>.82){mainTitle="稳定性瓶颈";mainText="已经进入较高分段，下一步主要靠减少低级失分、卡题和时间波动。";}
+  else {mainTitle="学习投入分散";mainText="你有一定基础，但容易每科都碰一点，没有一个短板被真正解决。";}
+  var pm={
+    base:["基础不牢","先把知识漏洞补上，再谈题量。"],
+    bias:["偏科明显","主攻科要吃掉更多额外时间，其他科只做保持。"],
+    careless:["会做却丢分","把“粗心”拆成审题、步骤、计算、检查四类具体错误。"],
+    slow:["做题速度慢","需要固定加入限时训练，而不是无限延长单题时间。"],
+    plan:["计划难落地","计划要减量，每天只保留 2–3 个关键任务。"],
+    unknown:["缺少明确顺序","先按提分优先级做，不要凭感觉决定今天学什么。"]
+  };
+  var second=pm[problem]||pm.unknown;
+  var top=ranked[0];
+  return [
+    {icon:"01",title:"主问题 · "+mainTitle,text:mainText,primary:true},
+    {icon:"02",title:"次问题 · "+second[0],text:second[1],primary:false},
+    {icon:"→",title:"立刻行动 · "+top.name,text:priorityAction(top,0).replace("今天：",""),primary:false}
+  ];
+}
+
 function switchPlanWeek(index,btn){
   document.querySelectorAll(".plan-week").forEach(function(x,i){x.classList.toggle("active",i===index)});
   document.querySelectorAll(".plan-tab").forEach(function(x,i){x.classList.toggle("active",i===index)});
@@ -1407,26 +1447,33 @@ function generateReport(){
   renderTrend(c.current);
 
   var pb=document.getElementById("priorityBox");pb.innerHTML="";
-  ranked.forEach(function(s,i){
-    var label=i===0?"第一突破":i===1?"重点补强":i===2?"稳定提升":"维持";
+  ranked.slice(0,3).forEach(function(s,i){
     var pct=Math.round(s.rate*100);
-    pb.innerHTML+='<div class="priority"><div class="phead"><span>'+(i+1)+'. '+escapeHtml(s.name)+'</span><span>'+s.score+' → '+s.target+'</span></div><div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div><div class="small">'+label+' · 当前得分率 '+pct+'% · 距目标 '+s.gap+' 分</div></div>';
+    var role=i===0?"第一突破":i===1?"重点补强":"稳定提升";
+    pb.innerHTML+='<div class="priority-focus">'+
+      '<div class="priority-rank">0'+(i+1)+'</div>'+
+      '<h3>'+escapeHtml(s.name)+'</h3>'+
+      '<div class="priority-score">'+role+' · 当前 '+pct+'%</div>'+
+      '<div class="priority-gap">+'+s.gap+'<span style="font-size:12px;font-weight:700;color:var(--muted)"> 分目标差</span></div>'+
+      '<div class="bar"><i style="width:'+Math.min(100,pct)+'%"></i></div>'+
+      '<div class="priority-why">'+escapeHtml(priorityWhy(s,i))+'</div>'+
+      '<div class="priority-action">'+escapeHtml(priorityAction(s,i))+'</div></div>';
   });
+  var rest=document.getElementById("priorityRest");rest.innerHTML="";
+  ranked.slice(3).forEach(function(s){rest.innerHTML+='<span class="rest-chip">'+escapeHtml(s.name)+' · '+Math.round(s.rate*100)+'% · 维持</span>'});
 
-  var diag="";
-  if(c.rate<.52)diag="你的总分结构更像“基础分流失型”。短期最值钱的不是难题，而是把会考、能学会、容易反复丢的基础和中档分先拿稳。";
-  else if(c.bias>.24)diag="你的总分并不一定很低，但科目之间差距明显。只要最弱的 1–2 科不再持续拖后腿，总分往往会比平均用力更容易出现变化。";
-  else if(c.rate>.82)diag="你已经进入高分段，继续提升主要靠稳定性、速度和细节，而不是重新大面积补基础。";
-  else diag="你已经有一定基础，最适合的是“专项突破 + 错题回炉 + 限时稳定”路线。这个阶段最怕每天什么都学一点，但没有任何一个短板被真正解决。";
-  diag+=" "+problemText(problem);
-  document.getElementById("diagnosis").textContent=diag;
+  var cards=diagnosisCards(c,problem,ranked),db=document.getElementById("diagnosis");db.innerHTML="";
+  cards.forEach(function(x){db.innerHTML+='<div class="diag-item '+(x.primary?'primary':'')+'"><div class="diag-icon">'+x.icon+'</div><div><b>'+escapeHtml(x.title)+'</b><p>'+escapeHtml(x.text)+'</p></div></div>'});
+  document.getElementById("diagnosisTag").textContent=c.typeTitle;
 
   renderRiskRadar(c,ranked);
   renderLeverMap(ranked);
   var totalMin=Math.round(c.hours*60),mins=allocateMinutes(ranked,totalMin);
   var tb=document.getElementById("timeBox");tb.innerHTML="";
+  document.getElementById("timeTotalBadge").textContent=totalMin+" 分钟 / 天";
   ranked.forEach(function(s,i){
-    tb.innerHTML+='<div class="priority"><div class="phead"><span>'+escapeHtml(s.name)+'</span><span>'+mins[i]+' 分钟</span></div><div class="bar"><i style="width:'+Math.round(mins[i]/totalMin*100)+'%"></i></div></div>';
+    var share=Math.round(mins[i]/totalMin*100);
+    tb.innerHTML+='<div class="time-row"><div class="time-row-top"><span>'+escapeHtml(s.name)+'</span><span>'+mins[i]+' 分钟 · '+share+'%</span></div><div class="time-mini-bar"><i style="width:'+share+'%"></i></div></div>';
   });
 
   document.getElementById("roadmapTitle").textContent="③ 你的 "+c.days+" 天阶段路线";
