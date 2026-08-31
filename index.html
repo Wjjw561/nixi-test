@@ -154,10 +154,34 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .lever-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .lever{padding:15px;border:1px solid var(--line);border-radius:17px;background:var(--card)}
 .lever .level{display:inline-block;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted);margin-top:8px}
-details.week{border:1px solid var(--line);border-radius:18px;background:var(--card);margin:10px 0;overflow:hidden}
-details.week summary{list-style:none;padding:14px 16px;font-weight:900;background:var(--soft);cursor:pointer}
-details.week summary::-webkit-details-marker{display:none}
-details.week .inside{padding:8px 12px 12px}
+.plan-card{overflow:hidden}
+.plan-tabs{display:flex;gap:7px;flex-shrink:0}
+.plan-tab{border:1px solid var(--line);background:var(--soft);color:var(--muted);padding:8px 12px;border-radius:999px;font-weight:850;font-size:12px}
+.plan-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.plan-week{display:none}.plan-week.active{display:block}
+.plan-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 15px;border-radius:16px;background:var(--soft);margin-bottom:10px}
+.plan-summary b{font-size:14px}.plan-summary span{font-size:11px;color:var(--muted)}
+.plan-list{display:grid;gap:8px}
+.plan-day{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:17px;background:var(--card);transition:.18s}
+.plan-day:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(36,38,32,.05)}
+.plan-date{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:13px;background:var(--soft);min-height:76px}
+.plan-date b{font-size:18px}.plan-date span{font-size:10px;color:var(--muted);margin-top:3px}
+.plan-main{min-width:0}
+.plan-day-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}
+.plan-day-head b{font-size:13px}
+.plan-phase{font-size:10px;padding:4px 7px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.plan-task{display:grid;grid-template-columns:48px 1fr;gap:7px;align-items:start;padding:4px 0;font-size:12px;line-height:1.55}
+.plan-task strong{font-size:10px;color:var(--muted);font-weight:850;padding-top:2px}
+.plan-review{margin-top:5px;padding:7px 9px;border-radius:11px;background:var(--soft);font-size:11px;color:var(--muted);line-height:1.5}
+.avoid-card{overflow:hidden}
+.avoid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.avoid-item{position:relative;padding:16px 16px 15px 48px;border:1px solid var(--line);border-radius:17px;background:var(--card);min-height:108px}
+.avoid-num{position:absolute;left:14px;top:15px;width:24px;height:24px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-size:10px;font-weight:900;color:var(--muted)}
+.avoid-item b{display:block;font-size:13px;margin-bottom:5px}
+.avoid-item p{margin:0;font-size:11px;color:var(--muted);line-height:1.6}
+.avoid-item.primary{background:linear-gradient(135deg,var(--soft),var(--card));border-color:var(--accent2)}
+@media(max-width:760px){.plan-card .section-title,.avoid-card .section-title{align-items:flex-start}.plan-tabs{margin-top:3px}.avoid-grid{grid-template-columns:1fr}}
+@media(max-width:430px){.plan-card .section-title{display:block}.plan-tabs{margin:10px 0 2px}.plan-day{grid-template-columns:52px 1fr;padding:11px}.plan-task{grid-template-columns:42px 1fr}.avoid-item{min-height:auto}}
 .review-schedule{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
 .review-step{padding:13px;border-radius:16px;background:var(--soft);text-align:center;border:1px solid var(--line)}
 .review-step b{display:block;font-size:18px;margin-bottom:4px}.review-step span{font-size:11px;color:var(--muted)}
@@ -436,15 +460,29 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div class="grid3" id="subjectStrategies"></div>
     </div>
 
-    <div class="grid2">
-      <div class="card">
-        <h2>⑤ 14 天执行计划</h2>
-        <div id="weekPlan"></div>
+    <div class="card plan-card">
+      <div class="section-title">
+        <div>
+          <h2>⑤ 14 天执行计划</h2>
+          <div class="desc">一次只看一周。每天只保留“主攻、补强、复盘”三件事，减少信息压迫感。</div>
+        </div>
+        <div class="plan-tabs no-print">
+          <button class="plan-tab active" data-plan-week="0" onclick="switchPlanWeek(0,this)">第 1 周</button>
+          <button class="plan-tab" data-plan-week="1" onclick="switchPlanWeek(1,this)">第 2 周</button>
+        </div>
       </div>
-      <div class="card">
-        <h2>⑥ 现在最不该做的事</h2>
-        <div id="avoidBox"></div>
+      <div id="weekPlan"></div>
+    </div>
+
+    <div class="card avoid-card">
+      <div class="section-title">
+        <div>
+          <h2>⑥ 避坑提醒</h2>
+          <div class="desc">不是“不能做”，而是这些行为最容易消耗时间却不转化成分数。</div>
+        </div>
+        <span class="state-pill">少踩坑 = 多拿分</span>
       </div>
+      <div id="avoidBox" class="avoid-grid"></div>
     </div>
 
     <div class="card">
