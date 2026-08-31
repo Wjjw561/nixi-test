@@ -299,6 +299,24 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
   </div>
 
   <section id="formArea">
+    <div class="form-status no-print">
+      <div class="form-status-main">
+        <div>
+          <div class="eyebrow">YOUR INPUT · 当前填写</div>
+          <b id="formProgressText">正在准备你的测评</b>
+          <div class="small" id="draftStatus">填写内容会自动保存在本机</div>
+        </div>
+        <button class="mini-link" onclick="clearDraft()">清空重填</button>
+      </div>
+      <div class="form-progress"><i id="formProgressBar" style="width:0%"></i></div>
+      <div class="input-snapshot" id="inputSnapshot">
+        <span>当前总分 <b id="liveCurrent">-</b></span>
+        <span>各科目标 <b id="liveTarget">-</b></span>
+        <span>计划提升 <b id="liveGain">-</b></span>
+        <span id="goalConsistency">等待成绩数据</span>
+      </div>
+    </div>
+
     <div class="card">
       <h2>先告诉我你的基本情况</h2>
       <div class="desc">信息越接近你最近一次考试，生成的路线越有参考价值。</div>
@@ -367,6 +385,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div class="subject-head"><span>科目</span><span>当前分</span><span>满分</span><span>目标分</span><span>主要失分原因</span><span></span></div>
       <div id="subjectBox"></div>
       <button class="btn ghost no-print" onclick="addSubject()">＋ 添加一科</button>
+      <div class="inline-note" id="subjectGoalNote">系统会用“各科目标分”和“总目标提升”交叉检查，避免目标互相矛盾。</div>
     </div>
 
     <div class="card">
@@ -391,6 +410,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <button class="btn no-print" onclick="generateReport()">生成我的逆袭档案</button>
       <div class="notice">本测试提供学习规划参考，不承诺固定提分结果。成绩变化还受课程难度、学习基础、执行质量等因素影响。</div>
     </div>
+    <div class="mobile-generate no-print">
+      <div><b>逆袭档案</b><span id="mobileReadyText">填写完成后生成报告</span></div>
+      <button onclick="generateReport()">生成报告</button>
+    </div>
   </section>
 
   <section id="resultArea" class="hidden">
@@ -407,6 +430,21 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
+    <div class="result-toolbar no-print">
+      <div class="result-nav">
+        <a href="#reportOverview">总览</a>
+        <a href="#reportStrategy">策略</a>
+        <a href="#reportPlan">14天计划</a>
+        <a href="#reportReview">复盘</a>
+        <a href="#reportBuddy">搭子</a>
+      </div>
+      <div class="view-switch">
+        <button class="view-btn active" data-view="focus" onclick="setReportView('focus',this)">重点版</button>
+        <button class="view-btn" data-view="full" onclick="setReportView('full',this)">完整版</button>
+      </div>
+    </div>
+
+    <div id="reportOverview" class="section-anchor"></div>
     <div class="dashboard-strip">
       <div class="dash-card">
         <div class="dash-label">TODAY MODE · 今日模式</div>
@@ -431,7 +469,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="card">
+    <div class="card detail-full" id="riskSection">
       <h2>学习风险雷达</h2>
       <div class="desc">拆开看基础、偏科、执行和目标压力四类风险，帮助你判断先解决什么。</div>
       <div class="radar-wrap">
@@ -440,7 +478,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="card">
+    <div class="card detail-full" id="trendSection">
       <h2>成绩趋势 & 执行条件</h2>
       <div class="desc">这两个指标不预测结果，只帮助决定计划该“冲”还是该“稳”。</div>
       <div class="metric-row">
@@ -459,12 +497,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="card">
-      <h2>提分杠杆地图</h2>
-      <div class="desc">把科目分成“优先投入 / 稳步提升 / 维持稳定”，方便你看出哪里最值得花时间。</div>
-      <div class="lever-grid" id="leverMap"></div>
-    </div>
-
+    <div id="reportStrategy" class="section-anchor"></div>
     <div class="card priority-card-section">
       <div class="section-title">
         <div>
@@ -475,6 +508,10 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
       <div id="priorityBox" class="priority-grid"></div>
       <div id="priorityRest" class="priority-rest"></div>
+      <div class="strategy-layer">
+        <div class="small"><b>策略分层</b> · 用来解释为什么时间不是平均分配</div>
+        <div id="leverMap" class="lever-compact"></div>
+      </div>
     </div>
 
     <div class="card diagnosis-section">
@@ -494,17 +531,18 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="card">
+    <div class="card detail-full" id="roadmapSection">
       <h2 id="roadmapTitle">③ 你的阶段路线</h2>
       <div class="desc">不是把每天排满，而是让每一阶段只解决一个主要问题。</div>
       <div class="grid4" id="roadmap"></div>
     </div>
 
-    <div class="card">
+    <div class="card detail-full" id="subjectStrategySection">
       <h2>④ 各科怎么补</h2>
       <div class="grid3" id="subjectStrategies"></div>
     </div>
 
+    <div id="reportPlan" class="section-anchor"></div>
     <div class="card plan-card">
       <div class="section-title">
         <div>
@@ -519,7 +557,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div id="weekPlan"></div>
     </div>
 
-    <div class="card avoid-card">
+    <div class="card avoid-card detail-full">
       <div class="section-title">
         <div>
           <h2>⑥ 避坑提醒</h2>
@@ -530,19 +568,20 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div id="avoidBox" class="avoid-grid"></div>
     </div>
 
-    <div class="card">
+    <div class="card detail-full">
       <h2>⑦ 本周量化目标</h2>
       <div class="desc">把“努力”改成可以打勾的数字目标。</div>
       <div class="goal-grid" id="weeklyGoals"></div>
     </div>
 
+    <div id="reportReview" class="section-anchor"></div>
     <div class="card">
       <h2>⑧ 错题二刷节奏</h2>
       <div class="desc">重要错题不要只看一次。下面给你一个简单复习节奏：当天、次日、第3天、第7天、第14天。</div>
       <div class="review-schedule" id="reviewSchedule"></div>
     </div>
 
-    <div class="card no-print">
+    <div class="card no-print detail-full">
       <h2>⑨ 目标压力模拟器</h2>
       <div class="desc">拖动“每天时间”和“阶段目标”，看看执行压力如何变化。它不是提分预测，只是帮助你把目标调到更可执行。</div>
       <div class="simulator">
@@ -562,13 +601,13 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       </div>
     </div>
 
-    <div class="card paper">
+    <div class="card paper detail-full">
       <h2>⑩ 你的“电子学习本”</h2>
       <div class="desc">可以直接截图或保存 PDF，当作接下来一周的执行页。</div>
       <div id="notebook"></div>
     </div>
 
-    <div class="card no-print">
+    <div class="card no-print detail-full" id="shareSection">
       <h2>结果分享海报</h2>
       <div class="desc">一键生成适合发朋友圈 / QQ / 小红书的摘要海报，不展示完整成绩明细。</div>
       <div class="poster-controls">
@@ -580,6 +619,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <button class="btn ghost" onclick="downloadPoster()">下载这张海报</button>
     </div>
 
+    <div id="reportBuddy" class="section-anchor"></div>
     <div class="card">
       <div class="companion-result">
         <div class="companion-profile">
