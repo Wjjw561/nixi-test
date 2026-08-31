@@ -119,6 +119,21 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 .note-panel{display:none}.note-panel.active{display:block}
 .note-box{min-height:76px;padding:13px;border:1px dashed var(--line);border-radius:14px;margin:8px 0;color:var(--muted);font-size:13px;line-height:1.65}
 .score-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted)}
+.radar-wrap{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:center}
+.radar{width:100%;max-width:260px;aspect-ratio:1;margin:auto}.radar svg{width:100%;height:100%}
+.risk-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.risk-item{padding:13px;border-radius:15px;background:var(--soft);border:1px solid var(--line)}
+.risk-item b{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px}
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.goal-card{padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--card)}
+.goal-card .num{font-size:30px;font-weight:900;margin:5px 0}
+.poster-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.poster-btn{border:0;border-radius:999px;padding:8px 11px;background:var(--soft);color:var(--muted);font-weight:800}
+.poster-btn.active{background:var(--accent);color:#fff}
+.poster-preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--soft);padding:10px}
+.poster-preview canvas{display:block;width:100%;height:auto;border-radius:14px;background:#fff}
+@media(max-width:760px){.radar-wrap{grid-template-columns:1fr}.risk-list,.goal-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){.risk-list,.goal-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.lever-grid{grid-template-columns:1fr 1fr}.review-schedule{grid-template-columns:repeat(3,1fr)}.simulator,.metric-row{grid-template-columns:1fr}}
 
 .theme-cute{--bg:#fff7f8;--card:#fff;--text:#422f37;--muted:#8d7480;--line:#efdce4;--accent:#cf7190;--accent2:#e491ad;--soft:#fbe8ef}
