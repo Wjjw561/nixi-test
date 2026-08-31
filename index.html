@@ -75,8 +75,15 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .companion-meta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}
 .companion-meta span{padding:5px 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:10px;color:var(--muted)}
 .buddy-missions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
-.buddy-mission{padding:13px;border-radius:15px;background:var(--card);border:1px solid var(--line);font-size:12px;line-height:1.55}
-.buddy-mission b{display:block;margin-bottom:5px}
+.buddy-mission{padding:13px;border-radius:15px;background:var(--card);border:1px solid var(--line);font-size:12px;line-height:1.55;cursor:pointer;transition:.18s;position:relative}
+.buddy-mission:hover{transform:translateY(-1px)}
+.buddy-mission.done{opacity:.68;background:var(--soft)}
+.buddy-mission.done:after{content:"✓";position:absolute;right:11px;top:10px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:11px;font-weight:900}
+.buddy-mission b{display:block;margin-bottom:5px;padding-right:24px}
+.mascot-state{animation:buddyFloat 2.6s ease-in-out infinite}
+.mascot-state.done{animation:buddyPop .55s ease}
+@keyframes buddyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes buddyPop{0%{transform:scale(.88)}55%{transform:scale(1.08)}100%{transform:scale(1)}}
 .buddy-dialogue{margin-top:12px;padding:15px;border-radius:16px;background:var(--card);border:1px dashed var(--line);line-height:1.7}
 .buddy-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .buddy-tools button{border:0;border-radius:999px;padding:8px 11px;background:var(--soft);color:var(--text);font-weight:800;font-size:12px}
@@ -527,6 +534,8 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 var subjects=[];
 var companionAuto=true;
 var buddyLineIndex=0;
+var buddyState="happy";
+var buddyMissionDone=[false,false,false];
 var selectedCompanion=null;
 var lastReport=null;
 var posterStyle="brief";
@@ -736,9 +745,41 @@ function mascotMarkup(c){
     '<path d="M35 38 Q60 21 85 38" stroke="#78a5ff" stroke-width="8" stroke-linecap="round"/><circle cx="37" cy="39" r="6" fill="#78a5ff"/><circle cx="83" cy="39" r="6" fill="#78a5ff"/>'+
     '<ellipse cx="36" cy="83" rx="9" ry="16" fill="#26334d" transform="rotate(25 36 83)"/><ellipse cx="84" cy="83" rx="9" ry="16" fill="#26334d" transform="rotate(-25 84 83)"/>'+end;
 }
+
+function stateDecor(state){
+  if(state==="done")return '<circle cx="94" cy="26" r="16" fill="#4dbb7a"/><path d="M86 26 L92 32 L102 20" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 35 L23 25 L28 35 L38 40 L28 45 L23 55 L18 45 L8 40Z" fill="#ffd75f"/>';
+  if(state==="sprint")return '<path d="M94 13 L82 36 L94 34 L84 55 L106 27 L94 29Z" fill="#ffb53e"/><circle cx="20" cy="25" r="5" fill="#ff6b61"/><circle cx="15" cy="42" r="3" fill="#ff9a58"/>';
+  if(state==="alert")return '<circle cx="96" cy="24" r="15" fill="#ffcf57"/><path d="M96 15 L96 27" stroke="#6a5121" stroke-width="4" stroke-linecap="round"/><circle cx="96" cy="33" r="2.5" fill="#6a5121"/><path d="M26 25 Q18 34 24 42 Q34 36 26 25Z" fill="#76b9ff"/>';
+  if(state==="comfort")return '<path d="M92 22 C88 13 74 16 76 27 C78 38 92 45 92 45 C92 45 106 38 108 27 C110 16 96 13 92 22Z" fill="#f39ab7"/><circle cx="25" cy="35" r="7" fill="#ffd4e0" opacity=".8"/>';
+  return '<path d="M94 18 L98 28 L108 32 L98 36 L94 46 L90 36 L80 32 L90 28Z" fill="#ffd75f"/><circle cx="22" cy="28" r="5" fill="#9fc5ff"/>';
+}
+function mascotStateMarkup(c,state){
+  return mascotMarkup(c).replace('</svg>',stateDecor(state||"happy")+'</svg>').replace('class="mascot-art"','class="mascot-art mascot-state '+(state||"happy")+'"');
+}
+function buddyStateInfo(state){
+  var map={
+    happy:["开心推进","今天的路线很清楚，先做第一突破科，完成后再往下走。"],
+    alert:["提醒模式","今天别让同一个失分原因再次出现，做完题要追到具体错因。"],
+    sprint:["冲刺模式","时间或目标偏紧，今天只做高回报任务，低价值任务可以删。"],
+    comfort:["安慰模式","今天把计划做轻一点，先完成最低任务，保持连续比硬撑更重要。"],
+    done:["完成打卡","今天的三项搭子任务已经完成，可以安心收尾并记录一个关键收获。"]
+  };
+  return map[state]||map.happy;
+}
+function chooseBuddyState(c,problem){
+  if(c.days<=14||c.pressure==="很高"||c.pressure==="较高")return "sprint";
+  if(c.execution<50)return "comfort";
+  if(problem==="careless"||problem==="bias")return "alert";
+  return "happy";
+}
+function issueLabel(issue){
+  var m={base:"基础不牢",careless:"粗心/步骤",speed:"速度慢",method:"方法不会",memory:"记忆不牢",unstable:"发挥波动"};
+  return m[issue]||"高价值失分";
+}
+
 function renderHeroMascot(){
   var box=document.getElementById("heroMascot");
-  if(box)box.innerHTML=mascotMarkup(selectedCompanion||companions[0]);
+  if(box)box.innerHTML=mascotStateMarkup(selectedCompanion||companions[0],buddyState);
 }
 
 function renderCompanions(){
@@ -820,7 +861,7 @@ function buddyMissionsFor(c,ranked){
   ];
 }
 function renderBuddy(c,ranked,problem){
-  document.getElementById("companionAvatar").innerHTML=mascotMarkup(selectedCompanion);
+  document.getElementById("companionAvatar").innerHTML=mascotStateMarkup(selectedCompanion,buddyState);
   document.getElementById("companionName").textContent=selectedCompanion.name;
   document.getElementById("companionRole").textContent=selectedCompanion.role+" · "+selectedCompanion.goodFor;
   document.getElementById("companionMeta").innerHTML=selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
