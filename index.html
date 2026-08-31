@@ -1579,32 +1579,128 @@ function problemText(problem){
   return map[problem]||"先集中解决最影响总分的问题。";
 }
 
-function subjectStrategy(s){
-  var n=s.name,rate=s.rate;
-  var stage=rate<.55?"基础":rate<.75?"提升":"精修";
-  var tail=" "+issueAdvice(s.issue);
-  if(n.indexOf("数学")>=0){
-    return (stage==="基础"?"先回补定义、公式和典型例题；基础题正确率稳定后再做综合题。":stage==="提升"?"按函数/几何/数列等高频模块做专项，错题至少二刷一次。":"用限时训练压缩计算和审题时间，重点减少低级失分与卡题。")+tail;
+function subjectFamily(name){
+  var n=String(name||"");
+  if(n.indexOf("数学")>=0)return "math";
+  if(n.indexOf("英语")>=0)return "english";
+  if(n.indexOf("语文")>=0)return "chinese";
+  if(n.indexOf("物理")>=0)return "physics";
+  if(n.indexOf("化学")>=0)return "chemistry";
+  if(n.indexOf("生物")>=0)return "biology";
+  if(n.indexOf("历史")>=0)return "history";
+  if(n.indexOf("地理")>=0)return "geography";
+  if(n.indexOf("政治")>=0||n.indexOf("道法")>=0)return "politics";
+  return "general";
+}
+function subjectStage(rate){
+  return rate<.55?"foundation":rate<.75?"growth":"refine";
+}
+function subjectStageLabel(stage){
+  return stage==="foundation"?"基础重建":stage==="growth"?"中段突破":"高分精修";
+}
+var subjectContentLibrary={
+  math:{
+    foundation:{focus:"定义、公式、基础计算和最常见题型先连起来",practice:"按知识块做“例题 1 道 → 基础题 3–5 道 → 当场订正”，先确认会不会，再追求数量。",avoid:"暂时少碰偏难综合题和大量陌生技巧题。",check:"7 天后应能在不看答案时说出核心公式，并稳定完成两组基础题。"},
+    growth:{focus:"高频题型识别和中档题方法迁移",practice:"按函数、几何、数列/概率等模块做同类题组；每组只记录识别信号、标准方法和最容易错的一步。",avoid:"不要一天换很多专题，也不要只收藏方法不做同类题。",check:"7 天后至少有 1–2 个高频题型能从“看答案才会”变成“看到特征就知道怎么下手”。"},
+    refine:{focus:"限时稳定、步骤完整和卡题管理",practice:"用小套卷或混合题做限时训练，单独记录超时题、计算失误和本来会做却没拿满的题。",avoid:"不要继续用大量基础重复题占满时间，也不要在一道难题上耗太久。",check:"7 天后同难度训练中，低级失分和无效卡题次数应比第一天更少。"}
+  },
+  english:{
+    foundation:{focus:"高频词、基础语法和句子读懂能力",practice:"每天固定一小组高频词 + 语法点，再用短阅读验证；词汇必须放进句子里认，不只看中文意思。",avoid:"不要一次背很多新词却不复现，也不要只刷阅读不补词汇和语法。",check:"7 天后应能主动回忆一批本周高频词，并明显减少“句子每个词都认识但看不懂”的情况。"},
+    growth:{focus:"阅读/完形稳定性 + 词汇语境 + 写作可复用表达",practice:"阅读和完形按错因分类：词义、句间逻辑、定位、语法；作文只积累自己真的会用的句型。",avoid:"不要只追求刷篇数，也不要抄很复杂但自己不会用的模板。",check:"7 天后能说清主要错题属于哪类原因，并沉淀一组可直接用于写作的表达。"},
+    refine:{focus:"阅读速度、长难句、写作准确性和整卷时间",practice:"做限时阅读组，复盘长句结构与定位路径；写作用熟练表达追求准确，不追求生僻词。",avoid:"不要为了“高级”牺牲准确，也不要把时间全压在单一题型。",check:"7 天后同等篇数阅读用时更稳定，作文中低级语法和拼写错误减少。"}
+  },
+  chinese:{
+    foundation:{focus:"古诗文、基础知识和阅读常见得分点",practice:"先把古诗文、字词、文言基础和阅读常见问法做成稳定得分区，再补作文基本结构。",avoid:"不要把大部分时间都花在作文素材或难阅读上。",check:"7 天后基础题和古诗文中的重复性错误应明显减少，并能说出常见阅读题的答题结构。"},
+    growth:{focus:"阅读题型结构 + 文言稳定 + 作文审题与素材调用",practice:"阅读按题型整理“题干要求—答案结构—文本依据”；作文练审题、立意和素材调用，不必每次写完整篇。",avoid:"不要只背标准答案，也不要只收集素材却不练如何使用。",check:"7 天后至少能把 2–3 类阅读题的答题结构讲清楚，并完成数次作文审题练习。"},
+    refine:{focus:"限时阅读、表达精度和作文稳定输出",practice:"用整组阅读和作文提纲做限时训练，重点复盘漏点、答非所问和语言冗余。",avoid:"不要为了文采堆砌表达，也不要忽略审题与卷面时间。",check:"7 天后阅读答案更贴题、漏点更少，作文立意和结构能在限定时间内快速确定。"}
+  },
+  physics:{
+    foundation:{focus:"公式含义、典型情境、受力/过程和单位",practice:"每个公式都配一个典型情境；基础题必须写清已知、过程和单位，避免只背公式名。",avoid:"不要直接跳到综合大题，也不要只背公式不理解适用条件。",check:"7 天后看到典型情境时能主动判断使用哪个模型，并减少单位和基本步骤错误。"},
+    growth:{focus:"模型识别 + 力学/电学等高频专题",practice:"按专题做连续题组，错题只追问三件事：模型识别错在哪、哪一步断了、下次看到什么信号要想到它。",avoid:"不要把所有错题都归结成“不会”，也不要跨专题乱刷。",check:"7 天后至少一个高频专题能稳定识别模型并写出完整过程。"},
+    refine:{focus:"综合题拆过程、限时计算和稳定性",practice:"用综合题训练分过程建模，记录卡顿点和计算链；做完优先复盘本来能拿却丢掉的步骤分。",avoid:"不要只看最终答案，也不要为了最后一问牺牲前面可得分步骤。",check:"7 天后综合题中过程书写更完整，卡在第一步的情况减少。"}
+  },
+  chemistry:{
+    foundation:{focus:"核心概念、方程式、实验现象和基本计算模板",practice:"概念与方程式用闭卷回忆，实验题按“目的—操作—现象—结论”整理，计算题先固定基本格式。",avoid:"不要只抄方程式和实验答案，也不要过早追综合推断。",check:"7 天后常见方程式和实验现象能主动写出，基础计算步骤更完整。"},
+    growth:{focus:"实验、反应原理、计算和高频推断模块",practice:"按模块训练，错题回填到对应概念；推断题重点练条件提取，不只记结论。",avoid:"不要把推断题做成猜答案，也不要题题都从头重新总结。",check:"7 天后至少一个高频模块的错误类型明显集中，不再每题都出现不同基础漏洞。"},
+    refine:{focus:"综合实验/推断的信息提取和答题完整性",practice:"限时做综合题，复盘遗漏条件、术语不规范、方程式条件和计算过程。",avoid:"不要只追最后结论，不要因为会做就省略必要步骤。",check:"7 天后综合题的非知识性扣分减少，表达更接近规范答案。"}
+  },
+  biology:{
+    foundation:{focus:"教材核心概念、过程和图表对应关系",practice:"以教材概念为中心，把名词、过程、图表和常见选择题连起来；错题必须回到具体概念。",avoid:"不要只刷材料题，也不要把生物学成纯背答案。",check:"7 天后能用自己的话解释本周核心过程，并减少概念混淆型选择题错误。"},
+    growth:{focus:"图表、实验和材料题中的概念迁移",practice:"做图表/实验题时标出自变量、因变量、对照和结论依据，材料题先找对应教材概念。",avoid:"不要一看材料长就凭印象答，也不要只背实验模板。",check:"7 天后遇到实验题能主动列出变量和对照，材料题更容易定位到教材知识点。"},
+    refine:{focus:"材料分析、实验设计和术语表达精度",practice:"用综合题练证据链：材料信息 → 教材概念 → 规范术语；重点检查答案是否回答题干限定。",avoid:"不要用模糊口语替代学科术语，也不要写很多无关内容。",check:"7 天后答案更短但更准确，术语和因果表达错误减少。"}
+  },
+  history:{
+    foundation:{focus:"时间线、事件因果和章节骨架",practice:"先搭“时间—人物/事件—原因—影响”框架，再做基础选择和简答，避免孤立背句子。",avoid:"不要只背碎片化结论，也不要先攻很复杂材料题。",check:"7 天后能不看书复述一条完整时间线，并把常错事件放回正确阶段。"},
+    growth:{focus:"材料信息与教材框架的对应",practice:"材料题先圈时间、主体、变化和设问动词，再把信息挂回原因/影响/特点等常见框架。",avoid:"不要看到材料题就直接默写背过的答案。",check:"7 天后材料题能更快判断在问原因、影响、特点还是评价。"},
+    refine:{focus:"史料解读、比较题和答案结构",practice:"练同类材料题的证据提取与分点表达，答案每一点尽量对应一条材料或教材依据。",avoid:"不要只追求写得多，也不要忽视题目限定的时间和主体。",check:"7 天后答案分点更清楚，材料依据与结论错位的情况减少。"}
+  },
+  geography:{
+    foundation:{focus:"地图定位、基础规律和常见地理过程",practice:"地图、区域位置和基本规律一起学；自然地理用简单示意图解释过程，不只背结论。",avoid:"不要脱离地图背区域，也不要直接大量刷综合题。",check:"7 天后常见区域能快速定位，核心过程能用图或因果链解释。"},
+    growth:{focus:"材料图表读取 + 自然/人文规律迁移",practice:"每道综合题先读图名、图例、坐标和变化，再判断调用哪个规律；错题记录“图上漏看了什么”。",avoid:"不要凭生活经验替代材料证据，也不要跳过图例和单位。",check:"7 天后读图时能形成固定顺序，因漏看图例、坐标造成的错误减少。"},
+    refine:{focus:"综合材料的信息筛选和规范表述",practice:"限时做综合题，练“条件—过程—结果”表达和区域差异比较；答案尽量使用学科术语。",avoid:"不要堆砌套话，也不要忽略区域特殊条件。",check:"7 天后综合题答案更贴材料，套模板但不对应区域的情况减少。"}
+  },
+  politics:{
+    foundation:{focus:"核心概念、关键词和知识模块关系",practice:"先建立章节框架，概念必须知道关键词和适用场景，再做基础选择与简答。",avoid:"不要整段机械背诵，也不要只记题目答案。",check:"7 天后能用关键词解释核心概念，并减少概念张冠李戴。"},
+    growth:{focus:"材料关键词 → 知识点 → 答题结构",practice:"材料题先标主体、行为、问题和设问动词，再匹配知识模块；每点答案都写“观点 + 材料对应”。",avoid:"不要一看到材料就堆知识点，也不要只写材料不写观点。",check:"7 天后材料题能更稳定匹配到正确模块，答案分点更清楚。"},
+    refine:{focus:"观点准确、材料结合和时间控制",practice:"限时训练主观题，复盘知识点漏用、材料结合不足和表述重复。",avoid:"不要追求写满版面，也不要用模糊口号代替教材观点。",check:"7 天后同类主观题用时更稳定，答案更短但有效点更多。"}
+  },
+  general:{
+    foundation:{focus:"最基础概念和高频基本题",practice:"先按知识块复习，再用基础题验证；每次只解决一个小范围。",avoid:"不要一开始就做大量综合题。",check:"7 天后至少一个核心知识块能从“经常错”变成“基本稳定”。"},
+    growth:{focus:"高频模块和典型题型",practice:"按模块做连续训练，错题记录识别信号和关键步骤。",avoid:"不要频繁更换专题。",check:"7 天后至少一个高频模块的正确率和熟练度明显更稳定。"},
+    refine:{focus:"限时稳定和非知识性失分",practice:"使用混合题和限时训练，重点复盘本来会做却丢掉的分。",avoid:"不要继续用大量低难度重复题占满时间。",check:"7 天后低级错误和无效卡顿次数减少。"}
   }
-  if(n.indexOf("英语")>=0){
-    return (stage==="基础"?"把词汇和基础语法放在每天固定位置，阅读先求读懂再求速度。":stage==="提升"?"词汇复习+阅读/完形专项并行，每周固定整理一次作文可复用表达。":"重点练阅读速度、长难句和写作稳定性，减少会但写不出的表达损失。")+tail;
+};
+function issueOverlayFor(s){
+  var family=subjectFamily(s.name),issue=s.issue||"base";
+  var generic={
+    base:{core:"基础知识调用不稳定",action:"把每次专项缩小到一个知识块，先闭卷回忆，再用基础题验证。",avoid:"不要把“看懂答案”当成真正掌握。"},
+    method:{core:"题型识别和方法选择不稳定",action:"整理“题目特征 → 应用方法 → 易错步骤”，并连续做同类题形成迁移。",avoid:"不要只收藏方法总结，却不做同类题验证。"},
+    careless:{core:"会做但在过程环节丢分",action:"把错误细分为审题、步骤、计算/书写、单位/关键词、检查五类。",avoid:"不要再用“粗心”两个字结束复盘。"},
+    speed:{core:"会做与限时做对之间有差距",action:"给高频题型设定时间上限，超时先标记，训练做题顺序和取舍。",avoid:"不要在一道题上无限延长时间。"},
+    memory:{core:"知识接触过，但需要时提取不出来",action:"使用当天、次日、第3天、第7天的主动回忆，并把记忆内容放回题目或语境。",avoid:"不要只反复看、抄，却不闭卷回忆。"},
+    unstable:{core:"同类内容输出波动较大",action:"固定答题顺序和检查流程，用小规模重复训练观察哪一步最容易波动。",avoid:"不要状态一差就马上更换整套学习方法。"}
+  };
+  var x=Object.assign({},generic[issue]||generic.base);
+  if(issue==="memory"&&family==="english"){
+    x.action="把高频词和固定搭配放进句子中主动回忆；当天、次日、第3天、第7天重复提取。";
+  }else if(issue==="memory"&&(family==="math"||family==="physics"||family==="chemistry")){
+    x.action="公式、定义、方程式采用“遮住答案自己写 → 用基础题调用 → 隔天再写”的方式复现。";
+  }else if(issue==="careless"&&family==="chinese"){
+    x.action="把失分拆成审题偏差、漏答要点、引用依据不足、表达不完整，而不是笼统写“粗心”。";
+  }else if(issue==="method"&&(family==="history"||family==="geography"||family==="politics")){
+    x.action="把题目设问类型和答题框架对应起来，同时要求每个观点都能找到材料或知识依据。";
+  }else if(issue==="speed"&&(family==="chinese"||family==="english")){
+    x.action="用阅读组限时训练，记录定位、理解和作答分别耗时多少，找出最慢环节。";
+  }else if(issue==="unstable"&&(family==="math"||family==="physics"||family==="chemistry")){
+    x.action="固定草稿、步骤和检查顺序，用同难度小套题比较波动来自模型识别、计算还是时间分配。";
   }
-  if(n.indexOf("语文")>=0){
-    return (stage==="基础"?"先守住古诗文、基础知识和阅读常见题型，不急着只攻作文。":stage==="提升"?"阅读题按题型总结答题结构，作文建立自己的素材库和常用结构。":"重点做限时阅读、作文审题与表达精修，提高稳定性而不是追求花哨。")+tail;
-  }
-  if(n.indexOf("物理")>=0){
-    return (stage==="基础"?"公式不要只背，要配典型情境；先把受力、过程、单位这些基础步骤做稳。":stage==="提升"?"按力学/电学等模块做专题，错题写清‘卡在哪一步’。":"重点练综合题拆过程能力和限时计算，减少模型识别慢的问题。")+tail;
-  }
-  if(n.indexOf("化学")>=0){
-    return (stage==="基础"?"先把概念、方程式、基本实验现象和计算模板补齐。":stage==="提升"?"把实验、反应原理、计算等高频模块拆开练，建立错题清单。":"重点训练综合实验与推断题的信息提取和答题完整性。")+tail;
-  }
-  if(n.indexOf("生物")>=0){
-    return (stage==="基础"?"先把核心概念、过程和教材图表理清，选择题先守住基础分。":stage==="提升"?"多做图表、实验与材料题，错题要回到对应概念。":"重点提升材料分析、实验设计和术语表达的准确性。")+tail;
-  }
-  if(n.indexOf("历史")>=0||n.indexOf("政治")>=0||n.indexOf("地理")>=0||n.indexOf("道法")>=0){
-    return (stage==="基础"?"先建立章节框架和核心关键词，避免碎片化背诵。":stage==="提升"?"把材料题按题型整理答题框架，并把错题对应回知识点。":"重点练材料提取、答题结构和时间控制，让会背的内容稳定转化成分数。")+tail;
-  }
-  return (stage==="基础"?"先补最基础的概念和高频题型，再进入综合练习。":stage==="提升"?"做高频模块专项并坚持错题二刷。":"以限时训练和稳定性为重点，减少非知识性失分。")+tail;
+  return x;
+}
+function subjectPlan(s){
+  var family=subjectFamily(s.name),stage=subjectStage(s.rate);
+  var base=(subjectContentLibrary[family]||subjectContentLibrary.general)[stage];
+  var overlay=issueOverlayFor(s);
+  return {
+    family:family,stage:stage,stageLabel:subjectStageLabel(stage),
+    core:overlay.core,
+    focus:base.focus,
+    practice:base.practice+" "+overlay.action,
+    avoid:base.avoid+" "+overlay.avoid,
+    check:base.check
+  };
+}
+function renderSubjectStrategies(ranked){
+  var box=document.getElementById("subjectStrategies");if(!box)return;box.innerHTML="";
+  ranked.slice(0,6).forEach(function(s,i){
+    var p=subjectPlan(s),role=i===0?"第一突破":i===1?"重点补强":i===2?"稳定提升":"保持科";
+    box.innerHTML+='<div class="subject-plan-card">'+
+      '<div class="subject-plan-head"><div><h3>'+escapeHtml(s.name)+'</h3><div class="subject-scoreline">'+role+' · 当前 '+s.score+'/'+s.full+' · 得分率 '+Math.round(s.rate*100)+'%</div></div><span class="subject-stage">'+p.stageLabel+'</span></div>'+
+      '<div class="subject-core"><span>当前最核心的问题</span><b>'+escapeHtml(p.core)+'</b><span class="subject-issue-chip">'+issueLabel(s.issue)+'</span></div>'+
+      '<div class="subject-plan-row action"><span>先补什么</span><div>'+escapeHtml(p.focus)+'</div></div>'+
+      '<div class="subject-plan-row"><span>具体怎么练</span><div>'+escapeHtml(p.practice)+'</div></div>'+
+      '<div class="subject-plan-row avoid"><span>先别做</span><div>'+escapeHtml(p.avoid)+'</div></div>'+
+      '<div class="subject-check"><b>7 天检验标准</b>'+escapeHtml(p.check)+'</div></div>';
+  });
 }
 
 function taskFor(name,index){
@@ -2062,10 +2158,7 @@ function generateReport(){
   ];
   phases.forEach(function(x){roadmap.innerHTML+='<div class="phase"><b>'+x[0]+' · '+x[1]+'</b><div class="small">'+x[2]+'<br>'+x[3]+'</div></div>'});
 
-  var strat=document.getElementById("subjectStrategies");strat.innerHTML="";
-  ranked.slice(0,6).forEach(function(s){
-    strat.innerHTML+='<div class="strategy-card"><b>'+escapeHtml(s.name)+' · '+Math.round(s.rate*100)+'%</b><div class="small">'+subjectStrategy(s)+'</div></div>';
-  });
+  renderSubjectStrategies(ranked);
 
   var week=document.getElementById("weekPlan");week.innerHTML="";
   for(var w=0;w<2;w++){
