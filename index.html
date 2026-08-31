@@ -1085,6 +1085,39 @@ function posterPalette(){
   if(document.body.classList.contains("theme-campus"))return ["#eef7ff","#ffffff","#19364f","#74899d","#356fa8"];
   return ["#f5f3ee","#fffdf9","#1b1c19","#777a72","#6f765e"];
 }
+
+function drawCanvasMascot(ctx,c,cx,cy,scale){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(scale,scale);
+  var tone=c.tone;
+  ctx.lineCap="round";ctx.lineJoin="round";
+  ctx.fillStyle=tone==="push"?"#fff0ef":tone==="detective"?"#fff6e8":tone==="gentle"?"#fff2fb":tone==="calm"?"#f8efff":tone==="routine"?"#eef8ff":"#eef3ff";
+  ctx.beginPath();ctx.arc(0,0,56,0,Math.PI*2);ctx.fill();
+  if(tone==="focus"){
+    ctx.fillStyle="#263552";ctx.beginPath();ctx.moveTo(-34,-17);ctx.lineTo(-21,-39);ctx.lineTo(-10,-20);ctx.quadraticCurveTo(0,-25,10,-20);ctx.lineTo(22,-39);ctx.lineTo(34,-16);ctx.quadraticCurveTo(43,2,35,25);ctx.quadraticCurveTo(0,52,-35,25);ctx.quadraticCurveTo(-43,2,-34,-17);ctx.fill();
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(-15,1,6,8,0,0,Math.PI*2);ctx.ellipse(15,1,6,8,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#4f7cff";ctx.beginPath();ctx.arc(-14,3,3,0,Math.PI*2);ctx.arc(14,3,3,0,Math.PI*2);ctx.fill();
+  }else if(tone==="gentle"){
+    ctx.fillStyle="#fff";[-22,0,22].forEach(function(x,i){ctx.beginPath();ctx.arc(x,i===1?-13:0,i===1?27:22,0,Math.PI*2);ctx.fill()});ctx.fillRect(-27,0,54,23);
+    ctx.fillStyle="#5973a7";ctx.beginPath();ctx.ellipse(-11,4,4,6,0,0,Math.PI*2);ctx.ellipse(11,4,4,6,0,0,Math.PI*2);ctx.fill();
+  }else if(tone==="calm"){
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(-17,-31,11,25,0,0,Math.PI*2);ctx.ellipse(17,-31,11,25,0,0,Math.PI*2);ctx.arc(0,8,35,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#5f5c8a";ctx.beginPath();ctx.ellipse(-12,4,5,7,0,0,Math.PI*2);ctx.ellipse(12,4,5,7,0,0,Math.PI*2);ctx.fill();
+  }else if(tone==="push"){
+    ctx.fillStyle="#ffd7bb";ctx.beginPath();ctx.arc(0,5,35,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#25304c";ctx.beginPath();ctx.moveTo(-31,-3);ctx.quadraticCurveTo(-25,-34,1,-33);ctx.quadraticCurveTo(30,-33,33,-3);ctx.quadraticCurveTo(12,-17,-31,-3);ctx.fill();
+    ctx.strokeStyle="#ff4e55";ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-28,-22);ctx.quadraticCurveTo(0,-37,28,-21);ctx.stroke();
+  }else if(tone==="detective"){
+    ctx.fillStyle="#ffd9bd";ctx.beginPath();ctx.arc(-4,8,32,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#8b5d3c";ctx.beginPath();ctx.moveTo(-34,-8);ctx.quadraticCurveTo(-27,-36,-2,-36);ctx.quadraticCurveTo(24,-36,33,-8);ctx.lineTo(14,-13);ctx.quadraticCurveTo(-6,-18,-24,-12);ctx.closePath();ctx.fill();
+    ctx.strokeStyle="#3d5477";ctx.lineWidth=5;ctx.beginPath();ctx.arc(22,22,13,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(31,31);ctx.lineTo(44,44);ctx.stroke();
+  }else{
+    ctx.fillStyle="#26334d";ctx.beginPath();ctx.ellipse(0,8,34,41,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.ellipse(0,11,23,28,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#ffb84a";ctx.beginPath();ctx.moveTo(-5,8);ctx.lineTo(5,8);ctx.lineTo(0,14);ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
+
 function renderPoster(){
   if(!lastReport)return;var cv=document.getElementById("shareCanvas");if(!cv)return;var x=cv.getContext("2d"),p=posterPalette(),r=lastReport;
   x.fillStyle=p[0];x.fillRect(0,0,1080,1350);x.fillStyle=p[1];x.fillRect(65,65,950,1220);
@@ -1092,7 +1125,7 @@ function renderPoster(){
   if(posterStyle==="goal"){
     x.fillStyle=p[4];x.font="900 110px sans-serif";x.fillText("+"+r.gain,120,360);x.fillStyle=p[2];x.font="800 42px sans-serif";x.fillText("阶段目标提升",120,425);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("剩余 "+r.days+" 天 · 每天约 "+r.hours+" 小时",120,520);
   }else if(posterStyle==="companion"){
-    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);x.font="100px serif";x.fillText(selectedCompanion.emoji,120,520);x.font="800 38px sans-serif";x.fillText(selectedCompanion.name,260,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],260,535,650,44);
+    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);drawCanvasMascot(x,selectedCompanion,190,500,1.15);x.font="800 38px sans-serif";x.fillStyle=p[2];x.fillText(selectedCompanion.name,300,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],300,535,610,44);
   }else{
     x.fillStyle=p[2];x.font="900 66px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,80);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("当前 "+r.current+" · 目标 +"+r.gain+" · "+r.days+" 天",120,510);
   }
