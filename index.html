@@ -1389,10 +1389,13 @@ function finalConclusions(c,ranked,problem){
   var top=ranked[0],second=ranked[1]||ranked[0],issue=dominantIssue(ranked),avoids=avoidAdvice(problem);
   var rr=ranked.slice(0,2).map(suggestedRange),low=rr.reduce(function(a,x){return a+x[0]},0),high=rr.reduce(function(a,x){return a+x[1]},0);
   var pressureText=c.pressure==="很高"?"当前目标组合压力很高，建议拆成两个阶段。":c.pressure==="较高"?"目标压力偏高，必须减少低回报任务。":c.pressure==="适中"?"目标压力适中，关键在于集中投入。":"目标压力相对温和，更重要的是稳定执行。";
+  var recKey=recommendedScenarioKey(c),recName=recKey==="safe"?"保守方案":recKey==="sprint"?"冲刺方案":"标准方案";
+  var rec=buildScenarios(c,ranked).find(function(x){return x.key===recKey});
   return [
     ["优先顺序", "先 "+top.name+"，再 "+second.name, "不要平均补所有科。前两科决定了当前额外学习时间应该怎么分。"],
-    ["第一阶段争取值", low===0&&high===0?"以守分为主":("前两科合计 +"+low+"～"+high+" 分"), "这是规划用的优先争取区间，不是对考试成绩的预测或保证。"],
+    ["第一阶段优先争取", low===0&&high===0?"以守分为主":("前两科合计 +"+low+"～"+high+" 分"), "这是规划用的优先争取区间，不是对考试成绩的预测或保证。"],
     ["最大失分模式", issueLabel(issue), "接下来做题和复盘时，最需要反复检查的就是这一类失分。"],
+    ["推荐规划强度", recName, "结合剩余时间、目标压力和执行条件，更建议从这一档开始。该档主动覆盖约 +"+rec.coverage+" 分目标分差。"],
     ["目标压力判断", c.pressure, pressureText],
     ["最该避免", avoids[0].t, avoids[0].a]
   ];
