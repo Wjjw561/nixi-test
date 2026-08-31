@@ -458,15 +458,74 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 
 <script>
 var subjects=[];
-var selectedCompanion={emoji:"📘",name:"学霸猫",tone:"focus"};
+var companionAuto=true;
+var buddyLineIndex=0;
+var selectedCompanion=null;
 var lastReport=null;
 var posterStyle="brief";
 var companions=[
-  {emoji:"📘",name:"学霸猫",tone:"focus",text:"先完成最重要的一项，再处理下一项。今天不求学很多，只求真正拿回一点分。"},
-  {emoji:"☁️",name:"云朵同桌",tone:"gentle",text:"不用一下子变得特别厉害，能把今天该做的做完，就是很实在的进步。"},
-  {emoji:"🌙",name:"夜读兔",tone:"calm",text:"别被整张计划吓到。只看今天，只做眼前这一小段，节奏会慢慢稳定下来。"},
-  {emoji:"⚡",name:"冲刺队长",tone:"push",text:"目标已经写清楚了。今天少想一点，多完成一点，把可以拿回来的分一项项拿回来。"}
+  {
+    emoji:"📘",name:"学霸猫",tone:"focus",role:"拆解任务型搭子",
+    traits:["专注","清单控","适合执行"],
+    goodFor:"计划容易散、任务很多时",
+    lines:[
+      "先完成最重要的一项，再处理下一项。今天不求学很多，只求真正拿回一点分。",
+      "如果一项任务超过 30 分钟还没进入状态，就把它再拆小一点。",
+      "别同时救五科。今天只需要让主攻科往前走一步。"
+    ]
+  },
+  {
+    emoji:"☁️",name:"云朵同桌",tone:"gentle",role:"低压力陪伴型搭子",
+    traits:["温和","减压","适合低完成率"],
+    goodFor:"计划容易压垮自己时",
+    lines:[
+      "不用一下子变得特别厉害，能把今天该做的做完，就是很实在的进步。",
+      "今天少做一点没关系，但做完的那部分要算数。",
+      "不用拿别人的速度要求自己，先让节奏稳定下来。"
+    ]
+  },
+  {
+    emoji:"🌙",name:"夜读兔",tone:"calm",role:"稳定节奏型搭子",
+    traits:["安静","稳定","适合波动"],
+    goodFor:"成绩波动大、容易乱节奏时",
+    lines:[
+      "别被整张计划吓到。只看今天，只做眼前这一小段，节奏会慢慢稳定下来。",
+      "今天如果状态一般，就守住最低任务，不要整天直接放弃。",
+      "稳定不是每天都超常发挥，而是状态差的时候也能完成基本盘。"
+    ]
+  },
+  {
+    emoji:"⚡",name:"冲刺队长",tone:"push",role:"高压冲刺型搭子",
+    traits:["直接","强目标","适合临考"],
+    goodFor:"考试临近、目标压力较高时",
+    lines:[
+      "目标已经写清楚了。今天少想一点，多完成一点，把可以拿回来的分一项项拿回来。",
+      "临近考试不要再大面积开新坑，优先做高频、错题和稳定得分项。",
+      "时间不够时就删掉低回报任务，不要什么都舍不得。"
+    ]
+  },
+  {
+    emoji:"🕵️",name:"错题侦探",tone:"detective",role:"失分追踪型搭子",
+    traits:["找错因","二刷","适合粗心"],
+    goodFor:"会做但总丢分、错题反复时",
+    lines:[
+      "别把‘粗心’当结论。我们要找到你到底是在审题、步骤、计算还是检查上丢的分。",
+      "一题错两次，就说明它已经不是偶然，要给它单独建档。",
+      "错题价值不在抄答案，而在下次看到同类题能立刻认出来。"
+    ]
+  },
+  {
+    emoji:"🐧",name:"节奏企鹅",tone:"routine",role:"习惯养成型搭子",
+    traits:["固定时段","打卡","适合拖延"],
+    goodFor:"没有固定学习节奏、容易拖延时",
+    lines:[
+      "先固定开始时间，比研究最完美的计划更重要。",
+      "每天同一时间开始，哪怕只学 20 分钟，也比忽长忽短更容易坚持。",
+      "今天完成最小任务，就算连续记录没有断。"
+    ]
+  }
 ];
+selectedCompanion=companions[0];
 
 var subjectTaskBank={
   "语文":["阅读理解1篇并写错因","古诗文/基础知识20分钟","作文素材整理1组","把本周错题重新看一遍"],
@@ -556,16 +615,99 @@ function renderCompanions(){
   var box=document.getElementById("companionGrid");box.innerHTML="";
   companions.forEach(function(c,i){
     var d=document.createElement("div");
-    d.className="choice companion-choice"+(i===0?" active":"");
-    d.innerHTML='<div class="emoji">'+c.emoji+'</div><strong>'+c.name+'</strong><small>'+c.text+'</small>';
+    d.className="choice companion-choice"+(!companionAuto&&selectedCompanion===c?" active":"");
+    d.dataset.tone=c.tone;
+    d.innerHTML='<div class="emoji">'+c.emoji+'</div><strong>'+c.name+'</strong><div class="role">'+c.role+'</div><small>'+c.goodFor+'</small><div class="traits">'+c.traits.map(function(t){return '<span class="trait">'+t+'</span>'}).join("")+'</div>';
     d.onclick=function(){
-      selectedCompanion=c;
+      companionAuto=false;selectedCompanion=c;buddyLineIndex=0;
       document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
       d.classList.add("active");
-      if(lastReport)renderPoster();
+      updateAutoMatchUI();
+      if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
     };
     box.appendChild(d);
   });
+}
+function updateAutoMatchUI(){
+  var b=document.getElementById("autoMatchBtn"),h=document.getElementById("autoMatchHint");
+  if(!b||!h)return;
+  b.textContent=companionAuto?"已开启":"重新开启";
+  h.textContent=companionAuto?"当前开启 · 生成报告时自动选择":"已手动选择 "+selectedCompanion.name;
+}
+function enableAutoCompanion(){
+  companionAuto=true;
+  document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
+  updateAutoMatchUI();
+  showToast("已开启自动匹配");
+}
+function pickCompanion(c,problem,ranked){
+  if(!companionAuto)return selectedCompanion;
+  var tone="focus";
+  if(c.days<=14||c.pressure==="很高"||c.pressure==="较高")tone="push";
+  else if(problem==="careless"||ranked.some(function(x){return x.issue==="careless"}))tone="detective";
+  else if(c.execution<48)tone="gentle";
+  else if(problem==="plan"||c.execution<65)tone="routine";
+  else if(c.bias>.24)tone="focus";
+  else if(problem==="slow"||problem==="unknown")tone="calm";
+  selectedCompanion=companions.find(function(x){return x.tone===tone})||companions[0];
+  buddyLineIndex=0;
+  return selectedCompanion;
+}
+function companionReason(c,problem){
+  if(selectedCompanion.tone==="push")return "你的剩余时间或目标压力偏紧，所以更适合一个会帮你删掉低回报任务、保持冲刺节奏的搭子。";
+  if(selectedCompanion.tone==="detective")return "你的失分里存在粗心、步骤或反复错题信号，所以更适合一个专门追踪错因的搭子。";
+  if(selectedCompanion.tone==="gentle")return "当前执行条件偏弱，继续把计划排得很满只会更难完成，所以更适合低压力陪伴。";
+  if(selectedCompanion.tone==="routine")return "你的关键问题更偏向计划落地和学习节奏，因此优先建立固定开始时间和最小任务。";
+  if(selectedCompanion.tone==="calm")return "你更需要稳住节奏与波动，而不是每天靠情绪决定学多少。";
+  return "你的成绩结构更适合先做任务拆解和主攻科聚焦，减少同时处理太多目标。";
+}
+function buddyMissionsFor(c,ranked){
+  var top=ranked[0],second=ranked[1]||ranked[0];
+  if(selectedCompanion.tone==="detective")return [
+    ["抓一条错因",top.name+" 找 1 道高价值错题，写清具体错因"],
+    ["二刷一次",second.name+" 二刷 1 组同类题"],
+    ["收尾检查","今天结束前看一次错题复习日期"]
+  ];
+  if(selectedCompanion.tone==="push")return [
+    ["先拿分",top.name+" 完成今天最高回报的专项"],
+    ["限时一组",second.name+" 做一次限时训练"],
+    ["删一项","删除今天最低回报、来不及完成的任务"]
+  ];
+  if(selectedCompanion.tone==="gentle")return [
+    ["最小任务",top.name+" 先做 20–30 分钟"],
+    ["完成一个",second.name+" 完成 1 个小专项即可"],
+    ["及时结束","达到今日底线任务后允许收尾"]
+  ];
+  if(selectedCompanion.tone==="routine")return [
+    ["固定开场","今天在固定时间开始学习"],
+    ["不断档",top.name+" 完成最低主攻任务"],
+    ["留下记录","结束后记录今日完成率"]
+  ];
+  return [
+    ["第一主攻",top.name+" 先完成最重要的一项"],
+    ["第二补强",second.name+" 完成一个专项"],
+    ["10 分钟复盘","记下今天最值得二刷的错误"]
+  ];
+}
+function renderBuddy(c,ranked,problem){
+  document.getElementById("companionAvatar").textContent=selectedCompanion.emoji;
+  document.getElementById("companionName").textContent=selectedCompanion.name;
+  document.getElementById("companionRole").textContent=selectedCompanion.role+" · "+selectedCompanion.goodFor;
+  document.getElementById("companionMeta").innerHTML=selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
+  document.getElementById("companionWhy").textContent="匹配理由："+companionReason(c,problem);
+  document.getElementById("companionLine").textContent=selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length];
+  var ms=buddyMissionsFor(c,ranked),box=document.getElementById("buddyMissions");box.innerHTML="";
+  ms.forEach(function(m,i){box.innerHTML+='<div class="buddy-mission"><b>0'+(i+1)+' · '+m[0]+'</b>'+escapeHtml(m[1])+'</div>'});
+}
+function nextBuddyLine(){
+  buddyLineIndex=(buddyLineIndex+1)%selectedCompanion.lines.length;
+  document.getElementById("companionLine").textContent=selectedCompanion.lines[buddyLineIndex];
+}
+function buddyCheckIn(){
+  var key="nixi_buddy_check_"+new Date().toISOString().slice(0,10);
+  try{localStorage.setItem(key,selectedCompanion.name);}catch(e){}
+  document.getElementById("buddyDialogueTitle").textContent="✓ 今日已和 "+selectedCompanion.name+" 打卡";
+  showToast("今日搭子打卡完成");
 }
 
 document.querySelectorAll(".theme-choice").forEach(function(t){
