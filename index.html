@@ -74,12 +74,12 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .companion-big-avatar{width:86px;height:86px;border-radius:26px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:46px}
 .companion-meta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}
 .companion-meta span{padding:5px 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:10px;color:var(--muted)}
-.buddy-missions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
-.buddy-mission{padding:13px;border-radius:15px;background:var(--card);border:1px solid var(--line);font-size:12px;line-height:1.55;cursor:pointer;transition:.18s;position:relative}
-.buddy-mission:hover{transform:translateY(-1px)}
-.buddy-mission.done{opacity:.68;background:var(--soft)}
-.buddy-mission.done:after{content:"✓";position:absolute;right:11px;top:10px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:11px;font-weight:900}
-.buddy-mission b{display:block;margin-bottom:5px;padding-right:24px}
+
+
+
+
+
+
 .mascot-state{animation:buddyFloat 2.6s ease-in-out infinite}
 .mascot-state.done{animation:buddyPop .55s ease}
 @keyframes buddyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -297,7 +297,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 }
 @media(max-width:430px){
   .grid4{grid-template-columns:1fr 1fr}.theme-grid,.companion-grid{grid-template-columns:1fr 1fr}
-  .note-row{grid-template-columns:1fr;gap:3px}.companion-grid,.buddy-missions{grid-template-columns:1fr}.companion-profile{grid-template-columns:76px 1fr}.companion-big-avatar{width:70px;height:70px;font-size:38px}
+  .note-row{grid-template-columns:1fr;gap:3px}.companion-grid,.companion-profile{grid-template-columns:76px 1fr}.companion-big-avatar{width:70px;height:70px;font-size:38px}
 }
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
@@ -320,7 +320,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <h1>别再“平均努力”，先找到最值得拿回来的分。</h1>
         <p>输入成绩、目标和剩余时间，生成你的成绩分型、主攻科目、14 天执行计划、风险雷达、错题节奏和专属学习搭子。全程静态运行，不上传成绩。</p>
         <div class="hero-tags">
-          <span class="tag">约 2 分钟</span><span class="tag">自动学习分型</span><span class="tag">6 位学习搭子</span><span class="tag">可下载结果海报</span>
+          <span class="tag">约 2 分钟</span><span class="tag">自动学习分型</span><span class="tag">6 位解读伙伴</span><span class="tag">可下载结果海报</span>
         </div>
       </div>
       <div class="hero-visual" aria-hidden="true">
@@ -483,7 +483,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <a href="#reportStrategy">策略</a>
         <a href="#reportPlan">14天计划</a>
         <a href="#reportReview">复盘</a>
-        <a href="#reportBuddy">搭子</a>
+        <a href="#reportBuddy">伙伴</a>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
         <button class="mini-link" onclick="restart()">修改数据</button>
@@ -727,13 +727,12 @@ var subjects=[];
 var companionAuto=true;
 var buddyLineIndex=0;
 var buddyState="happy";
-var buddyMissionDone=[false,false,false];
 var selectedCompanion=null;
 var lastReport=null;
 var posterStyle="brief";
 var companions=[
   {
-    emoji:"📘",name:"学霸猫",tone:"focus",role:"拆解任务型搭子",
+    emoji:"📘",name:"学霸猫",tone:"focus",role:"结构拆解型伙伴",
     traits:["专注","清单控","适合执行"],
     goodFor:"计划容易散、任务很多时",
     lines:[
@@ -743,7 +742,7 @@ var companions=[
     ]
   },
   {
-    emoji:"☁️",name:"云朵同桌",tone:"gentle",role:"低压力陪伴型搭子",
+    emoji:"☁️",name:"云朵同桌",tone:"gentle",role:"温和解读型伙伴",
     traits:["温和","减压","适合低完成率"],
     goodFor:"计划容易压垮自己时",
     lines:[
@@ -753,7 +752,7 @@ var companions=[
     ]
   },
   {
-    emoji:"🌙",name:"夜读兔",tone:"calm",role:"稳定节奏型搭子",
+    emoji:"🌙",name:"夜读兔",tone:"calm",role:"稳定分析型伙伴",
     traits:["安静","稳定","适合波动"],
     goodFor:"成绩波动大、容易乱节奏时",
     lines:[
@@ -763,7 +762,7 @@ var companions=[
     ]
   },
   {
-    emoji:"⚡",name:"冲刺队长",tone:"push",role:"高压冲刺型搭子",
+    emoji:"⚡",name:"冲刺队长",tone:"push",role:"冲刺解读型伙伴",
     traits:["直接","强目标","适合临考"],
     goodFor:"考试临近、目标压力较高时",
     lines:[
@@ -773,7 +772,7 @@ var companions=[
     ]
   },
   {
-    emoji:"🕵️",name:"错题侦探",tone:"detective",role:"失分追踪型搭子",
+    emoji:"🕵️",name:"错题侦探",tone:"detective",role:"失分追踪型伙伴",
     traits:["找错因","二刷","适合粗心"],
     goodFor:"会做但总丢分、错题反复时",
     lines:[
@@ -783,8 +782,8 @@ var companions=[
     ]
   },
   {
-    emoji:"🐧",name:"节奏企鹅",tone:"routine",role:"习惯养成型搭子",
-    traits:["固定时段","打卡","适合拖延"],
+    emoji:"🐧",name:"节奏企鹅",tone:"routine",role:"节奏分析型伙伴",
+    traits:["固定时段","节奏","适合拖延"],
     goodFor:"没有固定学习节奏、容易拖延时",
     lines:[
       "先固定开始时间，比研究最完美的计划更重要。",
@@ -956,11 +955,11 @@ function mascotStateMarkup(c,state){
 }
 function buddyStateInfo(state){
   var map={
-    happy:["开心推进","今天的路线很清楚，先做第一突破科，完成后再往下走。"],
-    alert:["提醒模式","今天别让同一个失分原因再次出现，做完题要追到具体错因。"],
-    sprint:["冲刺模式","时间或目标偏紧，今天只做高回报任务，低价值任务可以删。"],
-    comfort:["安慰模式","今天把计划做轻一点，先完成最低任务，保持连续比硬撑更重要。"],
-    done:["完成打卡","今天的三项搭子任务已经完成，可以安心收尾并记录一个关键收获。"]
+    happy:["常规解读","从成绩结构和目标差出发，先看最值得投入的科目和主要失分模式。"],
+    alert:["失分解读","这份报告更需要关注反复失分、步骤和错因，而不是单纯增加题量。"],
+    sprint:["冲刺解读","你的剩余时间或目标压力偏紧，报告会更强调取舍、优先级和高回报任务。"],
+    comfort:["稳态解读","你的执行条件偏弱，报告会更强调计划减量和可完成性。"],
+    done:["报告解读","重点看结论和优先级，不需要长期打卡或追踪。"]
   };
   return map[state]||map.happy;
 }
@@ -1025,54 +1024,13 @@ function pickCompanion(c,problem,ranked){
   return selectedCompanion;
 }
 function companionReason(c,problem){
-  if(selectedCompanion.tone==="push")return "你的剩余时间或目标压力偏紧，所以更适合一个会帮你删掉低回报任务、保持冲刺节奏的搭子。";
-  if(selectedCompanion.tone==="detective")return "你的失分里存在粗心、步骤或反复错题信号，所以更适合一个专门追踪错因的搭子。";
-  if(selectedCompanion.tone==="gentle")return "当前执行条件偏弱，继续把计划排得很满只会更难完成，所以更适合低压力陪伴。";
+  if(selectedCompanion.tone==="push")return "你的剩余时间或目标压力偏紧，所以更适合一个会帮你删掉低回报任务、保持冲刺节奏的伙伴。";
+  if(selectedCompanion.tone==="detective")return "你的失分里存在粗心、步骤或反复错题信号，所以更适合一个专门追踪错因的伙伴。";
+  if(selectedCompanion.tone==="gentle")return "当前执行条件偏弱，继续把计划排得很满只会更难完成，所以更适合温和、低压力的报告解读。";
   if(selectedCompanion.tone==="routine")return "你的关键问题更偏向计划落地和学习节奏，因此优先建立固定开始时间和最小任务。";
   if(selectedCompanion.tone==="calm")return "你更需要稳住节奏与波动，而不是每天靠情绪决定学多少。";
   return "你的成绩结构更适合先做任务拆解和主攻科聚焦，减少同时处理太多目标。";
 }
-function buddyMissionsFor(c,ranked){
-  var top=ranked[0],second=ranked[1]||ranked[0];
-  if(selectedCompanion.tone==="detective")return [
-    ["抓一条错因",top.name+" 找 1 道高价值错题，写清具体错因"],
-    ["二刷一次",second.name+" 二刷 1 组同类题"],
-    ["收尾检查","今天结束前看一次错题复习日期"]
-  ];
-  if(selectedCompanion.tone==="push")return [
-    ["先拿分",top.name+" 完成今天最高回报的专项"],
-    ["限时一组",second.name+" 做一次限时训练"],
-    ["删一项","删除今天最低回报、来不及完成的任务"]
-  ];
-  if(selectedCompanion.tone==="gentle")return [
-    ["最小任务",top.name+" 先做 20–30 分钟"],
-    ["完成一个",second.name+" 完成 1 个小专项即可"],
-    ["及时结束","达到今日底线任务后允许收尾"]
-  ];
-  if(selectedCompanion.tone==="routine")return [
-    ["固定开场","今天在固定时间开始学习"],
-    ["不断档",top.name+" 完成最低主攻任务"],
-    ["留下记录","结束后记录今日完成率"]
-  ];
-  return [
-    ["第一主攻",top.name+" 先完成最重要的一项"],
-    ["第二补强",second.name+" 完成一个专项"],
-    ["10 分钟复盘","记下今天最值得二刷的错误"]
-  ];
-}
-function todayKey(){
-  var d=new Date();
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
-function missionStorageKey(){return "nixi_buddy_missions_"+todayKey();}
-function loadBuddyMissions(){
-  try{
-    var raw=localStorage.getItem(missionStorageKey());
-    if(raw){var x=JSON.parse(raw);if(Array.isArray(x)&&x.length===3)return x.map(Boolean);}
-  }catch(e){}
-  return [false,false,false];
-}
-function saveBuddyMissions(){try{localStorage.setItem(missionStorageKey(),JSON.stringify(buddyMissionDone));}catch(e){}}
 function dominantIssue(ranked){
   var counts={};
   ranked.slice(0,Math.min(4,ranked.length)).forEach(function(x){counts[x.issue]=(counts[x.issue]||0)+(x.priority||1);});
@@ -1512,7 +1470,7 @@ function renderPoster(){
     x.fillStyle=p[4];x.beginPath();x.roundRect(292,420,180,46,23);x.fill();
     x.fillStyle="#fff";x.font="800 23px sans-serif";x.fillText(bst[0],320,451);
     x.font="800 38px sans-serif";x.fillStyle=p[2];x.fillText(selectedCompanion.name,300,510);
-    x.fillStyle=p[3];x.font="29px sans-serif";wrapCanvas(x,bst[1]+" "+selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],300,565,610,42);
+    x.fillStyle=p[3];x.font="29px sans-serif";wrapCanvas(x,companionInterpretation(r.classify||lastReport.classify,r.ranked||lastReport.ranked,r.problem||lastReport.problem,buddyLineIndex),300,565,610,42);
   }else{
     x.fillStyle=p[2];x.font="900 66px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,80);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("当前 "+r.current+" · 目标 +"+r.gain+" · "+r.days+" 天",120,510);
   }
