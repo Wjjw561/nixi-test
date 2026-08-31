@@ -175,6 +175,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
           </select>
         </div>
         <div><label>目标考试</label><input id="exam" value="期末考试" placeholder="如：中考、期末、高考"></div>
+        <div><label>目标学校 / 班级（可选）</label><input id="targetSchool" placeholder="例如：重点班、某高中、某大学"></div>
         <div><label>距离考试还有多少天</label><input id="days" type="number" value="60" min="7"></div>
         <div><label>每天可用于额外学习的时间</label>
           <select id="hours"><option value="1">约 1 小时</option><option value="1.5">约 1.5 小时</option><option value="2">约 2 小时</option><option value="2.5">约 2.5 小时</option><option value="3" selected>约 3 小时</option><option value="4">约 4 小时</option><option value="5">4 小时以上</option></select>
@@ -267,6 +268,15 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card">
+      <h2>学习风险雷达</h2>
+      <div class="desc">拆开看基础、偏科、执行和目标压力四类风险，帮助你判断先解决什么。</div>
+      <div class="radar-wrap">
+        <div class="radar" id="riskRadar"></div>
+        <div class="risk-list" id="riskList"></div>
+      </div>
+    </div>
+
+    <div class="card">
       <h2>成绩趋势 & 执行条件</h2>
       <div class="desc">这两个指标不预测结果，只帮助决定计划该“冲”还是该“稳”。</div>
       <div class="metric-row">
@@ -328,13 +338,19 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card">
-      <h2>⑦ 错题二刷节奏</h2>
+      <h2>⑦ 本周量化目标</h2>
+      <div class="desc">把“努力”改成可以打勾的数字目标。</div>
+      <div class="goal-grid" id="weeklyGoals"></div>
+    </div>
+
+    <div class="card">
+      <h2>⑧ 错题二刷节奏</h2>
       <div class="desc">重要错题不要只看一次。下面给你一个简单复习节奏：当天、次日、第3天、第7天、第14天。</div>
       <div class="review-schedule" id="reviewSchedule"></div>
     </div>
 
     <div class="card no-print">
-      <h2>⑧ 目标压力模拟器</h2>
+      <h2>⑨ 目标压力模拟器</h2>
       <div class="desc">拖动“每天时间”和“阶段目标”，看看执行压力如何变化。它不是提分预测，只是帮助你把目标调到更可执行。</div>
       <div class="simulator">
         <div>
@@ -354,9 +370,21 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card paper">
-      <h2>⑨ 你的“电子学习本”</h2>
+      <h2>⑩ 你的“电子学习本”</h2>
       <div class="desc">可以直接截图或保存 PDF，当作接下来一周的执行页。</div>
       <div id="notebook"></div>
+    </div>
+
+    <div class="card no-print">
+      <h2>结果分享海报</h2>
+      <div class="desc">一键生成适合发朋友圈 / QQ / 小红书的摘要海报，不展示完整成绩明细。</div>
+      <div class="poster-controls">
+        <button class="poster-btn active" onclick="setPosterStyle('brief',this)">极简简报</button>
+        <button class="poster-btn" onclick="setPosterStyle('goal',this)">目标冲刺</button>
+        <button class="poster-btn" onclick="setPosterStyle('companion',this)">陪伴角色</button>
+      </div>
+      <div class="poster-preview"><canvas id="shareCanvas" width="1080" height="1350"></canvas></div>
+      <button class="btn ghost" onclick="downloadPoster()">下载这张海报</button>
     </div>
 
     <div class="card">
@@ -368,7 +396,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div class="actions no-print">
         <button class="btn ghost" onclick="copySummary()">复制结果摘要</button>
         <button class="btn ghost" onclick="window.print()">保存 / 打印 PDF</button>
-        <button class="btn ghost" onclick="downloadShareCard()">下载结果分享卡</button>
+        
         <button class="btn" onclick="restart()">重新测试</button>
       </div>
       <div class="notice">建议完成 7–14 天后用最新成绩重新测一次，观察主攻科、成绩趋势和执行条件是否发生变化。</div>
