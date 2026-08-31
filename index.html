@@ -640,18 +640,81 @@ function escapeHtml(s){
   return String(s||"").replace(/[&<>"']/g,function(m){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[m]});
 }
 
+
+function mascotMarkup(c){
+  var tone=c.tone;
+  var start='<svg class="mascot-art" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">';
+  var end='</svg>';
+  var bg='<circle cx="60" cy="60" r="56" fill="#eef3ff"/>';
+  if(tone==="focus"){
+    return start+bg+
+      '<path d="M27 43 L39 22 L50 39 Q60 34 70 39 L82 22 L93 44 Q100 53 97 70 Q94 94 61 99 Q28 95 24 70 Q21 54 27 43Z" fill="#263552"/>'+
+      '<path d="M39 24 L43 39 L33 39Z" fill="#f3a8b6"/><path d="M81 24 L77 39 L87 39Z" fill="#f3a8b6"/>'+
+      '<ellipse cx="45" cy="61" rx="6" ry="8" fill="#fff"/><ellipse cx="75" cy="61" rx="6" ry="8" fill="#fff"/>'+
+      '<circle cx="46" cy="63" r="3" fill="#4f7cff"/><circle cx="74" cy="63" r="3" fill="#4f7cff"/>'+
+      '<path d="M56 73 Q60 77 64 73" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+      '<rect x="41" y="87" width="38" height="16" rx="8" fill="#4f7cff"/>'+end;
+  }
+  if(tone==="gentle"){
+    return start+'<circle cx="60" cy="60" r="56" fill="#fff2fb"/>'+
+      '<circle cx="39" cy="58" r="22" fill="#fff"/><circle cx="60" cy="45" r="27" fill="#fff"/><circle cx="82" cy="59" r="22" fill="#fff"/><rect x="33" y="56" width="54" height="27" rx="14" fill="#fff"/>'+
+      '<ellipse cx="49" cy="61" rx="4" ry="6" fill="#5973a7"/><ellipse cx="71" cy="61" rx="4" ry="6" fill="#5973a7"/>'+
+      '<path d="M54 70 Q60 75 66 70" stroke="#e38dad" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+      '<circle cx="38" cy="70" r="6" fill="#ffd0df" opacity=".75"/><circle cx="82" cy="70" r="6" fill="#ffd0df" opacity=".75"/>'+
+      '<path d="M48 91 Q60 100 72 91" stroke="#8fb8ff" stroke-width="7" stroke-linecap="round"/>'+end;
+  }
+  if(tone==="calm"){
+    return start+'<circle cx="60" cy="60" r="56" fill="#f8efff"/>'+
+      '<ellipse cx="43" cy="27" rx="11" ry="25" fill="#fff"/><ellipse cx="77" cy="27" rx="11" ry="25" fill="#fff"/>'+
+      '<ellipse cx="43" cy="27" rx="5" ry="17" fill="#ffb4c7"/><ellipse cx="77" cy="27" rx="5" ry="17" fill="#ffb4c7"/>'+
+      '<circle cx="60" cy="65" r="35" fill="#fff"/>'+
+      '<ellipse cx="48" cy="61" rx="5" ry="7" fill="#5f5c8a"/><ellipse cx="72" cy="61" rx="5" ry="7" fill="#5f5c8a"/>'+
+      '<circle cx="60" cy="69" r="4" fill="#f59aae"/><path d="M56 76 Q60 80 64 76" stroke="#806f9e" stroke-width="2.5" fill="none"/>'+
+      '<path d="M38 96 Q60 106 82 96" stroke="#8f87ff" stroke-width="8" stroke-linecap="round"/>'+end;
+  }
+  if(tone==="push"){
+    return start+'<circle cx="60" cy="60" r="56" fill="#fff0ef"/>'+
+      '<circle cx="60" cy="62" r="35" fill="#ffd7bb"/>'+
+      '<path d="M29 55 Q31 25 61 24 Q91 25 93 55 Q82 43 72 43 Q52 43 29 55Z" fill="#25304c"/>'+
+      '<path d="M32 36 Q60 20 88 37 L84 48 Q60 38 36 49Z" fill="#ff4e55"/>'+
+      '<ellipse cx="48" cy="63" rx="5" ry="7" fill="#27344d"/><ellipse cx="72" cy="63" rx="5" ry="7" fill="#27344d"/>'+
+      '<path d="M48 78 Q60 87 73 76" stroke="#ce5c55" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+      '<path d="M32 100 Q60 88 88 100 L92 116 L28 116Z" fill="#304d88"/><path d="M60 95 L70 111 L50 111Z" fill="#ff4e55"/>'+end;
+  }
+  if(tone==="detective"){
+    return start+'<circle cx="60" cy="60" r="56" fill="#fff6e8"/>'+
+      '<circle cx="56" cy="67" r="32" fill="#ffd9bd"/>'+
+      '<path d="M27 48 Q34 20 59 21 Q84 20 93 48 L76 43 Q57 39 38 44Z" fill="#8b5d3c"/>'+
+      '<path d="M39 24 Q59 12 78 25 L73 35 Q58 30 44 36Z" fill="#a8784d"/>'+
+      '<circle cx="46" cy="65" r="6" fill="#fff"/><circle cx="67" cy="65" r="6" fill="#fff"/><circle cx="46" cy="65" r="3" fill="#3d3d4b"/><circle cx="67" cy="65" r="3" fill="#3d3d4b"/>'+
+      '<path d="M50 78 Q58 82 65 77" stroke="#b35f59" stroke-width="2.5" fill="none"/>'+
+      '<circle cx="82" cy="81" r="13" fill="none" stroke="#3d5477" stroke-width="5"/><path d="M91 91 L104 105" stroke="#3d5477" stroke-width="6" stroke-linecap="round"/>'+end;
+  }
+  return start+'<circle cx="60" cy="60" r="56" fill="#eef8ff"/>'+
+    '<ellipse cx="60" cy="66" rx="34" ry="41" fill="#26334d"/><ellipse cx="60" cy="69" rx="23" ry="28" fill="#fff"/>'+
+    '<ellipse cx="48" cy="56" rx="5" ry="7" fill="#fff"/><ellipse cx="72" cy="56" rx="5" ry="7" fill="#fff"/>'+
+    '<circle cx="48" cy="57" r="2.5" fill="#2b3652"/><circle cx="72" cy="57" r="2.5" fill="#2b3652"/>'+
+    '<path d="M55 67 L65 67 L60 73Z" fill="#ffb84a"/>'+
+    '<path d="M35 38 Q60 21 85 38" stroke="#78a5ff" stroke-width="8" stroke-linecap="round"/><circle cx="37" cy="39" r="6" fill="#78a5ff"/><circle cx="83" cy="39" r="6" fill="#78a5ff"/>'+
+    '<ellipse cx="36" cy="83" rx="9" ry="16" fill="#26334d" transform="rotate(25 36 83)"/><ellipse cx="84" cy="83" rx="9" ry="16" fill="#26334d" transform="rotate(-25 84 83)"/>'+end;
+}
+function renderHeroMascot(){
+  var box=document.getElementById("heroMascot");
+  if(box)box.innerHTML=mascotMarkup(selectedCompanion||companions[0]);
+}
+
 function renderCompanions(){
   var box=document.getElementById("companionGrid");box.innerHTML="";
   companions.forEach(function(c,i){
     var d=document.createElement("div");
     d.className="choice companion-choice"+(!companionAuto&&selectedCompanion===c?" active":"");
     d.dataset.tone=c.tone;
-    d.innerHTML='<div class="emoji">'+c.emoji+'</div><strong>'+c.name+'</strong><div class="role">'+c.role+'</div><small>'+c.goodFor+'</small><div class="traits">'+c.traits.map(function(t){return '<span class="trait">'+t+'</span>'}).join("")+'</div>';
+    d.innerHTML='<div class="mascot-frame">'+mascotMarkup(c)+'</div><strong>'+c.name+'</strong><div class="role">'+c.role+'</div><small>'+c.goodFor+'</small><div class="traits">'+c.traits.map(function(t){return '<span class="trait">'+t+'</span>'}).join("")+'</div>';
     d.onclick=function(){
       companionAuto=false;selectedCompanion=c;buddyLineIndex=0;
       document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
       d.classList.add("active");
-      updateAutoMatchUI();
+      updateAutoMatchUI();renderHeroMascot();
       if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
     };
     box.appendChild(d);
@@ -679,7 +742,7 @@ function pickCompanion(c,problem,ranked){
   else if(c.bias>.24)tone="focus";
   else if(problem==="slow"||problem==="unknown")tone="calm";
   selectedCompanion=companions.find(function(x){return x.tone===tone})||companions[0];
-  buddyLineIndex=0;
+  buddyLineIndex=0;renderHeroMascot();
   return selectedCompanion;
 }
 function companionReason(c,problem){
@@ -719,7 +782,7 @@ function buddyMissionsFor(c,ranked){
   ];
 }
 function renderBuddy(c,ranked,problem){
-  document.getElementById("companionAvatar").textContent=selectedCompanion.emoji;
+  document.getElementById("companionAvatar").innerHTML=mascotMarkup(selectedCompanion);
   document.getElementById("companionName").textContent=selectedCompanion.name;
   document.getElementById("companionRole").textContent=selectedCompanion.role+" · "+selectedCompanion.goodFor;
   document.getElementById("companionMeta").innerHTML=selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
@@ -735,7 +798,7 @@ function nextBuddyLine(){
 function switchBuddy(){
   var idx=companions.indexOf(selectedCompanion);
   selectedCompanion=companions[(idx+1)%companions.length];
-  companionAuto=false;buddyLineIndex=0;updateAutoMatchUI();
+  companionAuto=false;buddyLineIndex=0;updateAutoMatchUI();renderHeroMascot();
   if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
 }
 function buddyCheckIn(){
@@ -1202,6 +1265,7 @@ subjects=gradeSubjects(document.getElementById("grade").value);
 renderSubjects();
 renderCompanions();
 updateAutoMatchUI();
+renderHeroMascot();
 </script>
 </body>
 </html>
