@@ -440,6 +440,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <div class="buddy-dialogue"><b id="buddyDialogueTitle">搭子对你说</b><div id="companionLine" class="small" style="margin-top:5px"></div></div>
         <div class="buddy-tools no-print">
           <button onclick="nextBuddyLine()">换一句搭子话</button>
+          <button onclick="switchBuddy()">换一个搭子</button>
           <button onclick="buddyCheckIn()">完成今日打卡</button>
         </div>
       </div>
@@ -702,6 +703,12 @@ function renderBuddy(c,ranked,problem){
 function nextBuddyLine(){
   buddyLineIndex=(buddyLineIndex+1)%selectedCompanion.lines.length;
   document.getElementById("companionLine").textContent=selectedCompanion.lines[buddyLineIndex];
+}
+function switchBuddy(){
+  var idx=companions.indexOf(selectedCompanion);
+  selectedCompanion=companions[(idx+1)%companions.length];
+  companionAuto=false;buddyLineIndex=0;updateAutoMatchUI();
+  if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
 }
 function buddyCheckIn(){
   var key="nixi_buddy_check_"+new Date().toISOString().slice(0,10);
@@ -994,7 +1001,7 @@ function renderPoster(){
   if(posterStyle==="goal"){
     x.fillStyle=p[4];x.font="900 110px sans-serif";x.fillText("+"+r.gain,120,360);x.fillStyle=p[2];x.font="800 42px sans-serif";x.fillText("阶段目标提升",120,425);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("剩余 "+r.days+" 天 · 每天约 "+r.hours+" 小时",120,520);
   }else if(posterStyle==="companion"){
-    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);x.font="100px serif";x.fillText(selectedCompanion.emoji,120,520);x.font="800 38px sans-serif";x.fillText(selectedCompanion.name,260,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.text,260,535,650,44);
+    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);x.font="100px serif";x.fillText(selectedCompanion.emoji,120,520);x.font="800 38px sans-serif";x.fillText(selectedCompanion.name,260,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],260,535,650,44);
   }else{
     x.fillStyle=p[2];x.font="900 66px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,80);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("当前 "+r.current+" · 目标 +"+r.gain+" · "+r.days+" 天",120,510);
   }
@@ -1007,6 +1014,7 @@ function generateReport(){
   if(!validate())return;
   var c=classify(),ranked=rankedSubjects();
   var problem=document.getElementById("problem").value;
+  pickCompanion(c,problem,ranked);
   var nick=document.getElementById("nickname").value.trim();
   var grade=document.getElementById("grade").value;
   var exam=document.getElementById("exam").value.trim()||"目标考试";
@@ -1120,16 +1128,16 @@ function generateReport(){
   renderWeeklyGoals(c,ranked);
   renderReviewSchedule();
   renderNotebook(ranked,totalMin);
-  lastReport={current:c.current,gain:c.gain,days:c.days,hours:c.hours,ranked:ranked,typeTitle:document.getElementById("typeTitle").textContent,oneLine:""};
+  lastReport={current:c.current,gain:c.gain,days:c.days,hours:c.hours,ranked:ranked,typeTitle:document.getElementById("typeTitle").textContent,oneLine:"",classify:c,problem:problem};
   var simGainMax=Math.max(50,Math.min(200,c.full-c.current));
   var simGain=document.getElementById("simGain");
   simGain.max=simGainMax;simGain.value=Math.min(c.gain,simGainMax);
   document.getElementById("simHours").value=c.hours;
   updateSimulator();
 
-  document.getElementById("companionAvatar").textContent=selectedCompanion.emoji;
-  document.getElementById("companionName").textContent=selectedCompanion.name;
-  document.getElementById("companionLine").textContent=selectedCompanion.text;
+  renderBuddy(c,ranked,problem);
+  var savedKey="nixi_buddy_check_"+new Date().toISOString().slice(0,10);
+  try{if(localStorage.getItem(savedKey)){document.getElementById("buddyDialogueTitle").textContent="✓ 今天已经和搭子打过卡";}}catch(e){}
 
   var one="先把 "+ranked[0].name+(ranked[1]?" 和 "+ranked[1].name:"")+" 的高频失分拿回来，再扩展到其他科。你现在真正需要的不是“学更多”，而是让每一天的学习都直接指向可以拿回来的分。";
   document.getElementById("oneLine").textContent=one;
@@ -1165,6 +1173,7 @@ function showToast(msg){
 subjects=gradeSubjects(document.getElementById("grade").value);
 renderSubjects();
 renderCompanions();
+updateAutoMatchUI();
 </script>
 </body>
 </html>
