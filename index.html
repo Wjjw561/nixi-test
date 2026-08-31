@@ -47,7 +47,25 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .btn{width:100%;border:0;border-radius:14px;padding:14px 16px;background:var(--accent);color:#fff;font-weight:900;font-size:16px;margin-top:12px}
 .btn.ghost{background:var(--soft);color:var(--text)}
 .btn.inline{width:auto;margin:0;padding:10px 13px;font-size:13px}
-.theme-grid,.companion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.companion-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.companion-choice{position:relative;min-height:168px}
+.companion-choice .role{font-size:11px;color:var(--muted);margin:3px 0 8px}
+.companion-choice .traits{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.companion-choice .trait{font-size:10px;padding:4px 7px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.auto-match{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;border-radius:17px;background:var(--soft);border:1px solid var(--line);margin:12px 0}
+.auto-match b{display:block}.auto-match .small{margin-top:3px}
+.companion-result{margin-top:14px}
+.companion-profile{display:grid;grid-template-columns:92px 1fr;gap:16px;align-items:center;padding:18px;border-radius:20px;background:var(--soft);border:1px solid var(--line)}
+.companion-big-avatar{width:86px;height:86px;border-radius:26px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:46px}
+.companion-meta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}
+.companion-meta span{padding:5px 8px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:10px;color:var(--muted)}
+.buddy-missions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.buddy-mission{padding:13px;border-radius:15px;background:var(--card);border:1px solid var(--line);font-size:12px;line-height:1.55}
+.buddy-mission b{display:block;margin-bottom:5px}
+.buddy-dialogue{margin-top:12px;padding:15px;border-radius:16px;background:var(--card);border:1px dashed var(--line);line-height:1.7}
+.buddy-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.buddy-tools button{border:0;border-radius:999px;padding:8px 11px;background:var(--soft);color:var(--text);font-weight:800;font-size:12px}
 .choice{border:1px solid var(--line);border-radius:17px;padding:14px;background:var(--card);cursor:pointer;transition:.18s}
 .choice:hover{transform:translateY(-1px)}
 .choice.active{outline:3px solid var(--accent2)}
@@ -148,7 +166,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 }
 @media(max-width:430px){
   .grid4{grid-template-columns:1fr 1fr}.theme-grid,.companion-grid{grid-template-columns:1fr 1fr}
-  .note-row{grid-template-columns:1fr;gap:3px}
+  .note-row{grid-template-columns:1fr;gap:3px}.companion-grid,.buddy-missions{grid-template-columns:1fr}.companion-profile{grid-template-columns:76px 1fr}.companion-big-avatar{width:70px;height:70px;font-size:38px}
 }
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
@@ -260,8 +278,12 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card">
-      <h2>选择一个“学习陪伴角色”</h2>
-      <div class="desc">只负责结果页的陪伴文案，不参与成绩判断。</div>
+      <h2>选择你的学习搭子</h2>
+      <div class="desc">每个搭子的性格、提醒方式和擅长场景都不同。默认开启“自动匹配”，系统会根据你的偏科、执行条件和目标压力推荐更适合你的那个。</div>
+      <div class="auto-match">
+        <div><b>✨ 自动匹配搭子</b><div class="small" id="autoMatchHint">当前开启 · 生成报告时自动选择</div></div>
+        <button class="btn ghost inline no-print" id="autoMatchBtn" onclick="enableAutoCompanion()">已开启</button>
+      </div>
       <div class="companion-grid" id="companionGrid"></div>
       <button class="btn no-print" onclick="generateReport()">生成我的逆袭档案</button>
       <div class="notice">本测试提供学习规划参考，不承诺固定提分结果。成绩变化还受课程难度、学习基础、执行质量等因素影响。</div>
@@ -403,9 +425,23 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card">
-      <div class="companion-box">
-        <div class="companion-avatar" id="companionAvatar">📘</div>
-        <div><b id="companionName">学霸猫</b><div class="small" id="companionLine"></div></div>
+      <div class="companion-result">
+        <div class="companion-profile">
+          <div class="companion-big-avatar" id="companionAvatar">📘</div>
+          <div>
+            <div class="eyebrow">YOUR STUDY BUDDY</div>
+            <h2 id="companionName" style="margin:4px 0">学霸猫</h2>
+            <div class="small" id="companionRole"></div>
+            <div class="companion-meta" id="companionMeta"></div>
+            <div class="small" id="companionWhy"></div>
+          </div>
+        </div>
+        <div class="buddy-missions" id="buddyMissions"></div>
+        <div class="buddy-dialogue"><b id="buddyDialogueTitle">搭子对你说</b><div id="companionLine" class="small" style="margin-top:5px"></div></div>
+        <div class="buddy-tools no-print">
+          <button onclick="nextBuddyLine()">换一句搭子话</button>
+          <button onclick="buddyCheckIn()">完成今日打卡</button>
+        </div>
       </div>
       <div class="quote" id="oneLine" style="margin-top:14px"></div>
       <div class="actions no-print">
