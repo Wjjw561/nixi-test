@@ -1235,6 +1235,145 @@ function suggestedRange(s){
   var high=Math.max(low,Math.min(s.gap,Math.round(s.gap*factor)));
   return [low,high];
 }
+function lossProfile(s){
+  var map={
+    base:{
+      type:"基础分流失型",
+      why:"当前主要问题更像知识点、公式、概念或基本步骤没有稳定形成。",
+      high:"定义 / 公式 / 基础题 / 高频基本步骤",
+      mid:"常规中档题，把基础知识放进典型情境",
+      low:"偏难综合题、低频技巧题",
+      action:"先用基础题验证知识点是否真的会，再进入中档题，不用靠难题证明学习强度。"
+    },
+    method:{
+      type:"题型方法断层型",
+      why:"你更可能不是完全不会知识，而是看到题目时不能快速识别该用什么方法。",
+      high:"高频题型识别信号 + 标准方法",
+      mid:"同类中档题连续训练，形成方法迁移",
+      low:"陌生综合题、跨度很大的压轴题",
+      action:"每次专项只整理“看到什么特征 → 想到什么方法 → 最容易错哪一步”。"
+    },
+    careless:{
+      type:"过程性失分型",
+      why:"知识可能已经会，但审题、步骤、计算或检查环节把本来能拿的分送掉了。",
+      high:"审题关键词 / 步骤完整 / 计算检查",
+      mid:"固定答题流程 + 限时后复查",
+      low:"盲目增加新题量",
+      action:"错题不能只写“粗心”，必须落到审题、步骤、计算、单位或检查中的具体一类。"
+    },
+    speed:{
+      type:"时间分配损失型",
+      why:"主要矛盾在“会做”和“规定时间内做对”之间，卡题会挤掉后面本来能拿的分。",
+      high:"熟题提速 / 高频题型限时",
+      mid:"中档题设定单题时间上限",
+      low:"在一道难题上长时间死磕",
+      action:"训练时记录最耗时题型；超过预设时间先标记跳过，再回来处理。"
+    },
+    memory:{
+      type:"记忆提取损失型",
+      why:"知识接触过，但需要时调不出来，常见于词汇、公式、概念、方程式和答题关键词。",
+      high:"高频记忆项 + 闭卷回忆",
+      mid:"放回题目或语境中反复提取",
+      low:"一次性抄写、只看不回忆",
+      action:"采用当天、次日、第3天、第7天的主动回忆，而不是把“看过”当成“记住”。"
+    },
+    unstable:{
+      type:"稳定性波动型",
+      why:"同类内容有时会、有时不会，说明输出流程和考试状态还没有稳定下来。",
+      high:"固定做题顺序 / 高频失分复查",
+      mid:"小套卷与限时训练，观察重复波动",
+      low:"频繁更换方法、临时开大量新内容",
+      action:"先固定解题和检查流程，用重复的小规模训练看波动是否下降。"
+    }
+  };
+  return map[s.issue]||map.base;
+}
+function renderLossDiagnosis(ranked){
+  var box=document.getElementById("lossDiagnosis");if(!box)return;box.innerHTML="";
+  ranked.slice(0,3).forEach(function(s,i){
+    var p=lossProfile(s);
+    box.innerHTML+='<div class="loss-card">'+
+      '<div class="loss-head"><h3>'+escapeHtml(s.name)+'</h3><span>当前 '+Math.round(s.rate*100)+'%</span></div>'+
+      '<div class="loss-type">'+escapeHtml(p.type)+'</div>'+
+      '<div class="loss-reason">'+escapeHtml(p.why)+'</div>'+
+      '<div class="loss-layer high"><b>先回收</b><div>'+escapeHtml(p.high)+'</div></div>'+
+      '<div class="loss-layer"><b>再提升</b><div>'+escapeHtml(p.mid)+'</div></div>'+
+      '<div class="loss-layer"><b>先别追</b><div>'+escapeHtml(p.low)+'</div></div>'+
+      '<div class="loss-action"><b>建议：</b>'+escapeHtml(p.action)+'</div></div>';
+  });
+}
+function roundTo5(n){
+  if(n<=5)return Math.max(1,Math.round(n));
+  return Math.max(5,Math.round(n/5)*5);
+}
+function recommendedScenarioKey(c){
+  if(c.execution<55||c.pressure==="很高")return "safe";
+  if(c.days<=14&&c.execution>=75&&c.pressure!=="很高")return "sprint";
+  return "standard";
+}
+function buildScenarios(c,ranked){
+  var requested=Math.max(1,+document.getElementById("goalGain").value||c.gain);
+  var subjectGap=ranked.reduce(function(a,x){return a+x.gap},0);
+  var planBase=subjectGap>0?Math.min(requested,subjectGap):requested;
+  var totalMin=Math.round(c.hours*60);
+  var configs=[
+    {key:"safe",name:"保守方案",cover:.52,load:.72,focus:.58,buffer:28,fit:"适合执行条件偏弱、容易计划过满，或希望先验证方法的人。"},
+    {key:"standard",name:"标准方案",cover:.78,load:.86,focus:.68,buffer:14,fit:"适合大多数情况：既明显集中主攻科，也保留复盘和突发缓冲。"},
+    {key:"sprint",name:"冲刺方案",cover:1,load:.96,focus:.76,buffer:4,fit:"适合时间短、执行条件较稳的人；不适合长期维持。"}
+  ];
+  return configs.map(function(x){
+    var cover=roundTo5(Math.max(1,planBase*x.cover));
+    if(x.key==="sprint")cover=roundTo5(planBase);
+    cover=Math.min(planBase,cover);
+    var activeMin=Math.max(20,Math.round(totalMin*x.load));
+    var top2=Math.round(activeMin*x.focus);
+    var p1=ranked[0]||{priority:1,name:"第一主攻科"},p2=ranked[1]||p1;
+    var denom=Math.max(.01,p1.priority+p2.priority);
+    var m1=Math.round(top2*(p1.priority/denom));
+    var m2=Math.max(0,top2-m1);
+    var other=Math.max(0,activeMin-top2);
+    var pressure=pressureFrom(Math.max(.5,activeMin/60),cover,c.days);
+    return {
+      key:x.key,name:x.name,coverage:cover,activeMin:activeMin,buffer:x.buffer,
+      focusPct:Math.round(x.focus*100),pressure:pressure[0],pressureText:pressure[1],
+      fit:x.fit,top1:p1.name,top2:p2.name,m1:m1,m2:m2,other:other,
+      requested:requested,subjectGap:subjectGap
+    };
+  });
+}
+function switchScenario(key,btn){
+  document.querySelectorAll(".scenario-tab").forEach(function(x){x.classList.toggle("active",x.dataset.scenario===key)});
+  document.querySelectorAll(".scenario-panel").forEach(function(x){x.classList.toggle("active",x.dataset.scenario===key)});
+  if(btn)btn.classList.add("active");
+}
+function renderScenarios(c,ranked){
+  var plans=buildScenarios(c,ranked),recommended=recommendedScenarioKey(c);
+  var sum=document.getElementById("scenarioSummary"),panels=document.getElementById("scenarioPanels");
+  if(!sum||!panels)return;
+  sum.innerHTML="";panels.innerHTML="";
+  plans.forEach(function(p){
+    sum.innerHTML+='<div class="scenario-mini '+(p.key===recommended?'recommended':'')+'">'+
+      '<div class="scenario-mini-top"><b>'+p.name+'</b>'+(p.key===recommended?'<span class="badge">更适合你</span>':'')+'</div>'+
+      '<div class="num">+'+p.coverage+'</div>'+
+      '<div class="small">规划覆盖分差 · 前两科占 '+p.focusPct+'% 主动学习时间</div></div>';
+    panels.innerHTML+='<div class="scenario-panel '+(p.key===recommended?'active':'')+'" data-scenario="'+p.key+'">'+
+      '<div class="scenario-hero"><div><div class="scenario-title">'+p.name+'</div><div class="small">'+escapeHtml(p.fit)+'</div></div><div class="scenario-pressure">计划压力 · '+p.pressure+'</div></div>'+
+      '<div class="scenario-metrics">'+
+        '<div class="scenario-metric"><span>主动覆盖目标分差</span><b>+'+p.coverage+' 分</b></div>'+
+        '<div class="scenario-metric"><span>每日主动学习量</span><b>'+p.activeMin+' 分钟</b></div>'+
+        '<div class="scenario-metric"><span>预留缓冲</span><b>'+p.buffer+'%</b></div>'+
+      '</div>'+
+      '<div class="scenario-subjects">'+
+        '<div class="scenario-subject"><b>'+escapeHtml(p.top1)+'</b>约 '+p.m1+' 分钟 / 天<br>第一主攻</div>'+
+        '<div class="scenario-subject"><b>'+escapeHtml(p.top2)+'</b>约 '+p.m2+' 分钟 / 天<br>第二补强</div>'+
+        '<div class="scenario-subject"><b>其他科</b>合计约 '+p.other+' 分钟 / 天<br>保持与复盘</div>'+
+      '</div>'+
+      '<div class="scenario-note">“+'+p.coverage+' 分”表示这档计划优先处理的目标分差范围，不代表考试必然提升 '+p.coverage+' 分。'+
+      (p.subjectGap<p.requested?' 另外，你当前各科目标合计只覆盖约 +'+p.subjectGap+' 分，低于填写的总目标 +'+p.requested+' 分，建议统一目标。':'')+
+      '</div></div>';
+  });
+  document.querySelectorAll(".scenario-tab").forEach(function(x){x.classList.toggle("active",x.dataset.scenario===recommended)});
+}
 function renderScoreStructure(ranked){
   var box=document.getElementById("scoreStructure");if(!box)return;box.innerHTML="";
   ranked.slice(0,6).forEach(function(s,i){
@@ -1859,6 +1998,8 @@ function generateReport(){
   renderRiskRadar(c,ranked);
   renderLeverMap(ranked);
   renderScoreStructure(ranked);
+  renderLossDiagnosis(ranked);
+  renderScenarios(c,ranked);
   var totalMin=Math.round(c.hours*60),mins=allocateMinutes(ranked,totalMin);
   var tb=document.getElementById("timeBox");tb.innerHTML="";
   document.getElementById("timeTotalBadge").textContent=totalMin+" 分钟 / 天";
