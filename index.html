@@ -860,19 +860,67 @@ function buddyMissionsFor(c,ranked){
     ["10 分钟复盘","记下今天最值得二刷的错误"]
   ];
 }
+function todayKey(){
+  var d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function missionStorageKey(){return "nixi_buddy_missions_"+todayKey();}
+function loadBuddyMissions(){
+  try{
+    var raw=localStorage.getItem(missionStorageKey());
+    if(raw){var x=JSON.parse(raw);if(Array.isArray(x)&&x.length===3)return x.map(Boolean);}
+  }catch(e){}
+  return [false,false,false];
+}
+function saveBuddyMissions(){try{localStorage.setItem(missionStorageKey(),JSON.stringify(buddyMissionDone));}catch(e){}}
+function currentMode(c){
+  if(c.days<=14||c.pressure==="很高")return ["冲刺抢分","只保留高回报任务，优先限时训练和错题回炉。"];
+  if(c.execution<50)return ["轻量稳住","先把每日任务压缩到能完成，再逐步增加学习量。"];
+  if(c.bias>.24)return ["偏科突破","把额外时间集中给第一、第二突破科，暂时不要平均分配。"];
+  if(c.rate>.82)return ["稳定精修","重点减少低级错误、做题卡顿和综合题波动。"];
+  return ["稳步推进","按主攻科顺序推进，保持专项训练和错题复盘。"];
+}
+function updateDashboard(c,ranked,problem){
+  if(!c||!ranked||!ranked.length)return;
+  var mode=currentMode(c),done=buddyMissionDone.filter(Boolean).length,st=buddyStateInfo(buddyState),top=ranked[0];
+  document.getElementById("dashMode").textContent=mode[0];
+  document.getElementById("dashModeText").textContent=mode[1];
+  document.getElementById("dashProgressBar").style.width=Math.round(done/3*100)+"%";
+  document.getElementById("dashProgressText").textContent="今日搭子任务 "+done+" / 3";
+  document.getElementById("dashTopSubject").textContent=top.name+" · "+top.score+"→"+top.target;
+  document.getElementById("dashTopReason").textContent="距目标 "+top.gap+" 分 · "+issueLabel(top.issue)+" · 当前得分率 "+Math.round(top.rate*100)+"%";
+  document.getElementById("dashTopTag").textContent=top.rate<.6?"高回报突破":top.gap<=top.full*.06?"接近目标":"重点补强";
+  document.getElementById("dashBuddyArt").innerHTML=mascotStateMarkup(selectedCompanion,buddyState);
+  document.getElementById("dashBuddyName").textContent=selectedCompanion.name;
+  document.getElementById("dashBuddyState").textContent=st[0];
+  document.getElementById("dashBuddyText").textContent=st[1];
+}
 function renderBuddy(c,ranked,problem){
+  var st=buddyStateInfo(buddyState);
   document.getElementById("companionAvatar").innerHTML=mascotStateMarkup(selectedCompanion,buddyState);
   document.getElementById("companionName").textContent=selectedCompanion.name;
   document.getElementById("companionRole").textContent=selectedCompanion.role+" · "+selectedCompanion.goodFor;
-  document.getElementById("companionMeta").innerHTML=selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
+  document.getElementById("companionMeta").innerHTML='<span>'+st[0]+'</span>'+selectedCompanion.traits.map(function(t){return "<span>"+t+"</span>"}).join("");
   document.getElementById("companionWhy").textContent="匹配理由："+companionReason(c,problem);
-  document.getElementById("companionLine").textContent=selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length];
+  document.getElementById("buddyDialogueTitle").textContent=st[0]+" · "+selectedCompanion.name+" 对你说";
+  document.getElementById("companionLine").textContent=st[1]+" "+selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length];
   var ms=buddyMissionsFor(c,ranked),box=document.getElementById("buddyMissions");box.innerHTML="";
-  ms.forEach(function(m,i){box.innerHTML+='<div class="buddy-mission"><b>0'+(i+1)+' · '+m[0]+'</b>'+escapeHtml(m[1])+'</div>'});
+  ms.forEach(function(m,i){
+    box.innerHTML+='<div class="buddy-mission '+(buddyMissionDone[i]?"done":"")+'" onclick="toggleBuddyMission('+i+')"><b>0'+(i+1)+' · '+m[0]+'</b>'+escapeHtml(m[1])+'</div>';
+  });
+  updateDashboard(c,ranked,problem);
+}
+function toggleBuddyMission(i){
+  if(i<0||i>2)return;
+  buddyMissionDone[i]=!buddyMissionDone[i];
+  if(buddyMissionDone.every(Boolean))buddyState="done";
+  else if(lastReport)buddyState=chooseBuddyState(lastReport.classify,lastReport.problem);
+  saveBuddyMissions();renderHeroMascot();
+  if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
 }
 function nextBuddyLine(){
   buddyLineIndex=(buddyLineIndex+1)%selectedCompanion.lines.length;
-  document.getElementById("companionLine").textContent=selectedCompanion.lines[buddyLineIndex];
+  if(lastReport)renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);
 }
 function switchBuddy(){
   var idx=companions.indexOf(selectedCompanion);
@@ -881,10 +929,13 @@ function switchBuddy(){
   if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
 }
 function buddyCheckIn(){
-  var key="nixi_buddy_check_"+new Date().toISOString().slice(0,10);
-  try{localStorage.setItem(key,selectedCompanion.name);}catch(e){}
-  document.getElementById("buddyDialogueTitle").textContent="✓ 今日已和 "+selectedCompanion.name+" 打卡";
-  showToast("今日搭子打卡完成");
+  buddyMissionDone=[true,true,true];
+  buddyState="done";
+  saveBuddyMissions();
+  try{localStorage.setItem("nixi_buddy_check_"+todayKey(),selectedCompanion.name);}catch(e){}
+  renderHeroMascot();
+  if(lastReport){renderBuddy(lastReport.classify,lastReport.ranked,lastReport.problem);renderPoster();}
+  showToast("今日 3 项搭子任务全部完成");
 }
 
 document.querySelectorAll(".theme-choice").forEach(function(t){
@@ -1218,6 +1269,9 @@ function generateReport(){
   var c=classify(),ranked=rankedSubjects();
   var problem=document.getElementById("problem").value;
   pickCompanion(c,problem,ranked);
+  buddyMissionDone=loadBuddyMissions();
+  buddyState=buddyMissionDone.every(Boolean)?"done":chooseBuddyState(c,problem);
+  renderHeroMascot();
   var nick=document.getElementById("nickname").value.trim();
   var grade=document.getElementById("grade").value;
   var exam=document.getElementById("exam").value.trim()||"目标考试";
@@ -1339,8 +1393,6 @@ function generateReport(){
   updateSimulator();
 
   renderBuddy(c,ranked,problem);
-  var savedKey="nixi_buddy_check_"+new Date().toISOString().slice(0,10);
-  try{if(localStorage.getItem(savedKey)){document.getElementById("buddyDialogueTitle").textContent="✓ 今天已经和搭子打过卡";}}catch(e){}
 
   var one="先把 "+ranked[0].name+(ranked[1]?" 和 "+ranked[1].name:"")+" 的高频失分拿回来，再扩展到其他科。你现在真正需要的不是“学更多”，而是让每一天的学习都直接指向可以拿回来的分。";
   document.getElementById("oneLine").textContent=one;
