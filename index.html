@@ -1255,7 +1255,13 @@ function renderPoster(){
   if(posterStyle==="goal"){
     x.fillStyle=p[4];x.font="900 110px sans-serif";x.fillText("+"+r.gain,120,360);x.fillStyle=p[2];x.font="800 42px sans-serif";x.fillText("阶段目标提升",120,425);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("剩余 "+r.days+" 天 · 每天约 "+r.hours+" 小时",120,520);
   }else if(posterStyle==="companion"){
-    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);drawCanvasMascot(x,selectedCompanion,190,500,1.15);x.font="800 38px sans-serif";x.fillStyle=p[2];x.fillText(selectedCompanion.name,300,475);x.fillStyle=p[3];x.font="30px sans-serif";wrapCanvas(x,selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],300,535,610,44);
+    var bst=buddyStateInfo(buddyState);
+    x.fillStyle=p[2];x.font="900 62px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,76);
+    drawCanvasMascot(x,selectedCompanion,190,500,1.15);
+    x.fillStyle=p[4];x.beginPath();x.roundRect(292,420,180,46,23);x.fill();
+    x.fillStyle="#fff";x.font="800 23px sans-serif";x.fillText(bst[0],320,451);
+    x.font="800 38px sans-serif";x.fillStyle=p[2];x.fillText(selectedCompanion.name,300,510);
+    x.fillStyle=p[3];x.font="29px sans-serif";wrapCanvas(x,bst[1]+" "+selectedCompanion.lines[buddyLineIndex%selectedCompanion.lines.length],300,565,610,42);
   }else{
     x.fillStyle=p[2];x.font="900 66px sans-serif";wrapCanvas(x,r.typeTitle,120,310,820,80);x.fillStyle=p[3];x.font="30px sans-serif";x.fillText("当前 "+r.current+" · 目标 +"+r.gain+" · "+r.days+" 天",120,510);
   }
