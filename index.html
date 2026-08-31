@@ -31,6 +31,15 @@ button{cursor:pointer}
 .hero-stars{position:absolute;inset:0;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.75) 0 1px,transparent 1.5px),radial-gradient(circle at 65% 18%,rgba(255,255,255,.55) 0 1px,transparent 1.5px),radial-gradient(circle at 85% 60%,rgba(255,255,255,.5) 0 1px,transparent 1.5px);background-size:90px 90px,120px 120px,140px 140px;opacity:.5}
 .hero-mascot{position:absolute;left:18px;bottom:15px;width:150px;height:150px;z-index:2}
 .hero-dashboard{position:absolute;right:14px;top:16px;width:57%;display:grid;gap:8px;z-index:2}
+.hero-mascot-center{left:50%;bottom:82px;transform:translateX(-50%);width:170px;height:170px}
+.hero-brand-panel{position:absolute;left:18px;right:18px;bottom:16px;z-index:3;padding:13px 15px;border-radius:17px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);color:#18223a;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.hero-brand-panel b{display:block;font-size:12px;margin-bottom:3px}.hero-brand-panel .tiny{font-size:10px;color:#73809a}
+.hero-brand-mark{position:absolute;right:12px;top:10px;width:30px;height:30px;border-radius:10px;background:#1e2a47;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:900}
+.report-preview-card{overflow:hidden}
+.report-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.report-preview-item{padding:15px;border-radius:16px;background:var(--soft);border:1px solid var(--line)}
+.report-preview-item b{display:block;font-size:13px;margin-bottom:5px}
+.report-preview-item span{display:block;font-size:10px;color:var(--muted);line-height:1.55}
 .hero-mini-card{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:16px;padding:11px;color:#18223a;box-shadow:0 10px 28px rgba(0,0,0,.14)}
 .hero-mini-card b{font-size:12px}.hero-mini-card .value{font-size:26px;font-weight:900;margin-top:4px}.hero-mini-card .tiny{font-size:10px;color:#73809a;margin-top:3px}
 .hero-bars{display:grid;gap:5px;margin-top:7px}.hero-bar{height:5px;background:#e9edf4;border-radius:99px;overflow:hidden}.hero-bar i{display:block;height:100%;background:#6a85ff;border-radius:99px}
@@ -38,7 +47,7 @@ button{cursor:pointer}
 .mascot-frame{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(145deg,var(--card),var(--soft));border:1px solid var(--line);overflow:hidden}
 .companion-choice .mascot-frame{width:74px;height:74px;margin-bottom:9px}
 .companion-big-avatar{overflow:hidden}.companion-big-avatar .mascot-art{width:76px;height:76px}
-@media(max-width:760px){.score-structure-grid{grid-template-columns:1fr 1fr}.conclusion-grid{grid-template-columns:1fr 1fr}.hero-layout{grid-template-columns:1fr}.hero-visual{min-height:300px}.hero-dashboard{width:58%}.hero-mascot{width:138px;height:138px}}
+@media(max-width:760px){.score-structure-grid{grid-template-columns:1fr 1fr}.conclusion-grid{grid-template-columns:1fr 1fr}.report-preview-grid{grid-template-columns:1fr 1fr}.hero-layout{grid-template-columns:1fr}.hero-visual{min-height:300px}.hero-dashboard{width:58%}.hero-mascot{width:138px;height:138px}}
 .hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--soft);font-size:12px;color:var(--muted)}
 .stepbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
@@ -110,7 +119,7 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .dash-buddy-art .mascot-art{width:66px;height:66px}
 .state-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:10px;color:var(--muted);font-weight:800}
 @media(max-width:760px){.dashboard-strip{grid-template-columns:1fr 1fr}.dashboard-strip .dash-card:first-child{grid-column:1/-1}}
-@media(max-width:430px){.score-structure-grid,.conclusion-grid{grid-template-columns:1fr}.dashboard-strip{grid-template-columns:1fr}.dashboard-strip .dash-card:first-child{grid-column:auto}}
+@media(max-width:430px){.score-structure-grid,.conclusion-grid,.report-preview-grid{grid-template-columns:1fr}.dashboard-strip{grid-template-columns:1fr}.dashboard-strip .dash-card:first-child{grid-column:auto}}
 .eyebrow{font-size:11px;letter-spacing:.12em;font-weight:900;color:var(--muted)}
 .result-title{font-size:38px;line-height:1.1;margin:8px 0 10px;letter-spacing:-1px}
 .result-sub{color:var(--muted);line-height:1.7;max-width:760px}
@@ -174,7 +183,7 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .notice{font-size:11px;color:var(--muted);line-height:1.65;margin-top:10px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);padding:10px 14px;background:#111;color:#fff;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
 .toast.show{opacity:1}
-.form-status{position:sticky;top:8px;z-index:8;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:14px;box-shadow:0 10px 30px rgba(36,38,32,.06)}
+.form-status{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:14px;box-shadow:0 10px 30px rgba(36,38,32,.05)}
 .form-status-main{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
 .form-status-main b{display:block;font-size:14px;margin-top:2px}
 .mini-link{border:0;background:transparent;color:var(--muted);font-size:11px;padding:5px;white-space:nowrap}
@@ -318,18 +327,18 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div class="hero-copy">
         <div class="eyebrow">STUDY RISE · PERSONAL REPORT</div>
         <h1>别再“平均努力”，先找到最值得拿回来的分。</h1>
-        <p>输入成绩、目标和剩余时间，生成你的成绩分型、主攻科目、14 天执行计划、风险雷达、错题节奏和专属学习搭子。全程静态运行，不上传成绩。</p>
+        <p>输入成绩、目标和剩余时间，生成你的成绩分型、主攻科目、分数结构、14 天执行计划和专属报告解读。全程静态运行，不上传成绩。</p>
         <div class="hero-tags">
           <span class="tag">约 2 分钟</span><span class="tag">自动学习分型</span><span class="tag">6 位解读伙伴</span><span class="tag">可下载结果海报</span>
         </div>
       </div>
       <div class="hero-visual" aria-hidden="true">
         <div class="hero-stars"></div>
-        <div class="hero-mascot" id="heroMascot"></div>
-        <div class="hero-dashboard">
-          <div class="hero-mini-card"><b>学习档案</b><div class="value">512</div><div class="tiny">示例总分 · 目标 +88</div></div>
-          <div class="hero-mini-card"><b>今日计划</b><div class="hero-bars"><div class="hero-bar"><i style="width:78%"></i></div><div class="hero-bar"><i style="width:56%"></i></div><div class="hero-bar"><i style="width:68%"></i></div></div><div class="tiny">主攻数学 · 英语 · 物理</div></div>
-          <div class="hero-mini-card"><b>执行指数</b><div class="value">68</div><div class="tiny">适中 · 建议保留 15% 缓冲</div></div>
+        <div class="hero-mascot hero-mascot-center" id="heroMascot"></div>
+        <div class="hero-brand-panel">
+          <div class="hero-brand-mark">逆</div>
+          <b>一次填写 · 生成完整测评</b>
+          <div class="tiny">成绩结构 / 提分优先级 / 14 天路线 / 报告解读</div>
         </div>
       </div>
     </div>
@@ -342,24 +351,6 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
   </div>
 
   <section id="formArea">
-    <div class="form-status no-print">
-      <div class="form-status-main">
-        <div>
-          <div class="eyebrow">YOUR INPUT · 当前填写</div>
-          <b id="formProgressText">正在准备你的测评</b>
-          <div class="small" id="draftStatus">填写内容会自动保存在本机</div>
-        </div>
-        <button class="mini-link" onclick="clearDraft()">清空重填</button>
-      </div>
-      <div class="form-progress"><i id="formProgressBar" style="width:0%"></i></div>
-      <div class="input-snapshot" id="inputSnapshot">
-        <span>当前总分 <b id="liveCurrent">-</b></span>
-        <span>各科目标 <b id="liveTarget">-</b></span>
-        <span>计划提升 <b id="liveGain">-</b></span>
-        <span id="goalConsistency">等待成绩数据</span>
-      </div>
-    </div>
-
     <div class="card">
       <h2>先告诉我你的基本情况</h2>
       <div class="desc">信息越接近你最近一次考试，生成的路线越有参考价值。</div>
@@ -431,6 +422,22 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div class="inline-note" id="subjectGoalNote">系统会用“各科目标分”和“总目标提升”交叉检查，避免目标互相矛盾。</div>
     </div>
 
+    <div class="card report-preview-card">
+      <div class="section-title">
+        <div>
+          <h2>你最终会得到什么</h2>
+          <div class="desc">填完数据以后，才会生成属于你的学习档案。这里先告诉你报告包含哪些内容，不提前展示示例分数。</div>
+        </div>
+        <span class="state-pill">结果预览</span>
+      </div>
+      <div class="report-preview-grid">
+        <div class="report-preview-item"><b>学习画像</b><span>判断当前成绩结构和主要瓶颈</span></div>
+        <div class="report-preview-item"><b>提分优先级</b><span>告诉你先补哪几科、为什么</span></div>
+        <div class="report-preview-item"><b>分数结构</b><span>拆解哪些分更值得先争取</span></div>
+        <div class="report-preview-item"><b>14 天路线</b><span>给出一次性可保存的执行计划</span></div>
+      </div>
+    </div>
+
     <div class="card">
       <h2>选择你的结果风格</h2>
       <div class="desc">学习逻辑不变，只改变报告的视觉和陪伴语气。</div>
@@ -439,6 +446,24 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
         <div class="choice theme-choice" data-theme="cute"><strong>奶油治愈</strong><small>柔和、轻松、低压力</small><div class="swatches"><i class="sw" style="background:#cf7190"></i><i class="sw" style="background:#fbe8ef"></i></div></div>
         <div class="choice theme-choice" data-theme="campus"><strong>校园清新</strong><small>明亮、清爽、学生感</small><div class="swatches"><i class="sw" style="background:#356fa8"></i><i class="sw" style="background:#e1eef8"></i></div></div>
         <div class="choice theme-choice" data-theme="dark"><strong>暗黑冲刺</strong><small>冷静、强目标、冲刺感</small><div class="swatches"><i class="sw" style="background:#202329"></i><i class="sw" style="background:#8d9cff"></i></div></div>
+      </div>
+    </div>
+
+    <div class="form-status no-print">
+      <div class="form-status-main">
+        <div>
+          <div class="eyebrow">YOUR INPUT · 当前填写</div>
+          <b id="formProgressText">正在准备你的测评</b>
+          <div class="small" id="draftStatus">填写内容会自动保存在本机</div>
+        </div>
+        <button class="mini-link" onclick="clearDraft()">清空重填</button>
+      </div>
+      <div class="form-progress"><i id="formProgressBar" style="width:0%"></i></div>
+      <div class="input-snapshot" id="inputSnapshot">
+        <span>当前总分 <b id="liveCurrent">-</b></span>
+        <span>各科目标 <b id="liveTarget">-</b></span>
+        <span>计划提升 <b id="liveGain">-</b></span>
+        <span id="goalConsistency">等待成绩数据</span>
       </div>
     </div>
 
