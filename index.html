@@ -526,6 +526,7 @@ function renderCompanions(){
       selectedCompanion=c;
       document.querySelectorAll(".companion-choice").forEach(function(x){x.classList.remove("active")});
       d.classList.add("active");
+      if(lastReport)renderPoster();
     };
     box.appendChild(d);
   });
@@ -536,6 +537,7 @@ document.querySelectorAll(".theme-choice").forEach(function(t){
     document.querySelectorAll(".theme-choice").forEach(function(x){x.classList.remove("active")});
     t.classList.add("active");
     document.body.className="theme-"+t.dataset.theme;
+    if(lastReport)renderPoster();
   };
 });
 
@@ -868,6 +870,7 @@ function generateReport(){
   diag+=" "+problemText(problem);
   document.getElementById("diagnosis").textContent=diag;
 
+  renderRiskRadar(c,ranked);
   renderLeverMap(ranked);
   var totalMin=Math.round(c.hours*60),mins=allocateMinutes(ranked,totalMin);
   var tb=document.getElementById("timeBox");tb.innerHTML="";
@@ -936,9 +939,10 @@ function generateReport(){
   var ab=document.getElementById("avoidBox");ab.innerHTML="";
   avoids.slice(0,6).forEach(function(x){ab.innerHTML+='<div class="priority">'+x+'</div>'});
 
+  renderWeeklyGoals(c,ranked);
   renderReviewSchedule();
   renderNotebook(ranked,totalMin);
-  lastReport={current:c.current,gain:c.gain,days:c.days,hours:c.hours,ranked:ranked};
+  lastReport={current:c.current,gain:c.gain,days:c.days,hours:c.hours,ranked:ranked,typeTitle:document.getElementById("typeTitle").textContent,oneLine:""};
   var simGainMax=Math.max(50,Math.min(200,c.full-c.current));
   var simGain=document.getElementById("simGain");
   simGain.max=simGainMax;simGain.value=Math.min(c.gain,simGainMax);
@@ -951,6 +955,8 @@ function generateReport(){
 
   var one="先把 "+ranked[0].name+(ranked[1]?" 和 "+ranked[1].name:"")+" 的高频失分拿回来，再扩展到其他科。你现在真正需要的不是“学更多”，而是让每一天的学习都直接指向可以拿回来的分。";
   document.getElementById("oneLine").textContent=one;
+  if(lastReport){lastReport.oneLine=one;lastReport.typeTitle=document.getElementById("typeTitle").textContent;}
+  renderPoster();
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
