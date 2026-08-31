@@ -39,7 +39,7 @@ button{cursor:pointer}
 label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
 input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);outline:none}
 input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent2) 14%,transparent)}
-.subject-head,.subject-row{display:grid;grid-template-columns:1.15fr .68fr .68fr .68fr 42px;gap:8px;align-items:end}
+.subject-head,.subject-row{display:grid;grid-template-columns:1.05fr .62fr .62fr .62fr .95fr 42px;gap:8px;align-items:end}
 .subject-head{font-size:11px;color:var(--muted);padding:0 0 6px}
 .subject-row{padding:7px 0;border-bottom:1px dashed var(--line)}
 .subject-row:last-child{border-bottom:0}
@@ -91,6 +91,36 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .notice{font-size:11px;color:var(--muted);line-height:1.65;margin-top:10px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);padding:10px 14px;background:#111;color:#fff;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
 .toast.show{opacity:1}
+.metric-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.metric-card{padding:18px;border-radius:20px;background:var(--soft);border:1px solid var(--line)}
+.metric-card h3{margin:0 0 6px;font-size:16px}.metric-card .big{font-size:30px;font-weight:900;margin:7px 0}
+.meter{height:12px;background:var(--card);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;background:var(--accent2);border-radius:99px}
+.trend-chart{height:160px;border-radius:16px;background:var(--card);border:1px solid var(--line);padding:12px;margin-top:10px}
+.trend-chart svg{width:100%;height:100%}
+.lever-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lever{padding:15px;border:1px solid var(--line);border-radius:17px;background:var(--card)}
+.lever .level{display:inline-block;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted);margin-top:8px}
+details.week{border:1px solid var(--line);border-radius:18px;background:var(--card);margin:10px 0;overflow:hidden}
+details.week summary{list-style:none;padding:14px 16px;font-weight:900;background:var(--soft);cursor:pointer}
+details.week summary::-webkit-details-marker{display:none}
+details.week .inside{padding:8px 12px 12px}
+.review-schedule{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.review-step{padding:13px;border-radius:16px;background:var(--soft);text-align:center;border:1px solid var(--line)}
+.review-step b{display:block;font-size:18px;margin-bottom:4px}.review-step span{font-size:11px;color:var(--muted)}
+.simulator{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.range-line{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);margin:8px 0}
+input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;accent-color:var(--accent2)}
+.sim-result{padding:17px;border-radius:18px;background:var(--soft);border:1px solid var(--line)}
+.sim-result .big{font-size:30px;font-weight:900}
+.note-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.note-tab{border:0;border-radius:999px;padding:8px 11px;background:var(--soft);color:var(--muted);font-weight:800}
+.note-tab.active{background:var(--accent);color:#fff}
+.note-panel{display:none}.note-panel.active{display:block}
+.note-box{min-height:76px;padding:13px;border:1px dashed var(--line);border-radius:14px;margin:8px 0;color:var(--muted);font-size:13px;line-height:1.65}
+.score-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--soft);font-size:11px;color:var(--muted)}
+@media(max-width:760px){.lever-grid{grid-template-columns:1fr 1fr}.review-schedule{grid-template-columns:repeat(3,1fr)}.simulator,.metric-row{grid-template-columns:1fr}}
+
 .theme-cute{--bg:#fff7f8;--card:#fff;--text:#422f37;--muted:#8d7480;--line:#efdce4;--accent:#cf7190;--accent2:#e491ad;--soft:#fbe8ef}
 .theme-dark{--bg:#15171c;--card:#202329;--text:#f5f6f8;--muted:#aeb3bd;--line:#353a44;--accent:#f4f5f7;--accent2:#8d9cff;--soft:#2b2f37}
 .theme-campus{--bg:#eef7ff;--card:#fff;--text:#19364f;--muted:#74899d;--line:#d9e7f2;--accent:#356fa8;--accent2:#5f97cb;--soft:#e1eef8}
@@ -165,11 +195,39 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
     </div>
 
     <div class="card">
+      <h2>最近成绩趋势（可选）</h2>
+      <div class="desc">如果你愿意填最近两次总分，结果页会判断你目前处于上升、波动还是下滑阶段。最新一次总分会自动由下面各科成绩相加。</div>
+      <div class="grid2">
+        <div><label>前两次考试总分</label><input id="prev2" type="number" min="0" placeholder="例如：418"></div>
+        <div><label>上一次考试总分</label><input id="prev1" type="number" min="0" placeholder="例如：436"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>执行条件快速诊断</h2>
+      <div class="desc">不评价“自律不自律”，只用来判断计划应该排得多紧、多细。</div>
+      <div class="grid2">
+        <div><label>平时计划完成率</label>
+          <select id="completion"><option value="35">经常不到 40%</option><option value="55">大约 40%–70%</option><option value="75" selected>大约 70%–90%</option><option value="90">基本都能完成</option></select>
+        </div>
+        <div><label>错题复盘频率</label>
+          <select id="reviewHabit"><option value="25">几乎不复盘</option><option value="50">想起来才看</option><option value="72" selected>每周会看</option><option value="90">基本每天/隔天复盘</option></select>
+        </div>
+        <div><label>有没有固定学习时段</label>
+          <select id="fixedTime"><option value="35">没有固定时间</option><option value="60" selected>大致固定</option><option value="85">比较固定</option></select>
+        </div>
+        <div><label>学习时容易被打断吗</label>
+          <select id="focus"><option value="35">经常被打断</option><option value="60" selected>偶尔</option><option value="85">很少</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="section-title">
         <div><h2>各科成绩</h2><div class="desc">建议按最近一次完整考试填写；目标分不用夸张，写下一阶段想达到的分数。</div></div>
         <button class="btn ghost inline no-print" onclick="loadGradePreset()">按年级重置科目</button>
       </div>
-      <div class="subject-head"><span>科目</span><span>当前分</span><span>满分</span><span>目标分</span><span></span></div>
+      <div class="subject-head"><span>科目</span><span>当前分</span><span>满分</span><span>目标分</span><span>主要失分原因</span><span></span></div>
       <div id="subjectBox"></div>
       <button class="btn ghost no-print" onclick="addSubject()">＋ 添加一科</button>
     </div>
@@ -208,6 +266,31 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
       </div>
     </div>
 
+    <div class="card">
+      <h2>成绩趋势 & 执行条件</h2>
+      <div class="desc">这两个指标不预测结果，只帮助决定计划该“冲”还是该“稳”。</div>
+      <div class="metric-row">
+        <div class="metric-card">
+          <h3>最近成绩趋势</h3>
+          <div class="big" id="trendLabel">未填写历史成绩</div>
+          <div class="small" id="trendText"></div>
+          <div class="trend-chart" id="trendChart"></div>
+        </div>
+        <div class="metric-card">
+          <h3>执行条件指数</h3>
+          <div class="big"><span id="executionScore">-</span>/100</div>
+          <div class="meter"><i id="executionBar" style="width:0%"></i></div>
+          <div class="small" id="executionText" style="margin-top:9px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>提分杠杆地图</h2>
+      <div class="desc">把科目分成“优先投入 / 稳步提升 / 维持稳定”，方便你看出哪里最值得花时间。</div>
+      <div class="lever-grid" id="leverMap"></div>
+    </div>
+
     <div class="grid2">
       <div class="card">
         <h2>① 先救哪几科</h2>
@@ -235,7 +318,7 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 
     <div class="grid2">
       <div class="card">
-        <h2>⑤ 第一周执行卡</h2>
+        <h2>⑤ 14 天执行计划</h2>
         <div id="weekPlan"></div>
       </div>
       <div class="card">
@@ -244,8 +327,34 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
       </div>
     </div>
 
+    <div class="card">
+      <h2>⑦ 错题二刷节奏</h2>
+      <div class="desc">重要错题不要只看一次。下面给你一个简单复习节奏：当天、次日、第3天、第7天、第14天。</div>
+      <div class="review-schedule" id="reviewSchedule"></div>
+    </div>
+
+    <div class="card no-print">
+      <h2>⑧ 目标压力模拟器</h2>
+      <div class="desc">拖动“每天时间”和“阶段目标”，看看执行压力如何变化。它不是提分预测，只是帮助你把目标调到更可执行。</div>
+      <div class="simulator">
+        <div>
+          <label>每天额外学习时间：<b id="simHoursLabel">3 小时</b></label>
+          <input id="simHours" type="range" min="0.5" max="5" step="0.5" value="3" oninput="updateSimulator()">
+          <div class="range-line"><span>0.5h</span><span>5h</span></div>
+          <label>阶段目标提升：<b id="simGainLabel">50 分</b></label>
+          <input id="simGain" type="range" min="10" max="150" step="5" value="50" oninput="updateSimulator()">
+          <div class="range-line"><span>10分</span><span>150分</span></div>
+        </div>
+        <div class="sim-result">
+          <div class="small">当前执行压力</div>
+          <div class="big" id="simPressure">适中</div>
+          <div class="small" id="simAdvice"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="card paper">
-      <h2>⑦ 你的“电子学习本”第一页</h2>
+      <h2>⑨ 你的“电子学习本”</h2>
       <div class="desc">可以直接截图或保存 PDF，当作接下来一周的执行页。</div>
       <div id="notebook"></div>
     </div>
@@ -259,9 +368,10 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
       <div class="actions no-print">
         <button class="btn ghost" onclick="copySummary()">复制结果摘要</button>
         <button class="btn ghost" onclick="window.print()">保存 / 打印 PDF</button>
+        <button class="btn ghost" onclick="downloadShareCard()">下载结果分享卡</button>
         <button class="btn" onclick="restart()">重新测试</button>
       </div>
-      <div class="notice">建议每完成 7 天后重新测一次，把最新成绩填进来，看看“第一突破科目”是否发生变化。</div>
+      <div class="notice">建议完成 7–14 天后用最新成绩重新测一次，观察主攻科、成绩趋势和执行条件是否发生变化。</div>
     </div>
   </section>
 </div>
@@ -270,6 +380,7 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 <script>
 var subjects=[];
 var selectedCompanion={emoji:"📘",name:"学霸猫",tone:"focus"};
+var lastReport=null;
 var companions=[
   {emoji:"📘",name:"学霸猫",tone:"focus",text:"先完成最重要的一项，再处理下一项。今天不求学很多，只求真正拿回一点分。"},
   {emoji:"☁️",name:"云朵同桌",tone:"gentle",text:"不用一下子变得特别厉害，能把今天该做的做完，就是很实在的进步。"},
@@ -292,25 +403,44 @@ var subjectTaskBank={
 function gradeSubjects(grade){
   if(grade.indexOf("初")===0){
     return [
-      {name:"语文",score:82,full:120,target:95},
-      {name:"数学",score:76,full:120,target:95},
-      {name:"英语",score:80,full:120,target:95},
-      {name:"物理",score:58,full:80,target:68},
-      {name:"道法",score:48,full:60,target:54}
+      {name:"语文",score:82,full:120,target:95,issue:"base"},
+      {name:"数学",score:76,full:120,target:95,issue:"method"},
+      {name:"英语",score:80,full:120,target:95,issue:"memory"},
+      {name:"物理",score:58,full:80,target:68,issue:"base"},
+      {name:"道法",score:48,full:60,target:54,issue:"memory"}
     ];
   }
   return [
-    {name:"语文",score:88,full:150,target:105},
-    {name:"数学",score:78,full:150,target:110},
-    {name:"英语",score:92,full:150,target:110},
-    {name:"物理",score:61,full:100,target:80},
-    {name:"化学",score:72,full:100,target:85}
+    {name:"语文",score:88,full:150,target:105,issue:"careless"},
+    {name:"数学",score:78,full:150,target:110,issue:"method"},
+    {name:"英语",score:92,full:150,target:110,issue:"memory"},
+    {name:"物理",score:61,full:100,target:80,issue:"base"},
+    {name:"化学",score:72,full:100,target:85,issue:"unstable"}
   ];
 }
 
 function loadGradePreset(){
   subjects=gradeSubjects(document.getElementById("grade").value);
   renderSubjects();
+}
+
+function issueOptions(current){
+  var opts=[
+    ["base","基础不牢"],["careless","粗心/步骤丢分"],["speed","速度慢"],
+    ["method","题型方法不会"],["memory","记忆不牢"],["unstable","发挥不稳定"]
+  ];
+  return opts.map(function(o){return '<option value="'+o[0]+'"'+(current===o[0]?' selected':'')+'>'+o[1]+'</option>'}).join("");
+}
+function issueAdvice(issue){
+  var map={
+    base:"先把知识点和基础题做稳，不要急着跳到难题。",
+    careless:"每次错题必须定位到具体步骤，不能只写“粗心”。",
+    speed:"加入限时小组题，逐步压缩单题用时。",
+    method:"按题型整理“识别信号—方法—易错点”，同类题连续练。",
+    memory:"采用当天、次日、第3天、第7天回看，避免只背一次。",
+    unstable:"优先练固定流程和限时稳定性，减少状态波动。"
+  };
+  return map[issue]||"先处理最主要的失分原因。";
 }
 
 function renderSubjects(){
@@ -324,13 +454,14 @@ function renderSubjects(){
       '<div><label>当前分</label><input type="number" min="0" value="'+s.score+'" oninput="subjects['+i+'].score=+this.value"></div>'+
       '<div><label>满分</label><input type="number" min="1" value="'+s.full+'" oninput="subjects['+i+'].full=+this.value"></div>'+
       '<div><label>目标分</label><input type="number" min="0" value="'+s.target+'" oninput="subjects['+i+'].target=+this.value"></div>'+
+      '<div><label>主要失分原因</label><select onchange="subjects['+i+'].issue=this.value">'+issueOptions(s.issue||"base")+'</select></div>'+
       '<div class="remove"><label>&nbsp;</label><button class="iconbtn" onclick="removeSubject('+i+')" aria-label="删除科目">×</button></div>';
     box.appendChild(d);
   });
 }
 
 function addSubject(){
-  subjects.push({name:"新科目",score:60,full:100,target:75});
+  subjects.push({name:"新科目",score:60,full:100,target:75,issue:"base"});
   renderSubjects();
 }
 function removeSubject(i){
@@ -390,6 +521,12 @@ function classify(){
   var gainRate=gain/Math.max(1,full);
   var gainPerWeek=gain/(days/7);
   var pressureScore=gainPerWeek/(hours*7);
+  var execution=Math.round((
+    (+document.getElementById("completion").value||50)+
+    (+document.getElementById("reviewHabit").value||50)+
+    (+document.getElementById("fixedTime").value||50)+
+    (+document.getElementById("focus").value||50)
+  )/4);
 
   var base=rate<.52?"基础重建":rate<.68?"稳步提分":rate<.82?"冲高精修":"高分稳定";
   var biasType=bias>.24?"明显偏科":bias>.13?"轻度偏科":"相对均衡";
@@ -403,7 +540,7 @@ function classify(){
   else if(rate>.82) typeTitle="高分精修型";
   else typeTitle="稳步提分型";
 
-  return {current:current,full:full,targetSum:targetSum,rate:rate,bias:bias,days:days,hours:hours,gain:gain,base:base,biasType:biasType,pressure:pressure,timeType:timeType,typeTitle:typeTitle};
+  return {current:current,full:full,targetSum:targetSum,rate:rate,bias:bias,days:days,hours:hours,gain:gain,base:base,biasType:biasType,pressure:pressure,timeType:timeType,typeTitle:typeTitle,execution:execution};
 }
 
 function rankedSubjects(){
@@ -411,7 +548,7 @@ function rankedSubjects(){
     var score=+s.score||0,full=Math.max(1,+s.full||100),target=+s.target||0;
     var rate=score/full,gap=Math.max(0,target-score);
     var priority=(gap/full)*1.8+(1-rate)*.62;
-    return {name:s.name,score:score,full:full,target:target,rate:rate,gap:gap,priority:priority};
+    return {name:s.name,score:score,full:full,target:target,rate:rate,gap:gap,priority:priority,issue:s.issue||"base"};
   }).sort(function(a,b){return b.priority-a.priority});
 }
 
@@ -446,33 +583,150 @@ function problemText(problem){
 function subjectStrategy(s){
   var n=s.name,rate=s.rate;
   var stage=rate<.55?"基础":rate<.75?"提升":"精修";
+  var tail=" "+issueAdvice(s.issue);
   if(n.indexOf("数学")>=0){
-    return stage==="基础"?"先回补定义、公式和典型例题；基础题正确率稳定后再做综合题。":stage==="提升"?"按函数/几何/数列等高频模块做专项，错题至少二刷一次。":"用限时训练压缩计算和审题时间，重点减少低级失分与卡题。";
+    return (stage==="基础"?"先回补定义、公式和典型例题；基础题正确率稳定后再做综合题。":stage==="提升"?"按函数/几何/数列等高频模块做专项，错题至少二刷一次。":"用限时训练压缩计算和审题时间，重点减少低级失分与卡题。")+tail;
   }
   if(n.indexOf("英语")>=0){
-    return stage==="基础"?"把词汇和基础语法放在每天固定位置，阅读先求读懂再求速度。":stage==="提升"?"词汇复习+阅读/完形专项并行，每周固定整理一次作文可复用表达。":"重点练阅读速度、长难句和写作稳定性，减少会但写不出的表达损失。";
+    return (stage==="基础"?"把词汇和基础语法放在每天固定位置，阅读先求读懂再求速度。":stage==="提升"?"词汇复习+阅读/完形专项并行，每周固定整理一次作文可复用表达。":"重点练阅读速度、长难句和写作稳定性，减少会但写不出的表达损失。")+tail;
   }
   if(n.indexOf("语文")>=0){
-    return stage==="基础"?"先守住古诗文、基础知识和阅读常见题型，不急着只攻作文。":stage==="提升"?"阅读题按题型总结答题结构，作文建立自己的素材库和常用结构。":"重点做限时阅读、作文审题与表达精修，提高稳定性而不是追求花哨。";
+    return (stage==="基础"?"先守住古诗文、基础知识和阅读常见题型，不急着只攻作文。":stage==="提升"?"阅读题按题型总结答题结构，作文建立自己的素材库和常用结构。":"重点做限时阅读、作文审题与表达精修，提高稳定性而不是追求花哨。")+tail;
   }
   if(n.indexOf("物理")>=0){
-    return stage==="基础"?"公式不要只背，要配典型情境；先把受力、过程、单位这些基础步骤做稳。":stage==="提升"?"按力学/电学等模块做专题，错题写清‘卡在哪一步’。":"重点练综合题拆过程能力和限时计算，减少模型识别慢的问题。";
+    return (stage==="基础"?"公式不要只背，要配典型情境；先把受力、过程、单位这些基础步骤做稳。":stage==="提升"?"按力学/电学等模块做专题，错题写清‘卡在哪一步’。":"重点练综合题拆过程能力和限时计算，减少模型识别慢的问题。")+tail;
   }
   if(n.indexOf("化学")>=0){
-    return stage==="基础"?"先把概念、方程式、基本实验现象和计算模板补齐。":stage==="提升"?"把实验、反应原理、计算等高频模块拆开练，建立错题清单。":"重点训练综合实验与推断题的信息提取和答题完整性。";
+    return (stage==="基础"?"先把概念、方程式、基本实验现象和计算模板补齐。":stage==="提升"?"把实验、反应原理、计算等高频模块拆开练，建立错题清单。":"重点训练综合实验与推断题的信息提取和答题完整性。")+tail;
   }
   if(n.indexOf("生物")>=0){
-    return stage==="基础"?"先把核心概念、过程和教材图表理清，选择题先守住基础分。":stage==="提升"?"多做图表、实验与材料题，错题要回到对应概念。":"重点提升材料分析、实验设计和术语表达的准确性。";
+    return (stage==="基础"?"先把核心概念、过程和教材图表理清，选择题先守住基础分。":stage==="提升"?"多做图表、实验与材料题，错题要回到对应概念。":"重点提升材料分析、实验设计和术语表达的准确性。")+tail;
   }
   if(n.indexOf("历史")>=0||n.indexOf("政治")>=0||n.indexOf("地理")>=0||n.indexOf("道法")>=0){
-    return stage==="基础"?"先建立章节框架和核心关键词，避免碎片化背诵。":stage==="提升"?"把材料题按题型整理答题框架，并把错题对应回知识点。":"重点练材料提取、答题结构和时间控制，让会背的内容稳定转化成分数。";
+    return (stage==="基础"?"先建立章节框架和核心关键词，避免碎片化背诵。":stage==="提升"?"把材料题按题型整理答题框架，并把错题对应回知识点。":"重点练材料提取、答题结构和时间控制，让会背的内容稳定转化成分数。")+tail;
   }
-  return stage==="基础"?"先补最基础的概念和高频题型，再进入综合练习。":stage==="提升"?"做高频模块专项并坚持错题二刷。":"以限时训练和稳定性为重点，减少非知识性失分。";
+  return (stage==="基础"?"先补最基础的概念和高频题型，再进入综合练习。":stage==="提升"?"做高频模块专项并坚持错题二刷。":"以限时训练和稳定性为重点，减少非知识性失分。")+tail;
 }
 
 function taskFor(name,index){
   var list=subjectTaskBank[name]||["基础知识复习20分钟","专项练习一组","错题二刷","限时训练20分钟"];
   return list[index%list.length];
+}
+
+function renderTrend(current){
+  var a=parseFloat(document.getElementById("prev2").value),b=parseFloat(document.getElementById("prev1").value);
+  var vals=[];
+  if(!isNaN(a))vals.push(a);
+  if(!isNaN(b))vals.push(b);
+  vals.push(current);
+  var label="未填写历史成绩",text="只填写了最新一次成绩，因此暂时不判断趋势。";
+  if(vals.length>=2){
+    var diff=vals[vals.length-1]-vals[0];
+    var swings=0;
+    for(var i=1;i<vals.length;i++)swings+=Math.abs(vals[i]-vals[i-1]);
+    if(diff>=15)label="明显上升";
+    else if(diff>=5)label="小幅上升";
+    else if(diff<=-15)label="明显下滑";
+    else if(diff<=-5)label="小幅下滑";
+    else label="基本稳定";
+    if(swings>Math.abs(diff)+20)label="波动较大";
+    text="最近有效数据："+vals.join(" → ")+"。趋势只用于调整计划节奏，不代表后续成绩一定延续。";
+  }
+  document.getElementById("trendLabel").textContent=label;
+  document.getElementById("trendText").textContent=text;
+  var box=document.getElementById("trendChart");
+  if(vals.length<2){box.innerHTML='<div class="small" style="padding:48px 8px;text-align:center">填写历史总分后显示趋势图</div>';return;}
+  var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),range=Math.max(1,max-min);
+  var pts=vals.map(function(v,i){return [35+i*(230/Math.max(1,vals.length-1)),115-(v-min)/range*75]});
+  var svg='<svg viewBox="0 0 300 140" preserveAspectRatio="none"><line x1="30" y1="120" x2="270" y2="120" stroke="var(--line)" stroke-width="2"/>'+
+    '<polyline points="'+pts.map(function(p){return p.join(",")}).join(" ")+'" fill="none" stroke="var(--accent2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
+  pts.forEach(function(p,i){svg+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="var(--card)" stroke="var(--accent2)" stroke-width="3"/><text x="'+p[0]+'" y="'+(p[1]-10)+'" text-anchor="middle" font-size="10" fill="var(--text)">'+vals[i]+'</text>'});
+  box.innerHTML=svg+'</svg>';
+}
+
+function executionText(score){
+  if(score<45)return "执行条件目前偏弱，计划必须更轻：每天只保留 2–3 个关键任务，先把完成率做起来。";
+  if(score<70)return "执行条件中等，适合明确每日主任务，并保留 15% 左右缓冲时间，避免计划过满。";
+  return "执行条件较稳，可以使用更清晰的阶段目标和限时训练，但仍要保留复盘与休息缓冲。";
+}
+
+function renderLeverMap(ranked){
+  var box=document.getElementById("leverMap");box.innerHTML="";
+  ranked.forEach(function(s,i){
+    var level,desc;
+    if(i<2 && s.rate<.75){level="高回报投入";desc="当前失分空间较大，又有明确目标差，优先投入更容易看到结构变化。";}
+    else if(s.gap<=s.full*.05){level="保持稳定";desc="离阶段目标已经不远，不需要过度挤占其他科时间。";}
+    else {level="稳步提升";desc="保持固定训练频率，避免成为新的短板。";}
+    box.innerHTML+='<div class="lever"><b>'+escapeHtml(s.name)+'</b><div class="small">当前 '+Math.round(s.rate*100)+'% · 目标差 '+s.gap+' 分</div><span class="level">'+level+'</span><div class="small" style="margin-top:8px">'+desc+'</div></div>';
+  });
+}
+
+function renderReviewSchedule(){
+  var days=[0,1,3,7,14],labels=["当天","次日","第3天","第7天","第14天"],box=document.getElementById("reviewSchedule");
+  box.innerHTML="";
+  var now=new Date();
+  days.forEach(function(d,i){
+    var x=new Date(now);x.setDate(now.getDate()+d);
+    var date=(x.getMonth()+1)+"月"+x.getDate()+"日";
+    box.innerHTML+='<div class="review-step"><b>'+labels[i]+'</b><span>'+date+'<br>'+(i===0?"写清错因":"快速二刷/回忆")+'</span></div>';
+  });
+}
+
+function pressureFrom(hours,gain,days){
+  var p=(gain/(days/7))/(hours*7);
+  return p<.65?["温和","目标和时间相对匹配，可以把重点放在稳定执行。"]:p<1.25?["适中","可以执行，但要优先主攻科目，不建议把任务平均摊开。"]:p<2.1?["较高","建议降低阶段目标、延长周期或增加稳定学习时间，三者至少调整一项。"]:["很高","当前组合容易造成计划过满。优先把目标拆成两阶段，不要一次追全部分差。"];
+}
+function updateSimulator(){
+  if(!lastReport)return;
+  var h=+document.getElementById("simHours").value,g=+document.getElementById("simGain").value;
+  document.getElementById("simHoursLabel").textContent=h+" 小时";
+  document.getElementById("simGainLabel").textContent=g+" 分";
+  var p=pressureFrom(h,g,lastReport.days);
+  document.getElementById("simPressure").textContent=p[0];
+  document.getElementById("simAdvice").textContent=p[1];
+}
+
+function switchNoteTab(id){
+  document.querySelectorAll(".note-tab").forEach(function(x){x.classList.toggle("active",x.dataset.tab===id)});
+  document.querySelectorAll(".note-panel").forEach(function(x){x.classList.toggle("active",x.id===id)});
+}
+
+function renderNotebook(ranked,totalMin){
+  var box=document.getElementById("notebook");
+  var top=ranked[0].name+(ranked[1]?" + "+ranked[1].name:"");
+  box.innerHTML=
+    '<div class="note-tabs"><button class="note-tab active" data-tab="noteToday" onclick="switchNoteTab(\'noteToday\')">今日页</button><button class="note-tab" data-tab="noteMistake" onclick="switchNoteTab(\'noteMistake\')">错题页</button><button class="note-tab" data-tab="noteWeek" onclick="switchNoteTab(\'noteWeek\')">周复盘</button></div>'+
+    '<div class="note-panel active" id="noteToday"><div class="note-row"><b>今日主攻</b><span>'+escapeHtml(top)+'</span></div><div class="note-row"><b>学习总量</b><span>约 '+totalMin+' 分钟，先主攻科再做保持科。</span></div><div class="note-box">□ 今日最重要任务 1<br>□ 今日最重要任务 2<br>□ 今日最重要任务 3<br><br>今天最值得记住的一个错误：________________</div></div>'+
+    '<div class="note-panel" id="noteMistake"><div class="note-row"><b>错题模板</b><span>题目 → 错因 → 正确方法 → 同类识别信号 → 二刷日期</span></div><div class="note-box">科目：__________　知识点：__________<br>为什么错：____________________________<br>下次看到什么特征要想到这个方法：________________<br>二刷结果：□ 会了　□ 仍不稳</div></div>'+
+    '<div class="note-panel" id="noteWeek"><div class="note-row"><b>本周主攻</b><span>'+escapeHtml(top)+'</span></div><div class="note-box">本周完成率：____%<br>最明显进步：____________________________<br>仍然反复错的地方：______________________<br>下周是否更换第一突破科：□ 是　□ 否</div></div>';
+}
+
+function downloadShareCard(){
+  if(!lastReport){showToast("请先生成报告");return;}
+  var canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+  canvas.width=1080;canvas.height=1350;
+  ctx.fillStyle="#f5f3ee";ctx.fillRect(0,0,1080,1350);
+  ctx.fillStyle="#1e211d";ctx.fillRect(70,70,940,1210);
+  ctx.fillStyle="#ffffff";ctx.font="700 42px -apple-system, PingFang SC, sans-serif";ctx.fillText("逆袭档案",120,145);
+  ctx.font="800 62px -apple-system, PingFang SC, sans-serif";wrapCanvas(ctx,document.getElementById("typeTitle").textContent,120,245,820,78);
+  ctx.fillStyle="#cfd3c6";ctx.font="32px -apple-system, PingFang SC, sans-serif";
+  ctx.fillText("当前总分 "+lastReport.current+"   ·   目标提升 +"+lastReport.gain,120,470);
+  ctx.fillText("剩余 "+lastReport.days+" 天   ·   每日 "+lastReport.hours+" 小时",120,525);
+  ctx.fillStyle="#ffffff";ctx.font="700 36px -apple-system, PingFang SC, sans-serif";ctx.fillText("优先突破",120,650);
+  ctx.font="44px -apple-system, PingFang SC, sans-serif";
+  ctx.fillText(lastReport.ranked.slice(0,3).map(function(x){return x.name}).join("  ·  "),120,720);
+  ctx.fillStyle="#cfd3c6";ctx.font="30px -apple-system, PingFang SC, sans-serif";
+  wrapCanvas(ctx,document.getElementById("oneLine").textContent,120,820,820,48);
+  ctx.fillStyle="#ffffff";ctx.font="600 28px -apple-system, PingFang SC, sans-serif";ctx.fillText("Study Rise Report",120,1200);
+  var a=document.createElement("a");a.href=canvas.toDataURL("image/png");a.download="逆袭档案-结果分享卡.png";a.click();
+}
+function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight){
+  var line="";
+  for(var i=0;i<text.length;i++){
+    var test=line+text[i];
+    if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y);line=text[i];y+=lineHeight;}else line=test;
+  }
+  if(line)ctx.fillText(line,x,y);
 }
 
 function generateReport(){
@@ -492,7 +746,7 @@ function generateReport(){
   document.getElementById("typeTitle").textContent=c.typeTitle+" · "+c.timeType;
   document.getElementById("resultIntro").textContent=(nick?nick+"，":"")+"你当前更适合走“"+c.base+" + "+c.biasType+"”路线。先处理最影响总分的结构性问题，再逐步扩展到其他科，比所有科同时加量更容易执行。";
   document.getElementById("typeTags").innerHTML=
-    '<span class="tag">'+escapeHtml(grade)+'</span><span class="tag">'+escapeHtml(exam)+'</span><span class="tag">'+c.biasType+'</span><span class="tag">目标压力 '+c.pressure+'</span>';
+    '<span class="tag">'+escapeHtml(grade)+'</span><span class="tag">'+escapeHtml(exam)+'</span><span class="tag">'+c.biasType+'</span><span class="tag">目标压力 '+c.pressure+'</span><span class="tag">执行条件 '+c.execution+'/100</span>';
   document.getElementById("curTotal").textContent=c.current;
   document.getElementById("scoreRate").textContent="总得分率 "+Math.round(c.rate*100)+"%";
   document.getElementById("gainTarget").textContent="+"+c.gain;
@@ -500,6 +754,10 @@ function generateReport(){
   document.getElementById("leftDays").textContent=c.days+"天";
   document.getElementById("timeWindow").textContent=c.timeType;
   document.getElementById("dailyHours").textContent=c.hours+"h";
+  document.getElementById("executionScore").textContent=c.execution;
+  document.getElementById("executionBar").style.width=c.execution+"%";
+  document.getElementById("executionText").textContent=executionText(c.execution);
+  renderTrend(c.current);
 
   var pb=document.getElementById("priorityBox");pb.innerHTML="";
   ranked.forEach(function(s,i){
@@ -516,6 +774,7 @@ function generateReport(){
   diag+=" "+problemText(problem);
   document.getElementById("diagnosis").textContent=diag;
 
+  renderLeverMap(ranked);
   var totalMin=Math.round(c.hours*60),mins=allocateMinutes(ranked,totalMin);
   var tb=document.getElementById("timeBox");tb.innerHTML="";
   ranked.forEach(function(s,i){
@@ -557,13 +816,18 @@ function generateReport(){
   });
 
   var week=document.getElementById("weekPlan");week.innerHTML="";
-  for(var d=1;d<=7;d++){
-    var a=ranked[(d-1)%Math.min(3,ranked.length)],b=ranked[d%Math.min(3,ranked.length)];
-    var phase=d<=2?"查漏洞":d<=5?"集中补强":"复盘稳定";
-    week.innerHTML+='<div class="day"><div class="dayhead"><span>Day '+d+'</span><span class="tag">'+phase+'</span></div>'+
-      '<div class="task">• '+escapeHtml(a.name)+'：'+escapeHtml(taskFor(a.name,d-1))+'</div>'+
-      '<div class="task">• '+escapeHtml(b.name)+'：'+escapeHtml(taskFor(b.name,d))+'</div>'+
-      '<div class="task">• 10 分钟：记录今天最值得二刷的 1 个错误</div></div>';
+  for(var w=0;w<2;w++){
+    var inside="";
+    for(var dd=1;dd<=7;dd++){
+      var d=w*7+dd;
+      var a=ranked[(d-1)%Math.min(3,ranked.length)],b=ranked[d%Math.min(3,ranked.length)];
+      var phase=d<=3?"查漏洞":d<=7?"集中补强":d<=11?"专项提速":"二刷稳定";
+      inside+='<div class="day"><div class="dayhead"><span>Day '+d+'</span><span class="tag">'+phase+'</span></div>'+
+        '<div class="task">• '+escapeHtml(a.name)+'：'+escapeHtml(taskFor(a.name,d-1))+'</div>'+
+        '<div class="task">• '+escapeHtml(b.name)+'：'+escapeHtml(taskFor(b.name,d))+'</div>'+
+        '<div class="task">• 10 分钟：回看今天最有价值的一个错误</div></div>';
+    }
+    week.innerHTML+='<details class="week" '+(w===0?'open':'')+'><summary>第 '+(w+1)+' 周 · '+(w===0?'定位与补强':'专项与稳定')+'</summary><div class="inside">'+inside+'</div></details>';
   }
 
   var avoids=[
@@ -578,15 +842,14 @@ function generateReport(){
   var ab=document.getElementById("avoidBox");ab.innerHTML="";
   avoids.slice(0,6).forEach(function(x){ab.innerHTML+='<div class="priority">'+x+'</div>'});
 
-  var note=document.getElementById("notebook");note.innerHTML="";
-  var noteRows=[
-    ["本周主攻",ranked[0].name+(ranked[1]?" + "+ranked[1].name:"")],
-    ["每天重点","优先完成主攻科任务，再做其他科；总额外学习约 "+totalMin+" 分钟"],
-    ["错题规则","每道高价值错题至少写清：错因、正确方法、二刷日期"],
-    ["7 天目标","不是一定涨多少分，而是让薄弱科正确率和任务完成率出现可见改善"],
-    ["复测时间","第 7 天后把最新成绩重新填入本测试，重新排序主攻科"]
-  ];
-  noteRows.forEach(function(x){note.innerHTML+='<div class="note-row"><b>'+x[0]+'</b><span>'+escapeHtml(x[1])+'</span></div>'});
+  renderReviewSchedule();
+  renderNotebook(ranked,totalMin);
+  lastReport={current:c.current,gain:c.gain,days:c.days,hours:c.hours,ranked:ranked};
+  var simGainMax=Math.max(50,Math.min(200,c.full-c.current));
+  var simGain=document.getElementById("simGain");
+  simGain.max=simGainMax;simGain.value=Math.min(c.gain,simGainMax);
+  document.getElementById("simHours").value=c.hours;
+  updateSimulator();
 
   document.getElementById("companionAvatar").textContent=selectedCompanion.emoji;
   document.getElementById("companionName").textContent=selectedCompanion.name;
