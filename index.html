@@ -672,14 +672,43 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
       <div id="scoreStructure" class="score-structure-grid"></div>
     </div>
 
+    <div class="card loss-section">
+      <div class="section-title">
+        <div>
+          <h2>④ 失分结构诊断</h2>
+          <div class="desc">根据当前得分率和你填写的主要失分原因，对前 3 个主攻科做规则化拆解：哪些分更像“可优先回收”，哪些暂时不值得追。</div>
+        </div>
+        <span class="state-pill">不是逐题阅卷</span>
+      </div>
+      <div id="lossDiagnosis" class="loss-grid"></div>
+      <div class="inline-note">说明：这是依据你填写的数据做的规划型诊断，不等同于真实试卷逐题统计；如果你知道更准确的失分分布，应以真实试卷为准。</div>
+    </div>
+
+    <div class="card scenario-section">
+      <div class="section-title">
+        <div>
+          <h2>⑤ 三档目标方案</h2>
+          <div class="desc">同一份成绩，用不同任务强度安排会得到不同的“规划目标”。这里比较的是计划压力和投入集中度，不预测考试一定能涨多少分。</div>
+        </div>
+        <span class="state-pill">规划强度对比</span>
+      </div>
+      <div class="scenario-tabs no-print">
+        <button class="scenario-tab" data-scenario="safe" onclick="switchScenario('safe',this)">保守方案</button>
+        <button class="scenario-tab active" data-scenario="standard" onclick="switchScenario('standard',this)">标准方案</button>
+        <button class="scenario-tab" data-scenario="sprint" onclick="switchScenario('sprint',this)">冲刺方案</button>
+      </div>
+      <div id="scenarioSummary" class="scenario-summary"></div>
+      <div id="scenarioPanels"></div>
+    </div>
+
     <div class="card detail-full" id="roadmapSection">
-      <h2 id="roadmapTitle">④ 你的阶段路线</h2>
+      <h2 id="roadmapTitle">⑥ 你的阶段路线</h2>
       <div class="desc">不是把每天排满，而是让每一阶段只解决一个主要问题。</div>
       <div class="grid4" id="roadmap"></div>
     </div>
 
     <div class="card detail-full" id="subjectStrategySection">
-      <h2>⑤ 各科怎么补</h2>
+      <h2>⑦ 各科怎么补</h2>
       <div class="grid3" id="subjectStrategies"></div>
     </div>
 
@@ -687,7 +716,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     <div class="card plan-card">
       <div class="section-title">
         <div>
-          <h2>⑥ 14 天执行计划</h2>
+          <h2>⑧ 14 天执行计划</h2>
           <div class="desc">一次只看一周。每天只保留“主攻、补强、复盘”三件事，减少信息压迫感。</div>
         </div>
         <div class="plan-tabs no-print">
@@ -701,7 +730,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     <div class="card avoid-card detail-full">
       <div class="section-title">
         <div>
-          <h2>⑦ 避坑提醒</h2>
+          <h2>⑨ 避坑提醒</h2>
           <div class="desc">不是“不能做”，而是这些行为最容易消耗时间却不转化成分数。</div>
         </div>
         <span class="state-pill">少踩坑 = 多拿分</span>
@@ -710,20 +739,20 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card detail-full">
-      <h2>⑧ 阶段执行标准</h2>
+      <h2>⑩ 阶段执行标准</h2>
       <div class="desc">把模糊的“努力”换成这份报告建议你在阶段内达到的执行标准。</div>
       <div class="goal-grid" id="weeklyGoals"></div>
     </div>
 
     <div id="reportReview" class="section-anchor"></div>
     <div class="card">
-      <h2>⑨ 错题复习节奏</h2>
+      <h2>⑪ 错题复习节奏</h2>
       <div class="desc">重要错题不要只看一次。下面给你一个简单复习节奏：当天、次日、第3天、第7天、第14天。</div>
       <div class="review-schedule" id="reviewSchedule"></div>
     </div>
 
     <div class="card no-print detail-full">
-      <h2>⑩ 目标压力模拟器</h2>
+      <h2>⑫ 目标压力模拟器</h2>
       <div class="desc">拖动“每天时间”和“阶段目标”，看看执行压力如何变化。它不是提分预测，只是帮助你把目标调到更可执行。</div>
       <div class="simulator">
         <div>
@@ -743,7 +772,7 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
 
     <div class="card paper detail-full">
-      <h2>⑪ 报告附带执行模板</h2>
+      <h2>⑬ 报告附带执行模板</h2>
       <div class="desc">可以直接截图或保存 PDF，当作接下来一周的执行页。</div>
       <div id="notebook"></div>
     </div>
@@ -1777,7 +1806,7 @@ function generateReport(){
     tb.innerHTML+='<div class="time-row"><div class="time-row-top"><span>'+escapeHtml(s.name)+'</span><span>'+mins[i]+' 分钟 · '+share+'%</span></div><div class="time-mini-bar"><i style="width:'+share+'%"></i></div></div>';
   });
 
-  document.getElementById("roadmapTitle").textContent="④ 你的 "+c.days+" 天阶段路线";
+  document.getElementById("roadmapTitle").textContent="⑥ 你的 "+c.days+" 天阶段路线";
   var roadmap=document.getElementById("roadmap");roadmap.innerHTML="";
   var phases;
   if(c.days<=14)phases=[
