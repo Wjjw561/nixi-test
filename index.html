@@ -174,6 +174,33 @@ input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-
 .notice{font-size:11px;color:var(--muted);line-height:1.65;margin-top:10px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);padding:10px 14px;background:#111;color:#fff;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
 .toast.show{opacity:1}
+.form-status{position:sticky;top:8px;z-index:8;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:14px;box-shadow:0 10px 30px rgba(36,38,32,.06)}
+.form-status-main{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.form-status-main b{display:block;font-size:14px;margin-top:2px}
+.mini-link{border:0;background:transparent;color:var(--muted);font-size:11px;padding:5px;white-space:nowrap}
+.form-progress{height:6px;border-radius:99px;background:var(--soft);overflow:hidden;margin:11px 0 9px}
+.form-progress i{display:block;height:100%;border-radius:99px;background:var(--accent2);transition:width .25s}
+.input-snapshot{display:flex;gap:7px;flex-wrap:wrap}
+.input-snapshot span{padding:5px 8px;border-radius:999px;background:var(--soft);font-size:10px;color:var(--muted)}
+.input-snapshot b{display:inline;font-size:10px;color:var(--text)}
+.inline-note{margin-top:10px;padding:10px 12px;border-radius:13px;background:var(--soft);font-size:11px;color:var(--muted);line-height:1.55}
+.result-toolbar{position:sticky;top:8px;z-index:7;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 10px;margin:0 0 14px;border-radius:18px;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(16px);border:1px solid var(--line);box-shadow:0 9px 24px rgba(36,38,32,.06)}
+.result-nav{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.result-nav::-webkit-scrollbar{display:none}
+.result-nav a{text-decoration:none;color:var(--muted);font-size:11px;font-weight:850;padding:7px 9px;border-radius:999px;white-space:nowrap}
+.result-nav a:hover{background:var(--soft);color:var(--text)}
+.view-switch{display:flex;gap:4px;padding:3px;border-radius:999px;background:var(--soft);flex-shrink:0}
+.view-btn{border:0;border-radius:999px;padding:6px 9px;background:transparent;color:var(--muted);font-size:10px;font-weight:900}
+.view-btn.active{background:var(--accent);color:#fff}
+.section-anchor{scroll-margin-top:80px}
+#resultArea.focus-mode .detail-full{display:none!important}
+.strategy-layer{margin-top:13px;padding-top:12px;border-top:1px dashed var(--line)}
+.lever-compact{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.lever-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border-radius:999px;background:var(--soft);font-size:10px;color:var(--muted)}
+.lever-chip b{color:var(--text);font-size:10px}
+.mobile-generate{display:none}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent2) 40%,transparent);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 .metric-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .metric-card{padding:18px;border-radius:20px;background:var(--soft);border:1px solid var(--line)}
 .metric-card h3{margin:0 0 6px;font-size:16px}.metric-card .big{font-size:30px;font-weight:900;margin:7px 0}
@@ -239,8 +266,20 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 .poster-btn.active{background:var(--accent);color:#fff}
 .poster-preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--soft);padding:10px}
 .poster-preview canvas{display:block;width:100%;height:auto;border-radius:14px;background:#fff}
-@media(max-width:760px){.radar-wrap{grid-template-columns:1fr}.risk-list,.goal-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:430px){.risk-list,.goal-grid{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .radar-wrap{grid-template-columns:1fr}.risk-list,.goal-grid{grid-template-columns:1fr 1fr}
+  .result-toolbar{top:6px;display:block;padding:8px}.result-nav{margin-bottom:6px}.view-switch{width:max-content}
+  .form-status{top:6px}.input-snapshot{gap:5px}
+}
+@media(max-width:430px){
+  .risk-list,.goal-grid{grid-template-columns:1fr}
+  body{padding-bottom:78px}
+  .mobile-generate{display:flex;position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:20;padding:10px 11px;border-radius:18px;background:color-mix(in srgb,var(--card) 95%,transparent);backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.14);align-items:center;justify-content:space-between;gap:10px}
+  .mobile-generate div b{display:block;font-size:12px}.mobile-generate div span{font-size:9px;color:var(--muted)}
+  .mobile-generate button{border:0;border-radius:13px;background:var(--accent);color:#fff;font-weight:900;padding:10px 13px}
+  .form-status{position:relative;top:auto}
+  .result-toolbar{position:sticky;top:5px}
+}
 @media(max-width:760px){.lever-grid{grid-template-columns:1fr 1fr}.review-schedule{grid-template-columns:repeat(3,1fr)}.simulator,.metric-row{grid-template-columns:1fr}}
 
 .theme-cute{--bg:#fff7f8;--card:#fff;--text:#422f37;--muted:#8d7480;--line:#efdce4;--accent:#cf7190;--accent2:#e491ad;--soft:#fbe8ef}
@@ -1226,13 +1265,10 @@ function executionText(score){
 }
 
 function renderLeverMap(ranked){
-  var box=document.getElementById("leverMap");box.innerHTML="";
+  var box=document.getElementById("leverMap");if(!box)return;box.innerHTML="";
   ranked.forEach(function(s,i){
-    var level,desc;
-    if(i<2 && s.rate<.75){level="高回报投入";desc="当前失分空间较大，又有明确目标差，优先投入更容易看到结构变化。";}
-    else if(s.gap<=s.full*.05){level="保持稳定";desc="离阶段目标已经不远，不需要过度挤占其他科时间。";}
-    else {level="稳步提升";desc="保持固定训练频率，避免成为新的短板。";}
-    box.innerHTML+='<div class="lever"><b>'+escapeHtml(s.name)+'</b><div class="small">当前 '+Math.round(s.rate*100)+'% · 目标差 '+s.gap+' 分</div><span class="level">'+level+'</span><div class="small" style="margin-top:8px">'+desc+'</div></div>';
+    var level=i<2&&s.rate<.75?"高回报":s.gap<=s.full*.05?"保持":"稳步";
+    box.innerHTML+='<span class="lever-chip"><b>'+escapeHtml(s.name)+'</b>'+level+' · '+Math.round(s.rate*100)+'%</span>';
   });
 }
 
