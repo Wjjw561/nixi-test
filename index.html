@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="build-version" content="2026-08-31-1615">
+<meta name="build-version" content="2026-09-01-sales-mvp1">
 <meta name="theme-color" content="#f5f3ee">
 <title>逆袭档案｜学习提分路线测试</title>
 <style>
@@ -449,6 +449,29 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
 .report-evidence-card span{display:block;font-size:9px;color:var(--muted);line-height:1.55}
 @media(max-width:760px){.report-evidence-body{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.report-evidence-body{grid-template-columns:1fr}.evidence-row{grid-template-columns:72px 1fr}}
+
+/* lightweight paid-access gate */
+.access-gate{margin:16px 0}
+.access-card{background:linear-gradient(145deg,var(--card),var(--soft));border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow)}
+.access-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.access-head h2{margin:3px 0 7px;font-size:24px}
+.access-price{padding:8px 11px;border-radius:999px;background:var(--accent);color:#fff;font-weight:900;font-size:12px;white-space:nowrap}
+.access-benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.access-benefit{padding:12px;border-radius:15px;background:var(--card);border:1px solid var(--line)}
+.access-benefit b{display:block;font-size:11px;margin-bottom:4px}
+.access-benefit span{display:block;font-size:9px;color:var(--muted);line-height:1.45}
+.access-form{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:13px}
+.access-form input{text-transform:uppercase;font-weight:850;letter-spacing:.04em}
+.access-form button{border:0;border-radius:13px;padding:0 18px;background:var(--accent);color:#fff;font-weight:900}
+.access-message{min-height:18px;margin-top:8px;font-size:10px;color:var(--muted)}
+.access-message.ok{color:var(--good)}.access-message.error{color:#b34c4c}
+.access-foot{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);font-size:9px;color:var(--muted);line-height:1.6}
+@media(max-width:620px){
+  .access-card{padding:18px}.access-head{grid-template-columns:1fr}.access-price{width:max-content}
+  .access-benefits{grid-template-columns:1fr 1fr}.access-form{grid-template-columns:1fr}
+  .access-form button{padding:12px 16px}
+}
+@media(max-width:390px){.access-benefits{grid-template-columns:1fr}}
 @media print{
   body{background:white}.no-print,.hero,.stepbar,.top{display:none!important}
   .wrap{max-width:none;padding:0}.card,.result-cover{box-shadow:none;break-inside:avoid}
@@ -476,13 +499,38 @@ input[type=range]{padding:0;border:0;box-shadow:none;background:transparent;acce
     </div>
   </section>
 
-  <div class="stepbar no-print">
+  <section id="accessGate" class="access-gate no-print">
+    <div class="access-card">
+      <div class="access-head">
+        <div>
+          <div class="eyebrow">PURCHASE ACCESS · 购买后进入</div>
+          <h2>输入兑换码，开始生成你的学习档案</h2>
+          <div class="small">在小红书完成购买后，你会收到一个专属兑换码或带兑换码的链接。验证通过后即可进入完整测评。</div>
+        </div>
+        <div class="access-price">首发体验 · ¥4.9</div>
+      </div>
+      <div class="access-benefits">
+        <div class="access-benefit"><b>提分优先级</b><span>判断先补哪几科以及为什么</span></div>
+        <div class="access-benefit"><b>失分结构</b><span>拆解更值得先回收的分数</span></div>
+        <div class="access-benefit"><b>三档方案</b><span>保守 / 标准 / 冲刺任务强度</span></div>
+        <div class="access-benefit"><b>14 天路线</b><span>生成可保存的一次性执行计划</span></div>
+      </div>
+      <div class="access-form">
+        <input id="accessCode" maxlength="20" autocomplete="one-time-code" placeholder="例如：NX-ABCD-2345" aria-label="兑换码">
+        <button type="button" onclick="verifyAccess()">验证并开始</button>
+      </div>
+      <div id="accessMessage" class="access-message">兑换码不区分大小写；同一设备验证后会自动记住。</div>
+      <div class="access-foot">这是首发试卖阶段的轻量兑换机制：网页只保存兑换码哈希，不保存明文。当前版本不能做到全网“一码仅用一次”，请不要公开分享自己的购买链接。</div>
+    </div>
+  </section>
+
+  <div class="stepbar no-print hidden" id="mainStepbar">
     <div class="step on" id="s1">1 · 填写档案</div>
     <div class="step" id="s2">2 · 成绩分型</div>
     <div class="step" id="s3">3 · 逆袭报告</div>
   </div>
 
-  <section id="formArea">
+  <section id="formArea" class="hidden">
     <div class="card">
       <h2>先告诉我你的基本情况</h2>
       <div class="desc">信息越接近你最近一次考试，生成的路线越有参考价值。</div>
@@ -2095,6 +2143,71 @@ function avoidAdvice(problem){
   return base.slice(0,6);
 }
 
+var ACCESS_STORAGE_KEY="nixi_access_v1";
+var VALID_ACCESS_HASHES=["b108bfef982715d4468499563ded3bde632892d0b8a1e69d6f1a8d6d3bec1d21","099cad3af516d779eb8a8ae38c59eef20be974a0f76e2ce8d1de5f24fc896ac4","f019ea89d04bd77701f5ac22b3c3cdb740dd937fc01d598459c165a16a8fc29a","a19467666e07d23b9835ea2f8e527eb829d65b4f6887f364663223ee52a95cce","f8072bc6fdd713f8d36b636a15fa12bd187410a720b58a81876f0716a35046a6","22b20d4a5b077035f8a0d07666d99b8e4caa3512af3ad2b6d426f417e6c1a814","059c2048125f8b1d759e02371197db4b69d085eff0fc498ed50598e4c9c199ac","ff377cab865342578d7ad4e7b8c7f33afeb27cdb05d6b86b86451f608f306e70","18ab9a06a69354b6150f1cda03bb12f0e9cc1d22033b4193ffc0ca3dd7304543","c0a3ad9a4a4922c3352e4df996212627e5e6e97ce99a13f39bc66c3072616477","49db19a99f457e1b5f1ef10fe360035b48d670fda4daaeb1e6e08d21ac814765","7d7e4b3508d8733bf4deb956381b7a1946ad68218edf13cc67f3abbd4bb2b248","4a3831b366b6d43c0ce0eea1af04ba5e3993c61e87a0b08eacdbf104e1e286dc","9428aba5cc92444f6bd45916a048308c9a2f8bcea5beb2abffd60ab1896462f8","4feda535c02ef9d5f27ba954cae90e58661d38815a81e2462738e6d1594e2d6a","e521bb617d11b189badd23919e7270f0fcf8a6c38e579e3f2328b5d07695980b","08ca53290201ab287a099d50d750cafcf1a12eaf7c14ad0778ee37044c08b21c","221ceb9e09fb2d91ae4c2d73f2892c8f2a5b790a7ba6afd216463df4df5938e4","37106e6cc346bbc212c51425fca810a90c40fe1852575b881cb256ab849061e8","17793fdb62615df9d03711d11fc0cff07ee23f887337bbf1ad43d49d98743fc2","b1c6dcbbb60f17bd5eb96d0458a598d7a8b6384a8aa085331695b2fd2a2e82c4","f7541e926d2728a21be551ed6a5a020550814bd245b64d60140b37c1971c4143","2a08d358eca2d99843d66bd48f699e179c3f7bae63532d962869b9af38752442","adf7d99d2e86c1c3821ba0de299b7891a08b0fd642bfa192855334e0aba2217c","bd10e3e43d306ba674288202af60937381c84bd531c70435c5ef0e0108c42671","f625e9d1fe87d426f6887e023a3a57e4d191c7222e183339c0ea6be09cf4cf8e","df15d2017ac96d3c1b5b29c41c91f07da26735890ed7e78036a7e9ff500c3ca7","405f5559c4a31f3301cabfc8b1d5587647460ab30ed53fe86b81882ac98d5496","41ed7b19077dd4847e8c66de1e40acdfaa2934e97b612a89ab39727180d331da","a7d46d586dc3ca46b1f85d70bcb56574037d385ea760b7ccb63607994cf2fc96","c19ee1dc9adea94038fc42553e0c9442e2d41bcd99420c45d8d03fda73cd1324","0f551c2216510f72e5f93f634bb45f06b5208c5e93a256e32c855fc5226733e8","afc5fed038cd4248822a5aa3426de293f773478ba5c9afe8b09a812539022942","add3eb47c616d9623a09af666f084b62ece7e08deb16c27a6ca53db64dabc111","1ce10ec57766f956172b39ab19e9a709b55ec118a740278b2309340820a073c8","269cbbc0b72c7900961553782959ce89601a12f6f0cff9839646b2a3435f7c06","f3788a29e1cac9c11f8b3a93f14561e3b35f7f9683921a69af09499dd4ed89c6","692e97295bc9e9e88276d0c8681b7b52d33c8452f6b447c7bf92dd7454dca71b","41c44dbd268ee9346e9b44abde9c03da08d7f37342d989596a37fb2f7cc82298","9afac4d57a7cf09c161fa5a7d4f1db7302276e14293094c492c93c163a9250f1","5a16c12578225749a5897e588fdd9b1cf057b8d210b6629fed00c8e2e2b831a7","ee03050125e40fa78152ce3f0bc5cf00047badb8761a65c0befe1bcf9eb2c9e0","d9236e430a1c53128b1b2d85f42f0bf85a6ff48836a47c189b4c22f071011007","85624f8438ead351697741f80a0ddc7c6fc95b059c0e6cc06cf1d731e9292fb9","7802178e9e7622da210487a7db8e5e40cc6597d055bc80117aa8e9ab5ba1ccba","912543c771b630bed12d8c8eaa5826f1f391d81acc95a5d8643ed0540505a7bd","958573b71f7d8772834f423fd355fa272571e6d3a39b6aa68e24e185b05091a0","f468273c5855f4ab47ba3d27a06b60682802fd2079c55cd8666dcd6b91b9f431","264df81b180cb629a7036c88ece40ff2a661ac645471b0301fd63163980d5101","37634f32787b0b6cf1b0f822a187d0d4ce029d45a183bf2313ffa70d259d66ad","4f33833162362978d674c783344152b91cf366811a2c517662cb21906fcb9598","d54aed543d2be1b7c6e70cb6474c7da3fc0306073cd21f841f3e72acca4302f9","0ce8f84f4b2088365c3696fab770db3601ea637499f5c08fe85eebab71f10a5b","aac94a95cdb75c49367f72f1fe598c1443654b5e5726bee5100b0e2c1f4f2be7","8d61fe5634ec1150a76ee6d21dd0cc130169c2c90159bb360bda112313b75d8e","45b55e5b813e2c7b2c56e176571e017558e4277317653600d4c8e8ef7d2cc88c","9376119ff9f8fc6bd07e64a2e1cae42234413b07a561f51a8b713c0c6179643c","82ae6ba633d53f9fa1a4b9c7054015c8c1edcfd874c5c0f6ba73921f2be5fcbf","6254c97b5188de180578ca8fc3a9028576465d43ef14978946cc6747bb76967a","e73771a7cb2c2b2cf0f1be4f1a9dc45238da77d2908b6fabd283df9ec52096e8","64301b05b64837058a1e8fe1a5e7dc3388a4796b0e33f4dd7bf08a136b51927f","b9212436c0e70c005c545e22dba9a5af1da844e81e9e0a0b10f2d5b7e7fdaef9","1b7b4b36f0b1b9669a1578f23d0c68836b4874bfb7820f81ec24458ff39550a6","a7995b7ea647d4099c53ad7b9370df56359dd08b3de035a537b424a2a90f8414","fa33bc794fc6409bfd4a54d55669baeaa23ff9a11682d1b3f8e6666fca60e642","218fb32d14c92ae2e4cfba580f29ed369e1faa46b7c7eeb94bd458d6b9a0bab9","0c582e42fc8274ac5eb41d04b959e9cf657dd6f1e8d5bc728ed8fed605f16fd3","ac21f089d11edf7592a72c8af32f500d761aeac5ec6684f8f8bd9ade40f95380","6b3becc6fa7e970a6fff8a37a21c4482273b479c5146111ef0ffa93f2d430c9b","d2522bbd232b5737ab4524c739c9fa7e531f7211716dd07ec0c380568355a987","a9c07edba0b360aec5fd18b7a84c770aa9ab23bb6e3cf1ebdda748b1e64f795b","855e7b35daa00486180bfb74e2ebf15c579ff640aab5c319b13c2448c5609fc6","84d2ac7671e174ead78b180e93225dfd6943cae90ec53020d513c10cb101fe13","3069bfc5561dfd7a63a6459121fe9ea42b693d95d067701d50755663ea52230c","3ece633916ac3a9949155ae8c2c203aa5ef1a93f62c0be0018dde09cf297f49c","4fbdf34498ddc452fdbfe838db69233b28370dba13adf210730f54a4aab42fa7","b095b429f2a3907cf9e16564c71ab702782e9d9a751809ded6b21c982d7fdffb","dc45f591aa287c7f00107b178cf6a86217e76340cbbee9a64a534f4498cf1157","d4c79145ae775b6b9dd26dba7f75117d7c07df66c3bafe045d3a0ad215d74bf1","2919f8e51e42f105d699144177cc9835cef3f82525114d0489e8a7640ed1fe90","bd4fb5d03f6be33ae19db78f8e03df63d20d6409c6ee137d5d686692b4592e93","21492ce71ef5dc3c8b5ff6bb7a3752676bc0d2db256151eb26aca1e695744d52","41ada3f54f78e1be5095f759f31ff5b34df55d844de56fac39198bd8fac40b9c","014f0a547eff2bd56614fccc234475189ec97ce82ff9ccd5df76162342dd2865","b9d325d6153d041a7e4fa5f44884ca51d0c46cfa6996d4171e1b94d9e96d634b","f7ded56cc1432885d5c20a05a57deb40803720d1b99580c74cd8974489a76993","67ddd59a96b981b12bcadbedc7ca6d277c7441ed18631bf3c930aeaff655425e","8fa035a172bb62b3014ab20d44007633823e4383d3c8b8fc9f4f58e9eb44df19","749f60ee7fd5879d2c8fac40317c71c4acb00b71fd37df3b9f530aa2ebce7484","3dda00b8cadc638e4e798e69d1e41f12d00af3fe40deca587ec129174aaaddeb","8f9a5fd45de88aa4c98ccf689d80e1fa9e6451aeacad4005fa096182a25cd2f2","1b57d564c0959968e3b176ea57878918aeddf30b26f0b5bcf9382ca7ada819b1","f154a56a825f94d4fa110c61540dd9c2fd3e1291523fd3e4ad37e978983e6805","88c043540dfc37bd31cff38ac30a0e152f9870dbca457dfaedb8092a46f5620b","fe3f04a1524c943e660409598db65a9aa0cb19aab0c679891a1a64e48f7a8245","cd06946321d177150295e6eccf23b4fc7a27b4b657265e974bb23c1d2896954e","47770e53734ba12d5f48398cd6bb98c1f7830be24b69bc8be6ff338a8cc8a861","b3480731f574ca0ad3d016ea3d9b89263f69e02aca4b64bf7d8839b66d9d66dc","e9b5fc0464dfb0c58d0d88ea70052897df430d757b4f6fdc2206962b463cb364","bc96c5513a5c07aa108ab06b07361f0139dd9a9dffeb399cea4124a996d9f821","4d02426f866676c2d9405ec7747dc84a088635cb6d71fa0fec7e0ffe5bef6e23"];
+function normalizeAccessCode(code){
+  return String(code||"").trim().toUpperCase().replace(/\s+/g,"");
+}
+async function sha256Hex(text){
+  var data=new TextEncoder().encode(text);
+  var buf=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+}
+function setAccessMessage(text,type){
+  var el=document.getElementById("accessMessage");if(!el)return;
+  el.textContent=text;el.className="access-message"+(type?" "+type:"");
+}
+function unlockAccess(hash){
+  var gate=document.getElementById("accessGate"),form=document.getElementById("formArea"),steps=document.getElementById("mainStepbar");
+  if(gate)gate.classList.add("hidden");
+  if(form)form.classList.remove("hidden");
+  if(steps)steps.classList.remove("hidden");
+  if(hash){try{localStorage.setItem(ACCESS_STORAGE_KEY,hash)}catch(e){}}
+}
+async function validateAccessCode(code,quiet){
+  var normalized=normalizeAccessCode(code);
+  if(!normalized){if(!quiet)setAccessMessage("请输入购买后收到的兑换码。","error");return false;}
+  if(!window.crypto||!crypto.subtle){if(!quiet)setAccessMessage("当前浏览器不支持安全验证，请换用最新版 Safari / Chrome。","error");return false;}
+  try{
+    var hash=await sha256Hex(normalized);
+    if(VALID_ACCESS_HASHES.indexOf(hash)>=0){
+      unlockAccess(hash);
+      if(!quiet)setAccessMessage("验证成功，正在进入测评。","ok");
+      return true;
+    }
+    if(!quiet)setAccessMessage("兑换码不正确，请检查字母、数字和横线后重试。","error");
+  }catch(e){
+    if(!quiet)setAccessMessage("验证失败，请刷新页面后重试。","error");
+  }
+  return false;
+}
+async function verifyAccess(){
+  var input=document.getElementById("accessCode");
+  await validateAccessCode(input?input.value:"",false);
+}
+async function initAccessGate(){
+  var saved="";
+  try{saved=localStorage.getItem(ACCESS_STORAGE_KEY)||""}catch(e){}
+  if(saved&&VALID_ACCESS_HASHES.indexOf(saved)>=0){unlockAccess(saved);return;}
+  var params=new URLSearchParams(location.search),code=params.get("code");
+  if(code){
+    var ok=await validateAccessCode(code,true);
+    if(ok){
+      try{
+        params.delete("code");
+        var qs=params.toString();
+        history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash);
+      }catch(e){}
+      return;
+    }
+    var input=document.getElementById("accessCode");
+    if(input)input.value=normalizeAccessCode(code);
+    setAccessMessage("链接中的兑换码未通过验证，请核对购买后收到的兑换码。","error");
+  }
+  var field=document.getElementById("accessCode");
+  if(field)field.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();verifyAccess();}});
+}
+
 var DRAFT_KEY="nixi_report_draft_v6";
 var draftTimer=null;
 
@@ -2369,6 +2482,7 @@ renderHeroMascot();
 restoreDraft();
 setupFormPersistence();
 updateFormStatus();
+initAccessGate();
 </script>
 </body>
 </html>
