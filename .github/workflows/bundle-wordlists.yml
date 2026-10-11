@@ -1,0 +1,41 @@
+name: Bundle English wordlists locally
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bundle-wordlists.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download wordlists
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p english-tool/data
+          curl --retry 4 --retry-delay 2 -fL 'https://raw.githubusercontent.com/mahavivo/english-wordlists/master/%E5%B0%8F%E5%AD%A6%E8%8B%B1%E8%AF%AD%E5%A4%A7%E7%BA%B2%E8%AF%8D%E6%B1%87.txt' -o english-tool/data/primary.txt
+          curl --retry 4 --retry-delay 2 -fL 'https://raw.githubusercontent.com/mahavivo/english-wordlists/master/%E4%B8%AD%E8%80%83%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87%E8%A1%A8.txt' -o english-tool/data/middle.txt
+          curl --retry 4 --retry-delay 2 -fL 'https://raw.githubusercontent.com/mahavivo/english-wordlists/master/CET4_edited.txt' -o english-tool/data/cet4.txt
+          curl --retry 4 --retry-delay 2 -fL 'https://raw.githubusercontent.com/mahavivo/english-wordlists/master/COCA_20000.txt' -o english-tool/data/frequency.txt
+          printf '%s\n' '{"source":"mahavivo/english-wordlists","bundled":true}' > english-tool/data/source.json
+
+      - name: Commit bundled data
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add english-tool/data
+          if git diff --cached --quiet; then
+            echo 'Wordlists already up to date.'
+          else
+            git commit -m 'Bundle wordlists for reliable app loading'
+            git push
+          fi
