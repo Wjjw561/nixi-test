@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>只背这个 · 180天计划</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#182033;--muted:#7b8497;--line:#e7eaf1;--blue:#315efb;--green:#159a62;--soft:#eef2ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.app{max-width:820px;margin:auto;padding:20px 15px 90px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.brand{font-size:28px;font-weight:900}.sub,.small{font-size:12px;color:var(--muted);line-height:1.6}.tag,.stage{background:var(--soft);color:var(--blue);padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px}.head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.dayctl{display:flex;gap:7px;align-items:center}.dayctl input{width:78px;border:1px solid var(--line);border-radius:12px;padding:9px}.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:9px 12px}.primary{border:0;background:var(--blue);color:#fff;font-weight:800}.progress{height:9px;background:#edf0f5;border-radius:99px;overflow:hidden;margin:13px 0 5px}.progress span{display:block;height:100%;background:var(--blue)}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.row:first-child{border-top:0}.word{font-size:17px;font-weight:850}.mean{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}.acts{display:flex;gap:6px}.acts button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 9px}.done{opacity:.45}.done .word{text-decoration:line-through}.tabs{display:flex;gap:7px;overflow:auto;margin-top:12px}.tabs button{white-space:nowrap}.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:10px 15px calc(env(safe-area-inset-bottom) + 10px)}.navin{max-width:820px;margin:auto;display:flex;gap:8px}.nav a{flex:1;text-decoration:none;text-align:center;padding:10px;border-radius:12px;color:var(--muted)}.nav a.on{background:var(--soft);color:var(--blue);font-weight:800}.empty{text-align:center;color:var(--muted);padding:30px}.notice{background:var(--soft);padding:12px 13px;border-radius:13px;line-height:1.65;margin-top:12px}@media(max-width:520px){.row{align-items:flex-start}.acts{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top"><div><div class="brand">180 天单词计划</div><div class="sub">零基础补漏 → 中学桥梁 → CET-4 全词表</div></div><div class="tag">每天自动分配</div></div>
+<div class="card">
+<div class="head"><div><b id="title">正在载入词表…</b><div id="meta" class="small">第一次打开需要联网读取公开词表，之后浏览器会缓存。</div></div><div class="dayctl"><button class="btn" id="prev">‹</button><input id="day" type="number" min="1" max="180" value="1"><button class="btn" id="next">›</button></div></div>
+<div class="progress"><span id="bar" style="width:0%"></span></div><div id="prog" class="small"></div>
+<div class="tabs"><button class="btn primary" id="today">今天</button><button class="btn jump" data-d="1">第1天</button><button class="btn jump" data-d="31">第31天</button><button class="btn jump" data-d="91">第91天</button><button class="btn jump" data-d="180">第180天</button></div>
+</div>
+<div class="card">
+<div class="head"><div><span id="stage" class="stage">基础补漏</span><div id="summary" class="small" style="margin-top:7px"></div></div><button class="btn" id="allDone">本日全部标记已学</button></div>
+<div id="list"><div class="empty">词表载入中…</div></div>
+</div>
+<div class="card"><b>发音说明</b><div class="notice">默认学习时先听 🇺🇸 美音；每个词也可以点 🇬🇧 英音。这里调用你手机/浏览器的系统英语语音，所以具体音色由设备决定，不是我现场拿塑料英语糊你。</div></div>
+</div>
+<div class="nav"><div class="navin"><a href="./index.html">查词</a><a class="on" href="./plan.html">每日计划</a></div></div>
+<script>
+const U1='https://raw.githubusercontent.com/mahavivo/english-wordlists/master/%E5%B0%8F%E5%AD%A6%E8%8B%B1%E8%AF%AD%E5%A4%A7%E7%BA%B2%E8%AF%8D%E6%B1%87.txt';
+const U2='https://raw.githubusercontent.com/mahavivo/english-wordlists/master/%E4%B8%AD%E8%80%83%E8%8B%B1%E8%AF%AD%E8%AF%8D%E6%B1%87%E8%A1%A8.txt';
+const U3='https://raw.githubusercontent.com/mahavivo/english-wordlists/master/CET4_edited.txt';
+let S;try{S=JSON.parse(localStorage.getItem('zbz-plan-180')||'{}')}catch(e){S={}};S.done=S.done||{};S.start=S.start||new Date().toLocaleDateString('en-CA');let L={a:[],b:[],c:[],map:{},raw:{}};let D=1;
+function save(){try{localStorage.setItem('zbz-plan-180',JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function simple(t){return t.split(/\r?\n/).map(x=>x.replace(/^\uFEFF/,'').trim().toLowerCase()).filter(x=>/^[a-z][a-z.'-]*$/.test(x)).map(w=>({w,p:'',m:''}))}
+function lex(t){let a=[];for(let line of t.split(/\r?\n/)){line=line.replace(/^\uFEFF/,'').trim();if(!line||/^[A-Z]$/.test(line))continue;let z=line.match(/^([A-Za-z][A-Za-z.'-]*)/);if(!z)continue;let w=z[1].toLowerCase(),r=line.slice(z[1].length).trim(),p='';let q=r.match(/^\[([^\]]+)\]/);if(q){p=q[0];r=r.slice(q[0].length).trim()}a.push({w,p,m:r})}let s=new Set;return a.filter(x=>!s.has(x.w)&&s.add(x.w))}
+async function txt(u,k){let ck='zbz-lex-'+k;try{let v=localStorage.getItem(ck);if(v)return v}catch(e){}let r=await fetch(u);if(!r.ok)throw 0;let t=await r.text();try{localStorage.setItem(ck,t)}catch(e){}return t}
+async function load(){try{let [x,y,z]=await Promise.all([txt(U1,'p'),txt(U2,'m'),txt(U3,'c')]);let a=simple(x),m=lex(y),c=lex(z),map={};[...c,...m,...a].forEach(v=>{if(!map[v.w])map[v.w]=v;else{if(!map[v.w].m&&v.m)map[v.w].m=v.m;if(!map[v.w].p&&v.p)map[v.w].p=v.p}});let A=new Set(a.map(v=>v.w)),B=new Set(m.map(v=>v.w));L={a,b:m.filter(v=>!A.has(v.w)),c:c.filter(v=>!A.has(v.w)&&!B.has(v.w)),map,raw:{p:a.length,m:m.length,c:c.length}};document.getElementById('meta').textContent=`零基础源词 ${a.length} · 中学源词 ${m.length} · CET-4 源词 ${c.length}；重复词自动去掉。`;setDay(todayDay())}catch(e){document.getElementById('list').innerHTML='<div class="empty">词表加载失败，请检查网络后刷新。</div>';document.getElementById('title').textContent='词表载入失败'}}
+function part(a,d,n){let s=Math.floor(a.length*(d-1)/n),e=Math.floor(a.length*d/n);return a.slice(s,e)}
+function words(d){return d<=30?part(L.a,d,30):d<=90?part(L.b,d-30,60):part(L.c,d-90,90)}
+function info(d){return d<=30?['零基础补漏','小学基础词']:d<=90?['中学桥梁','中学词（去掉前阶段重复）']:['CET-4 主体','剩余四级词（去掉前两阶段重复）']}
+function todayDay(){let a=new Date(S.start+'T00:00:00'),b=new Date();a.setHours(0,0,0,0);b.setHours(0,0,0,0);return Math.max(1,Math.min(180,Math.floor((b-a)/86400000)+1))}
+function setDay(d){D=Math.max(1,Math.min(180,Number(d)||1));document.getElementById('day').value=D;if(!L.map||!Object.keys(L.map).length)return;let w=words(D),i=info(D),done=S.done[D]||{},n=w.filter(x=>done[x.w]).length;document.getElementById('title').textContent=`第 ${D} 天`;document.getElementById('stage').textContent=i[0];document.getElementById('summary').textContent=`${i[1]} · 今天 ${w.length} 个新词`;document.getElementById('bar').style.width=(w.length?n/w.length*100:0)+'%';document.getElementById('prog').textContent=`已完成 ${n} / ${w.length}`;document.getElementById('list').innerHTML=w.map((x,k)=>{let v=L.map[x.w]||x,dd=!!done[x.w];return `<div class="row ${dd?'done':''}"><div style="min-width:0"><div class="word">${k+1}. ${esc(x.w)}</div><div class="mean">${esc(v.p)} ${esc(v.m)}</div></div><div class="acts"><button onclick="speak('${esc(x.w)}','en-US')">🇺🇸</button><button onclick="speak('${esc(x.w)}','en-GB')">🇬🇧</button><button onclick="done(${D},'${esc(x.w)}')">${dd?'撤销':'已学'}</button></div></div>`}).join('')||'<div class="empty">这一天没有新词。</div>'}
+function done(d,w){S.done[d]=S.done[d]||{};if(S.done[d][w])delete S.done[d][w];else S.done[d][w]=1;save();setDay(d)}
+function speak(w,l){if(!('speechSynthesis'in window))return; speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(w);u.lang=l;u.rate=.82;speechSynthesis.speak(u)}
+document.getElementById('prev').onclick=()=>setDay(D-1);document.getElementById('next').onclick=()=>setDay(D+1);document.getElementById('day').onchange=e=>setDay(e.target.value);document.getElementById('today').onclick=()=>setDay(todayDay());document.querySelectorAll('.jump').forEach(b=>b.onclick=()=>setDay(b.dataset.d));document.getElementById('allDone').onclick=()=>{let w=words(D);S.done[D]=S.done[D]||{};w.forEach(x=>S.done[D][x.w]=1);save();setDay(D)};load();
+</script>
+</body>
+</html>
