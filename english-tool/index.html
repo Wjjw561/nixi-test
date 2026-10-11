@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="只背这个">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>只背这个 · CET-4 学习系统</title>
-<link rel="manifest" href="manifest.webmanifest?v=25">
-<link rel="stylesheet" href="unified.css?v=25">
-<link rel="stylesheet" href="study.css?v=25">
+<link rel="manifest" href="manifest.webmanifest?v=26">
+<link rel="stylesheet" href="unified.css?v=26">
+<link rel="stylesheet" href="study.css?v=26">
 </head>
 <body>
 <div class="app">
@@ -19,7 +19,7 @@
       <div class="brand">只背这个</div>
       <div class="sub">查词 · 翻卡学习 · 180 天计划 · 自动复习</div>
     </div>
-    <div class="tag">v2.4</div>
+    <div class="tag">v2.5</div>
   </header>
 
   <section id="searchPage">
@@ -136,7 +136,7 @@
 
   <section id="bookPage" class="hidden">
     <div class="card">
-      <div class="head wrap"><div><div class="section-head">词本</div><div class="small">上面是你收藏的生词，下面可以按词类浏览整个词库。</div></div></div>
+      <div class="head wrap"><div><div class="section-head">词本</div><div class="small">上面是你收藏的生词，下面可以按词类、阶段和掌握状态浏览整个词库。</div></div></div>
       <div id="bookList"></div>
     </div>
   </section>
@@ -147,7 +147,7 @@
       <div class="stats">
         <div class="stat"><b id="myTouched">0</b><span>已接触</span></div>
         <div class="stat"><b id="myQuiz">0</b><span>累计测试</span></div>
-        <div class="stat"><b id="myAccuracy">0%</b><span>测试正确率</span></div>
+        <div class="stat"><b id="myAccuracy">0%</</b><span>测试正确率</span></div>
         <div class="stat"><b id="myDays">0</b><span>学习天数</span></div>
       </div>
       <div class="title">掌握判定</div>
@@ -169,6 +169,7 @@
   </section>
 </div>
 
+<div id="bootFail" class="hidden" style="position:fixed;left:16px;right:16px;bottom:86px;z-index:99;padding:13px 14px;border:1px solid #e4bcbc;background:#fff7f7;border-radius:14px;font-size:12px;line-height:1.6;color:#7a2f2f">页面资源没有完整载入。先刷新一次；即使外部词表暂时失败，主界面也不该白屏。</div>
 <div class="nav"><div class="navin">
   <button class="active" data-page="searchPage">查词</button>
   <button data-page="planPage">计划</button>
@@ -178,8 +179,9 @@
   <button data-page="myPage">我的</button>
 </div></div>
 <div class="toast" id="toast"></div>
-<script src="unified.js?v=25"></script>
-<script src="study.js?v=25"></script>
-<script src="categories.js?v=25"></script>
+<script src="unified.js?v=26"></script>
+<script src="study.js?v=26"></script>
+<script src="categories-v25.js?v=26"></script>
+<script>setTimeout(function(){if(!window.__ZBZ_READY__){var x=document.getElementById('bootFail');if(x)x.classList.remove('hidden')}},12000)</script>
 </body>
 </html>
