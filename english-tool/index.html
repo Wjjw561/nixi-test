@@ -8,13 +8,13 @@
 <meta name="apple-mobile-web-app-title" content="只背这个">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>只背这个 · CET-4 学习系统</title>
-<link rel="manifest" href="manifest.webmanifest?v=30">
-<link rel="stylesheet" href="unified.css?v=30">
-<link rel="stylesheet" href="study.css?v=30">
+<link rel="manifest" href="manifest.webmanifest?v=31">
+<link rel="stylesheet" href="unified.css?v=31">
+<link rel="stylesheet" href="study.css?v=31">
 </head>
 <body>
 <div class="app">
-  <header class="top"><div><div class="brand">只背这个</div><div class="sub">查词 · 翻卡学习 · 180 天计划 · 自动复习</div></div><div class="tag">v2.9</div></header>
+  <header class="top"><div><div class="brand">只背这个</div><div class="sub">20 词动态学习 · 180 天计划 · 错因复习</div></div><div class="tag">v3.0</div></header>
 
   <section id="searchPage">
     <div class="search"><input id="q" placeholder="输入单词，例如 pitch" autocomplete="off" autocapitalize="none"><button class="primary" id="go">查</button></div>
@@ -22,16 +22,16 @@
     <div class="stats status-stats"><div class="stat"><b id="touched">0</b><span>已接触</span></div><div class="stat"><b id="learning">0</b><span>学习中</span></div><div class="stat"><b id="familiar">0</b><span>基本认识</span></div><div class="stat"><b id="mastered">0</b><span>已掌握</span></div></div>
     <button class="due-banner" id="dueBanner"><span>今日到期复习</span><b id="due">0</b></button>
     <div id="homeStudySection" class="home-study card">
-      <div class="head wrap"><div><div class="section-head">今日翻卡学习</div><div id="homeStudyMeta" class="small">正在载入今天的单词…</div></div><div class="button-group"><button class="secondary" id="homeStudyPlan">查看计划</button><button class="secondary" id="homeStudyToday">回到今天</button><button class="primary compact" id="homeStudyQuiz">本日小测</button></div></div>
+      <div class="head wrap"><div><div class="section-head">今日动态学习</div><div id="homeStudyMeta" class="small">正在载入今天的单词…</div></div><div class="button-group"><button class="secondary" id="homeStudyPlan">查看计划</button><button class="secondary" id="homeStudyToday">回到今天</button><button class="primary compact" id="homeStudyQuiz">本日小测</button></div></div>
       <div id="homeStudyCardWrap" class="study-card-wrap" aria-live="polite"></div>
-      <div class="study-nav"><button class="study-arrow" id="homeStudyPrev" aria-label="上一个单词">‹</button><div><b id="homeStudyCounter">0 / 0</b><span id="homeStudyHint">左右滑动切换单词</span></div><button class="study-arrow" id="homeStudyNext" aria-label="下一个单词">›</button></div>
+      <div class="study-nav"><button class="study-arrow" id="homeStudyPrev" aria-label="上一个单词">‹</button><div><b id="homeStudyCounter">0 / 0</b><span id="homeStudyHint">点熟悉度后自动进入下一张</span></div><button class="study-arrow" id="homeStudyNext" aria-label="下一个单词">›</button></div>
     </div>
     <div id="result"></div>
   </section>
 
   <section id="planPage" class="hidden">
     <div class="card"><div class="head wrap"><div><div class="section-head">180 天单词计划</div><div id="planMeta" class="small">正在载入基础词表与 CET-4 词表…</div></div><div class="daybox"><button class="secondary" id="prevDay">‹</button><input id="dayInput" type="number" min="1" max="180" value="1"><button class="secondary" id="nextDay">›</button></div></div><div class="progress"><span id="bar"></span></div><div id="progressText" class="small"></div><div class="tabs"><button id="todayBtn" class="active">今天</button><button data-jump="1">第1天</button><button data-jump="31">第31天</button><button data-jump="91">第91天</button><button data-jump="180">第180天</button></div></div>
-    <div id="planListPanel" class="card"><div class="head wrap"><div><span id="stage" class="badge"></span><div id="daySummary" class="small space-top"></div></div><div class="button-group"><button class="secondary" id="learnNext">用翻卡学这一天</button><button class="primary compact" id="quizDay">今日小测</button></div></div><div class="legend"><span><i class="status-dot unseen"></i>未学习</span><span><i class="status-dot learning"></i>学习中</span><span><i class="status-dot familiar"></i>基本认识</span><span><i class="status-dot mastered"></i>已掌握</span></div><div id="dayWords"></div></div>
+    <div id="planListPanel" class="card"><div class="head wrap"><div><span id="stage" class="badge"></span><div id="daySummary" class="small space-top"></div></div><div class="button-group"><button class="secondary" id="learnNext">用动态卡片学这一天</button><button class="primary compact" id="quizDay">今日小测</button></div></div><div class="legend"><span><i class="status-dot unseen"></i>未学习</span><span><i class="status-dot learning"></i>学习中</span><span><i class="status-dot familiar"></i>基本认识</span><span><i class="status-dot mastered"></i>已掌握</span></div><div id="dayWords"></div></div>
     <div class="hidden" aria-hidden="true"><button id="listModeBtn"></button><button id="cardModeBtn"></button><div id="planStudyPanel" class="hidden"><button id="backToList"></button><button id="studyQuiz"></button><div id="studyCardWrap"></div><span id="studyCounter"></span><span id="studyHint"></span><button id="studyPrev"></button><button id="studyNext"></button></div></div>
   </section>
 
@@ -46,6 +46,6 @@
 <div id="bootFail" class="hidden" style="position:fixed;left:16px;right:16px;bottom:86px;z-index:99;padding:13px 14px;border:1px solid #e4bcbc;background:#fff7f7;border-radius:14px;font-size:12px;line-height:1.6;color:#7a2f2f">页面资源没有完整载入。先刷新一次；即使外部词表暂时失败，主界面也不该白屏。</div>
 <div class="nav"><div class="navin"><button class="active" data-page="searchPage">查词</button><button data-page="planPage">计划</button><button data-page="reviewPage">复习</button><button data-page="testPage">测试</button><button data-page="bookPage">词本</button><button data-page="myPage">我的</button></div></div>
 <div class="toast" id="toast"></div>
-<script src="unified.js?v=30"></script><script src="study.js?v=30"></script><script src="categories-v25.js?v=30"></script><script src="quiz-v27.js?v=30"></script><script src="review-v28.js?v=30"></script><script src="profile-v29.js?v=30"></script><script src="adaptive-v30.js?v=30"></script><script>setTimeout(function(){if(!window.__ZBZ_READY__){var x=document.getElementById('bootFail');if(x)x.classList.remove('hidden')}},12000)</script>
+<script src="unified.js?v=31"></script><script src="study.js?v=31"></script><script src="categories-v25.js?v=31"></script><script src="quiz-v27.js?v=31"></script><script src="review-v28.js?v=31"></script><script src="profile-v29.js?v=31"></script><script src="adaptive-v30.js?v=31"></script><script>setTimeout(function(){if(!window.__ZBZ_READY__){var x=document.getElementById('bootFail');if(x)x.classList.remove('hidden')}},12000)</script>
 </body>
 </html>
