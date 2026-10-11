@@ -36,7 +36,7 @@ function dailyState(w){
 }
 function stateChip(w){const s=dailyState(w);return `<span class="today-state ${s.key}" title="${esc(s.detail)}">${esc(s.label)}</span>`}
 
-// 明确规则：只有“熟悉度判断”计为今天学习。打开、朗读、收藏和单独做题都不冒充学习完成。
+// 只有一次明确熟悉度判断才计为“今天已学”。打开、朗读、收藏、单独做题都不冒充学习完成。
 try{const f=subjective;subjective=function(w,g){noteRating(w,g);const r=f(w,g);refreshEvidenceUI();return r}}catch(e){}
 try{const f=quizResult;quizResult=function(w,ok){noteQuiz(w,ok);const r=f(w,ok);refreshEvidenceUI();return r}}catch(e){}
 try{const f=studyRate;studyRate=function(g){const x=typeof studyCurrent==='function'?studyCurrent():null;if(x?.w)noteRating(x.w,g);const r=f(g);setTimeout(refreshEvidenceUI,150);return r}}catch(e){}
@@ -80,14 +80,14 @@ function annotatePlanEvidence(){
 }
 function annotateCurrentCard(){
   const x=typeof studyCurrent==='function'?studyCurrent():null;if(x?.w){const zone=document.querySelector('#homeStudyCardWrap .study-word-zone');if(zone){zone.querySelector('.today-state')?.remove();zone.insertAdjacentHTML('beforeend',stateChip(x.w))}}
-  const w=String(currentWord||$('q')?.value||'').toLowerCase(),top=document.querySelector('#result .wordtop');if(w&&top){top.parentElement?.querySelector(':scope > .today-state.search-state')?.remove();top.insertAdjacentHTML('afterend',`<span class="today-state search-state ${dailyState(w).key}" title="${esc(dailyState(w).detail)}">${esc(dailyState(w).label)}</span>`)}
+  const w=String(currentWord||$('q')?.value||'').toLowerCase(),top=document.querySelector('#result .wordtop');if(w&&top){top.parentElement?.querySelector(':scope > .today-state.search-state')?.remove();const s=dailyState(w);top.insertAdjacentHTML('afterend',`<span class="today-state search-state ${s.key}" title="${esc(s.detail)}">${esc(s.label)}</span>`)}
 }
 function updateStudyMetaEvidence(){
   if(!$('homeStudyMeta')||!L?.p?.length)return;const a=plan(homeStudyDay)||[],learned=homeStudyDay===today()?a.filter(x=>learnedToday(x.w)).length:a.filter(x=>!!planEvidence(homeStudyDay,x.w)?.ratedAt).length,verified=homeStudyDay===today()?a.filter(x=>verifiedToday(x.w)).length:0;
   $('homeStudyMeta').textContent=`第 ${homeStudyDay} 天 · 20 词分两组 · 明确已学 ${learned}/${a.length}${homeStudyDay===today()?` · 今日已验证 ${verified}`:''}`
 }
 function patchLearningReport(){
-  const box=$('learningReportV32');if(!box)return;const first=box.querySelector('.report-grid > div:first-child b'),label=box.querySelector('.report-grid > div:first-child span');if(first)first.textContent=currentDayLearnedCount(today());if(label)label.textContent='20 个中今日明确已学'
+  const box=$('learningReportV32');if(!box)return;const first=box.querySelector('.report-grid > div:first-child b'),label=box.querySelector('.report-grid > div:first-child span'),badge=box.querySelector('.report-head .badge');if(first)first.textContent=currentDayLearnedCount(today());if(label)label.textContent='20 个中今日明确已学';if(badge)badge.textContent='v3.3'
 }
 function refreshEvidenceUI(){mountDefinition();annotatePlanEvidence();annotateCurrentCard();updateStudyMetaEvidence();patchLearningReport()}
 
