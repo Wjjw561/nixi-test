@@ -9,6 +9,7 @@
 <title>只背这个 · CET-4 学习系统</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="unified.css">
+<link rel="stylesheet" href="study.css">
 </head>
 <body>
 <div class="app">
@@ -61,14 +62,19 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="plan-mode-tabs" role="tablist" aria-label="学习方式">
+      <button id="listModeBtn" class="active" type="button">☰ 每日列表</button>
+      <button id="cardModeBtn" type="button">⇆ 左右翻卡</button>
+    </div>
+
+    <div id="planListPanel" class="card">
       <div class="head wrap">
         <div>
           <span id="stage" class="badge"></span>
           <div id="daySummary" class="small space-top"></div>
         </div>
         <div class="button-group">
-          <button class="secondary" id="learnNext">继续学习</button>
+          <button class="secondary" id="learnNext">开始翻卡学习</button>
           <button class="primary compact" id="quizDay">今日小测</button>
         </div>
       </div>
@@ -79,6 +85,20 @@
         <span><i class="status-dot mastered"></i>已掌握</span>
       </div>
       <div id="dayWords"></div>
+    </div>
+
+    <div id="planStudyPanel" class="hidden">
+      <div class="study-toolbar">
+        <button class="secondary" id="backToList">☰ 返回列表</button>
+        <div class="small">右滑上一个 · 左滑下一个</div>
+        <button class="secondary" id="studyQuiz">本日小测</button>
+      </div>
+      <div id="studyCardWrap" class="study-card-wrap" aria-live="polite"></div>
+      <div class="study-nav">
+        <button class="study-arrow" id="studyPrev" aria-label="上一个单词">‹</button>
+        <div><b id="studyCounter">0 / 0</b><span id="studyHint">点卡片显示释义</span></div>
+        <button class="study-arrow" id="studyNext" aria-label="下一个单词">›</button>
+      </div>
     </div>
   </section>
 
@@ -165,5 +185,6 @@
 
 <div class="toast" id="toast"></div>
 <script src="unified.js"></script>
+<script src="study.js"></script>
 </body>
 </html>
