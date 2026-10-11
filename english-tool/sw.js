@@ -1,5 +1,5 @@
-const C='zbz-v3-20261012-v40-canonical-core';
-const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./preload.js','./lexicon-core.js','./quiz-core.js','./learning-core.js','./practice-core.js','./manifest.webmanifest','./data/primary.txt','./data/middle.txt','./data/cet4.txt','./data/frequency.txt','./data/source.json'];
+const C='zbz-v3-20261012-v41-spelling';
+const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./preload.js','./lexicon-core.js','./quiz-core.js','./learning-core.js','./practice-core.js','./spelling-core.js','./manifest.webmanifest','./data/primary.txt','./data/middle.txt','./data/cet4.txt','./data/frequency.txt','./data/source.json'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>Promise.allSettled(A.map(x=>c.add(x)))))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
