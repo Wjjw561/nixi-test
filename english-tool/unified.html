@@ -16,9 +16,9 @@
   <header class="top">
     <div>
       <div class="brand">只背这个</div>
-      <div class="sub">查词 · 180 天计划 · 自动复习 · 掌握度验证</div>
+      <div class="sub">查词 · 翻卡学习 · 180 天计划 · 自动复习</div>
     </div>
-    <div class="tag">v2</div>
+    <div class="tag">v2.1</div>
   </header>
 
   <section id="searchPage">
@@ -35,6 +35,27 @@
       <div class="stat"><b id="mastered">0</b><span>已掌握</span></div>
     </div>
     <button class="due-banner" id="dueBanner"><span>今日到期复习</span><b id="due">0</b></button>
+
+    <div id="homeStudySection" class="home-study card">
+      <div class="head wrap">
+        <div>
+          <div class="section-head">今日翻卡学习</div>
+          <div id="homeStudyMeta" class="small">正在载入今天的单词…</div>
+        </div>
+        <div class="button-group">
+          <button class="secondary" id="homeStudyPlan">查看计划</button>
+          <button class="secondary" id="homeStudyToday">回到今天</button>
+          <button class="primary compact" id="homeStudyQuiz">本日小测</button>
+        </div>
+      </div>
+      <div id="homeStudyCardWrap" class="study-card-wrap" aria-live="polite"></div>
+      <div class="study-nav">
+        <button class="study-arrow" id="homeStudyPrev" aria-label="上一个单词">‹</button>
+        <div><b id="homeStudyCounter">0 / 0</b><span id="homeStudyHint">点卡片显示释义</span></div>
+        <button class="study-arrow" id="homeStudyNext" aria-label="下一个单词">›</button>
+      </div>
+    </div>
+
     <div id="result"></div>
   </section>
 
@@ -62,11 +83,6 @@
       </div>
     </div>
 
-    <div class="plan-mode-tabs" role="tablist" aria-label="学习方式">
-      <button id="listModeBtn" class="active" type="button">☰ 每日列表</button>
-      <button id="cardModeBtn" type="button">⇆ 左右翻卡</button>
-    </div>
-
     <div id="planListPanel" class="card">
       <div class="head wrap">
         <div>
@@ -74,7 +90,7 @@
           <div id="daySummary" class="small space-top"></div>
         </div>
         <div class="button-group">
-          <button class="secondary" id="learnNext">开始翻卡学习</button>
+          <button class="secondary" id="learnNext">用翻卡学这一天</button>
           <button class="primary compact" id="quizDay">今日小测</button>
         </div>
       </div>
@@ -87,19 +103,12 @@
       <div id="dayWords"></div>
     </div>
 
-    <div id="planStudyPanel" class="hidden">
-      <div class="study-toolbar">
-        <button class="secondary" id="backToList">☰ 返回列表</button>
-        <div class="small">右滑上一个 · 左滑下一个</div>
-        <button class="secondary" id="studyQuiz">本日小测</button>
-      </div>
-      <div id="studyCardWrap" class="study-card-wrap" aria-live="polite"></div>
-      <div class="study-nav">
-        <button class="study-arrow" id="studyPrev" aria-label="上一个单词">‹</button>
-        <div><b id="studyCounter">0 / 0</b><span id="studyHint">点卡片显示释义</span></div>
-        <button class="study-arrow" id="studyNext" aria-label="下一个单词">›</button>
-      </div>
+    <!-- 兼容旧脚本的隐藏节点：计划页视觉上只保留每日列表 -->
+    <div class="hidden" aria-hidden="true">
+      <button id="listModeBtn"></button><button id="cardModeBtn"></button>
+      <div id="planStudyPanel" class="hidden"><button id="backToList"></button><button id="studyQuiz"></button><div id="studyCardWrap"></div><span id="studyCounter"></span><span id="studyHint"></span><button id="studyPrev"></button><button id="studyNext"></button></div>
     </div>
+
   </section>
 
   <section id="reviewPage" class="hidden">
