@@ -1,8 +1,169 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f7fb"><title>只背这个 · 统一版</title><link rel="stylesheet" href="unified.css"></head><body>
-<div class="app"><div class="top"><div><div class="brand">只背这个</div><div class="sub">查词 + 180天计划 + 复习，终于住进同一个屋檐下</div></div><div class="tag">统一版</div></div>
-<section id="searchPage"><div class="search"><input id="q" placeholder="输入单词，例如 pitch"><button class="primary" id="go">查</button></div><div class="quick" id="quick"></div><div class="stats"><div class="stat"><b id="learned">0</b><span>已学</span></div><div class="stat"><b id="due">0</b><span>今日复习</span></div><div class="stat"><b id="bookn">0</b><span>生词本</span></div><div class="stat"><b id="days">0</b><span>学习天数</span></div></div><div id="result"></div></section>
-<section id="planPage" class="hidden"><div class="card"><div class="head"><div><div class="word" style="font-size:28px">180 天计划</div><div id="planMeta" class="small">正在载入词表…</div></div><div class="daybox"><button class="secondary" id="prevDay">‹</button><input id="dayInput" type="number" min="1" max="180" value="1"><button class="secondary" id="nextDay">›</button></div></div><div class="progress"><span id="bar"></span></div><div id="progressText" class="small"></div><div class="tabs"><button id="todayBtn" class="active">今天</button><button data-jump="1">第1天</button><button data-jump="31">第31天</button><button data-jump="91">第91天</button><button data-jump="180">第180天</button></div></div><div class="card"><div class="head"><div><span id="stage" class="badge"></span><div id="daySummary" class="small" style="margin-top:7px"></div></div><button class="secondary" id="allDone">全标已学</button></div><div id="dayWords"></div></div></section>
-<section id="reviewPage" class="hidden"><div class="card"><div class="word" style="font-size:28px">今日复习</div><div id="reviewList"></div></div></section>
-<section id="bookPage" class="hidden"><div class="card"><div class="word" style="font-size:28px">生词本</div><div id="bookList"></div></div></section>
-<section id="aboutPage" class="hidden"><div class="card"><div class="word" style="font-size:28px">现在怎么互通</div><div class="tip">计划里的单词可以直接点开查词卡；查词卡里选择“不会/有印象/认识/掌握”后，会同步标记计划进度并进入复习系统。生词本和复习页也打开同一个单词卡。默认学习美音，同时保留英音按钮。</div></div></section></div>
-<div class="nav"><div class="navin"><button class="active" data-page="searchPage">查词</button><button data-page="planPage">计划</button><button data-page="reviewPage">复习</button><button data-page="bookPage">词本</button><button data-page="aboutPage">说明</button></div></div><div class="toast" id="toast"></div><script src="unified.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f7fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="只背这个">
+<title>只背这个 · CET-4 学习系统</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="unified.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <div class="brand">只背这个</div>
+      <div class="sub">查词 · 180 天计划 · 自动复习 · 掌握度验证</div>
+    </div>
+    <div class="tag">v2</div>
+  </header>
+
+  <section id="searchPage">
+    <div class="search">
+      <input id="q" placeholder="输入单词，例如 pitch" autocomplete="off" autocapitalize="none">
+      <button class="primary" id="go">查</button>
+    </div>
+    <div class="quick" id="quick"></div>
+
+    <div class="stats status-stats">
+      <div class="stat"><b id="touched">0</b><span>已接触</span></div>
+      <div class="stat"><b id="learning">0</b><span>学习中</span></div>
+      <div class="stat"><b id="familiar">0</b><span>基本认识</span></div>
+      <div class="stat"><b id="mastered">0</b><span>已掌握</span></div>
+    </div>
+    <button class="due-banner" id="dueBanner"><span>今日到期复习</span><b id="due">0</b></button>
+    <div id="result"></div>
+  </section>
+
+  <section id="planPage" class="hidden">
+    <div class="card">
+      <div class="head wrap">
+        <div>
+          <div class="section-head">180 天单词计划</div>
+          <div id="planMeta" class="small">正在载入基础词表与 CET-4 词表…</div>
+        </div>
+        <div class="daybox">
+          <button class="secondary" id="prevDay">‹</button>
+          <input id="dayInput" type="number" min="1" max="180" value="1">
+          <button class="secondary" id="nextDay">›</button>
+        </div>
+      </div>
+      <div class="progress"><span id="bar"></span></div>
+      <div id="progressText" class="small"></div>
+      <div class="tabs">
+        <button id="todayBtn" class="active">今天</button>
+        <button data-jump="1">第1天</button>
+        <button data-jump="31">第31天</button>
+        <button data-jump="91">第91天</button>
+        <button data-jump="180">第180天</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head wrap">
+        <div>
+          <span id="stage" class="badge"></span>
+          <div id="daySummary" class="small space-top"></div>
+        </div>
+        <div class="button-group">
+          <button class="secondary" id="learnNext">继续学习</button>
+          <button class="primary compact" id="quizDay">今日小测</button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="status-dot unseen"></i>未学习</span>
+        <span><i class="status-dot learning"></i>学习中</span>
+        <span><i class="status-dot familiar"></i>基本认识</span>
+        <span><i class="status-dot mastered"></i>已掌握</span>
+      </div>
+      <div id="dayWords"></div>
+    </div>
+  </section>
+
+  <section id="reviewPage" class="hidden">
+    <div class="card">
+      <div class="head wrap">
+        <div>
+          <div class="section-head">今日复习</div>
+          <div class="small">优先处理到期且薄弱的词。答题结果才决定掌握度。</div>
+        </div>
+        <button class="primary compact" id="startReview">开始复习</button>
+      </div>
+      <div id="reviewList"></div>
+    </div>
+  </section>
+
+  <section id="testPage" class="hidden">
+    <div class="card" id="testCard">
+      <div class="section-head">快速测验</div>
+      <div class="small">默认从已接触单词中抽题。答对才积累“掌握证据”，自我感觉不算作弊通行证。</div>
+      <div class="button-group space-top">
+        <button class="primary" id="startMixedTest">开始 10 题</button>
+        <button class="secondary" id="startWeakTest">专测薄弱词</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="bookPage" class="hidden">
+    <div class="card">
+      <div class="head wrap">
+        <div>
+          <div class="section-head">生词本</div>
+          <div class="small">收藏不等于会了，它只是承认“这个词以后还得见”。</div>
+        </div>
+      </div>
+      <div id="bookList"></div>
+    </div>
+  </section>
+
+  <section id="myPage" class="hidden">
+    <div class="card">
+      <div class="section-head">我的学习</div>
+      <div class="stats">
+        <div class="stat"><b id="myTouched">0</b><span>已接触</span></div>
+        <div class="stat"><b id="myQuiz">0</b><span>累计测试</span></div>
+        <div class="stat"><b id="myAccuracy">0%</b><span>测试正确率</span></div>
+        <div class="stat"><b id="myDays">0</b><span>学习天数</span></div>
+      </div>
+      <div class="title">掌握判定</div>
+      <div class="explain-grid">
+        <div><span class="state-pill learning">学习中</span><p>看过或测试过，但证据还少，或者刚刚答错。</p></div>
+        <div><span class="state-pill familiar">基本认识</span><p>至少跨 2 天答对、连续答对并保持较高正确率。</p></div>
+        <div><span class="state-pill mastered">已掌握</span><p>至少 4 次答对、3 个不同日期答对、连续答对 ≥3，且首次到最近正确间隔至少 6 天。</p></div>
+      </div>
+      <div class="tip">“不会 / 有印象 / 认识 / 很熟”只是你的主观反馈，只影响复习安排，不会直接把词判成已掌握。</div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">数据</div>
+      <div class="button-group space-top">
+        <button class="secondary" id="exportBtn">导出学习数据</button>
+        <label class="secondary file-label">导入学习数据<input id="importFile" type="file" accept=".json"></label>
+      </div>
+      <div class="small space-top">学习记录保存在当前浏览器。换手机前先导出，浏览器不会因为你很努力就突然获得跨设备心灵感应。</div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">发音</div>
+      <div class="small">默认按钮分别请求 en-US 美音和 en-GB 英音，并尽量选择设备里对应的系统语音。实际音色由 iPhone / 浏览器提供。</div>
+    </div>
+  </section>
+</div>
+
+<div class="nav">
+  <div class="navin">
+    <button class="active" data-page="searchPage">查词</button>
+    <button data-page="planPage">计划</button>
+    <button data-page="reviewPage">复习</button>
+    <button data-page="testPage">测试</button>
+    <button data-page="bookPage">词本</button>
+    <button data-page="myPage">我的</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="unified.js"></script>
+</body>
+</html>
