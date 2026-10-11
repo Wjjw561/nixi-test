@@ -8,13 +8,13 @@
 <meta name="apple-mobile-web-app-title" content="只背这个">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>只背这个 · CET-4 学习系统</title>
-<link rel="manifest" href="manifest.webmanifest?v=38">
-<link rel="stylesheet" href="unified.css?v=38">
-<link rel="stylesheet" href="study.css?v=38">
+<link rel="manifest" href="manifest.webmanifest?v=39">
+<link rel="stylesheet" href="unified.css?v=39">
+<link rel="stylesheet" href="study.css?v=39">
 </head>
 <body>
 <div class="app">
-  <header class="top"><div><div class="brand">只背这个</div><div class="sub">20 词动态学习 · 统一学习核心 · 稳定重构</div></div><div class="tag">v3.5</div></header>
+  <header class="top"><div><div class="brand">只背这个</div><div class="sub">20 词动态学习 · 单一结构诊断 · 稳定重构</div></div><div class="tag">v3.5</div></header>
 
   <section id="searchPage">
     <div class="search"><input id="q" placeholder="输入单词，例如 pitch" autocomplete="off" autocapitalize="none"><button class="primary" id="go">查</button></div>
@@ -34,7 +34,7 @@
     <div id="planListPanel" class="card"><div class="head wrap"><div><span id="stage" class="badge"></span><div id="daySummary" class="small space-top"></div></div><div class="button-group"><button class="secondary" id="learnNext">用动态卡片学这一天</button><button class="primary compact" id="quizDay">今日小测</button></div></div><div class="legend"><span><i class="status-dot unseen"></i>未学习</span><span><i class="status-dot learning"></i>学习中</span><span><i class="status-dot familiar"></i>基本认识</span><span><i class="status-dot mastered"></i>已掌握</span></div><div id="dayWords"></div></div>
   </section>
 
-  <section id="reviewPage" class="hidden"><div class="card"><div class="head wrap"><div><div class="section-head">今日复习</div><div class="small">单词到期 + 句子错因 + 掌握验证都会进入这里。系统优先修真正影响掌握的证据缺口。</div></div><button class="primary compact" id="startReview">开始复习</button></div><div id="reviewList"></div></div></section>
+  <section id="reviewPage" class="hidden"><div class="card"><div class="head wrap"><div><div class="section-head">今日复习</div><div class="small">到期单词 + 结构错因 + 掌握验证统一进入这里，不再两套诊断各算各的。</div></div><button class="primary compact" id="startReview">开始复习</button></div><div id="reviewList"></div></div></section>
   <section id="testPage" class="hidden"><div class="card" id="testCard"><div class="section-head">快速测验</div><div class="small">默认从已接触单词中抽题。答对才积累“掌握证据”。</div><div class="button-group space-top"><button class="primary" id="startMixedTest">开始 10 题</button><button class="secondary" id="startWeakTest">专测薄弱词</button></div></div></section>
   <section id="bookPage" class="hidden"><div class="card"><div class="head wrap"><div><div class="section-head">词本</div><div class="small">上面是你收藏的生词，下面可以按词类、阶段和掌握状态浏览整个词库。</div></div></div><div id="bookList"></div></div></section>
   <section id="myPage" class="hidden">
@@ -45,6 +45,6 @@
 <div id="bootFail" class="hidden" style="position:fixed;left:16px;right:16px;bottom:86px;z-index:99;padding:13px 14px;border:1px solid #e4bcbc;background:#fff7f7;border-radius:14px;font-size:12px;line-height:1.6;color:#7a2f2f">页面资源没有完整载入。请到“我的 → 系统状态”查看诊断，或执行安全重载。</div>
 <div class="nav"><div class="navin"><button class="active" data-page="searchPage">查词</button><button data-page="planPage">计划</button><button data-page="reviewPage">复习</button><button data-page="testPage">测试</button><button data-page="bookPage">词本</button><button data-page="myPage">我的</button></div></div>
 <div class="toast" id="toast"></div>
-<script src="preload-v33.js?v=38"></script><script src="unified.js?v=38"></script><script src="study.js?v=38"></script><script src="categories-v25.js?v=38"></script><script src="quiz-v27.js?v=38"></script><script src="review-v28.js?v=38"></script><script src="profile-v29.js?v=38"></script><script src="study-v31-fix.js?v=38"></script><script src="learning-core-v38.js?v=38"></script><script>setTimeout(function(){if(!window.__ZBZ_READY__){var x=document.getElementById('bootFail');if(x)x.classList.remove('hidden')}},12000)</script>
+<script src="preload-v33.js?v=39"></script><script src="unified.js?v=39"></script><script src="study.js?v=39"></script><script src="categories-v25.js?v=39"></script><script src="quiz-v27.js?v=39"></script><script src="study-v31-fix.js?v=39"></script><script src="learning-core-v38.js?v=39"></script><script src="practice-core-v39.js?v=39"></script><script>setTimeout(function(){if(!window.__ZBZ_READY__){var x=document.getElementById('bootFail');if(x)x.classList.remove('hidden')}},12000)</script>
 </body>
 </html>
