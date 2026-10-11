@@ -1,5 +1,5 @@
-const C='zbz-v3-20261012-v37-stability';
-const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./study-v31-fix.js','./categories-v25.js','./quiz-v27.js','./review-v28.js','./profile-v29.js','./learning-v32.js','./activity-v35.js','./mastery-v36.js','./stability-v37.js','./preload-v33.js','./manifest.webmanifest','./data/primary.txt','./data/middle.txt','./data/cet4.txt','./data/frequency.txt','./data/source.json'];
+const C='zbz-v3-20261012-v38-unified-core';
+const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./study-v31-fix.js','./categories-v25.js','./quiz-v27.js','./review-v28.js','./profile-v29.js','./learning-core-v38.js','./preload-v33.js','./manifest.webmanifest','./data/primary.txt','./data/middle.txt','./data/cet4.txt','./data/frequency.txt','./data/source.json'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>Promise.allSettled(A.map(x=>c.add(x)))))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
