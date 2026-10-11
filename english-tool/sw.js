@@ -1,5 +1,5 @@
-const C='zbz-v3-20261011-v31-dynamic-study';
-const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./categories-v25.js','./quiz-v27.js','./review-v28.js','./profile-v29.js','./adaptive-v30.js','./manifest.webmanifest'];
+const C='zbz-v3-20261011-v32-dynamic-study';
+const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./study-v31-fix.js','./categories-v25.js','./quiz-v27.js','./review-v28.js','./profile-v29.js','./adaptive-v30.js','./manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin!==location.origin)return;e.respondWith(fetch(e.request).then(r=>{const z=r.clone();caches.open(C).then(c=>c.put(e.request,z));return r}).catch(()=>caches.match(e.request)))})
