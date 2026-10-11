@@ -1,4 +1,4 @@
-const C='zbz-v2-20261011-v24-categories';
+const C='zbz-v2-20261011-v25-wordbook-classes';
 const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./categories.js','./manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
