@@ -1,0 +1,9 @@
+{
+  "name": "只背这个 · CET-4 学习系统",
+  "short_name": "只背这个",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#f5f7fb",
+  "lang": "zh-CN"
+}
