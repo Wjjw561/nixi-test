@@ -1,4 +1,4 @@
-const C='zbz-v2-20261011-v30-adaptive-20';
+const C='zbz-v3-20261011-v31-dynamic-study';
 const A=['./','./index.html','./unified.html','./unified.css','./unified.js','./study.css','./study.js','./categories-v25.js','./quiz-v27.js','./review-v28.js','./profile-v29.js','./adaptive-v30.js','./manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
