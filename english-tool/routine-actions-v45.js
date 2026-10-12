@@ -9,7 +9,7 @@ function goLearn(){
   setTimeout(()=>{$id('homeStudySection')?.scrollIntoView({behavior:'smooth',block:'start'})},40)
 }
 function goReview(){
-  const card=$id('routineCard'),row=card?.querySelectorAll('.routine-task')?.[1];
+  const row=$id('routineCard')?.querySelectorAll('.routine-task')?.[1];
   if(row?.classList.contains('done')){toastMsg('当前没有到期复习');return}
   try{page('reviewPage')}catch(e){}
   setTimeout(()=>{$id('startReview')?.scrollIntoView({behavior:'smooth',block:'center'})},40)
@@ -33,9 +33,8 @@ function goNext(){
     const b=row.querySelector('button');
     if(b&&!b.disabled){b.click();return}
   }
-  const locked=rows.find(r=>!r.classList.contains('done'));
-  if(locked){toastMsg('下一项还没解锁，先完成前面的任务');return}
-  toastMsg('今天的主线任务已经完成');
+  if(rows.some(r=>!r.classList.contains('done')))toastMsg('下一项还没解锁，先完成前面的任务');
+  else toastMsg('今天的主线任务已经完成');
 }
 window.routineGoLearn=goLearn;
 window.routineGoReview=goReview;
@@ -51,22 +50,23 @@ function patchRoutine(){
   try{
     const rows=[...card.querySelectorAll('.routine-task')];
     const actions=['routineGoLearn()','routineGoReview()','routineGoSpell()','routineGoListen()'];
-    const unlockedLabels=['继续学习','去复习','去拼写','去听力'];
+    const labels=['继续学习','去复习','去拼写','去听力'];
     rows.forEach((row,i)=>{
       const b=row.querySelector('button');if(!b||i>3)return;
-      b.setAttribute('onclick',actions[i]);
-      b.disabled=false;row.dataset.locked='0';
-      if((i===2||i===3)&&/学完今天的新词后生成/.test(row.textContent||'')){
-        b.disabled=true;row.dataset.locked='1';b.textContent='未解锁';
-      }else b.textContent=unlockedLabels[i];
+      const locked=(i===2||i===3)&&/学完今天的新词后生成/.test(row.textContent||'');
+      if(b.getAttribute('onclick')!==actions[i])b.setAttribute('onclick',actions[i]);
+      if(row.dataset.locked!==(locked?'1':'0'))row.dataset.locked=locked?'1':'0';
+      if(b.disabled!==locked)b.disabled=locked;
+      const label=locked?'未解锁':labels[i];
+      if(b.textContent!==label)b.textContent=label;
     });
     const next=card.querySelector('.routine-next');
-    if(next)next.setAttribute('onclick','routineGoNext()');
+    if(next&&next.getAttribute('onclick')!=='routineGoNext()')next.setAttribute('onclick','routineGoNext()');
   }finally{patching=false}
 }
 const style=document.createElement('style');style.id='routineActions45Style';style.textContent=`#routineCard .routine-task button:disabled{opacity:.45;cursor:not-allowed;background:var(--card);color:var(--muted)}#routineCard .routine-task[data-locked="1"]{opacity:.78}`;document.head.appendChild(style);
 const boot=setInterval(()=>{patchRoutine();if($id('routineCard'))clearInterval(boot)},120);setTimeout(()=>clearInterval(boot),12000);
-const root=document.body;new MutationObserver(()=>patchRoutine()).observe(root,{childList:true,subtree:true});
+new MutationObserver(()=>patchRoutine()).observe(document.body,{childList:true,subtree:true});
 patchRoutine();
 window.ZBZRoutineActions={ready:true,version:'45'};
 })();
